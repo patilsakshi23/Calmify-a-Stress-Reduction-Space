@@ -8,13 +8,17 @@ function OptionsPage() {
     navigate('/video-options');
   };
 
+  const handleAudioClick = () => {
+    navigate('/audio-options');
+  };
+
   return (
     <div style={{ textAlign: 'center', marginTop: '50px' }}>
       <h2>Options Page</h2>
       <button onClick={handleVideoClick} style={buttonStyle}>
         Video
       </button>
-      <button style={buttonStyle}>
+      <button onClick={handleAudioClick} style={buttonStyle}>
         Audio
       </button>
       <button style={buttonStyle}>
