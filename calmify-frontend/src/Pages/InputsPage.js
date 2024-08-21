@@ -1,3 +1,4 @@
+import { Button } from '@chakra-ui/react';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -19,17 +20,17 @@ function InputsPage() {
 
   return (
     <div style={{ textAlign: 'center', marginTop: '50px' }}>
-      <h2>Options Page</h2>
-      <button onClick={handleVideoClick} style={buttonStyle}>
+     
+      <Button onClick={handleVideoClick} style={buttonStyle}>
         Video
-      </button>
-      <button onClick={handleAudioClick} style={buttonStyle}>
+      </Button>
+      <Button onClick={handleAudioClick} style={buttonStyle}>
         Audio
-      </button>
-      <button  onClick={handleTextClick} style={buttonStyle}>
+      </Button>
+      <Button  onClick={handleTextClick} style={buttonStyle}>
         Text
-      </button>
-      {/* Add other buttons if needed */}
+      </Button>
+     
     </div>
   );
 }

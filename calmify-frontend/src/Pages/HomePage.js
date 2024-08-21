@@ -1,5 +1,5 @@
 import React from "react";
-import Background from "../assests/bg.png";
+import Background from "../assets/bg.png";
 import { useNavigate } from "react-router-dom";
 import { Button, Text, Heading } from "@chakra-ui/react";
 
