@@ -1,3 +1,4 @@
+import { Button } from '@chakra-ui/react';
 import React, { useState, useEffect } from 'react';
 
 const AudioPage = () => {
@@ -58,12 +59,12 @@ const AudioPage = () => {
   return (
     <div>
       <h2>Speech-to-Text Recorder</h2>
-      <button onClick={handleStartRecording} disabled={isRecording}>
+      <Button onClick={handleStartRecording} disabled={isRecording}>
         Start Recording
-      </button>
-      <button onClick={handleStopRecording} disabled={!isRecording}>
+      </Button>
+      <Button onClick={handleStopRecording} disabled={!isRecording}>
         Stop Recording
-      </button>
+      </Button>
       <p>Transcribed Text: {transcript}</p>
     </div>
   );
