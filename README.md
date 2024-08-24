@@ -1,4 +1,4 @@
 # Calmify-a-Stress-Reduction-Space
 calmify : a Stress Reduction Space
 
-python based web applicati
+python based web application
