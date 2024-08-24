@@ -13,7 +13,7 @@ import {
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import TextImage from "../assets/text.jpg";
-import AudioImage from "../assets/audio.png";
+import AudioImage from "../assets/audio.jpg";
 import VideoImage from "../assets/video.jpg";
 
 function InputsPage() {
