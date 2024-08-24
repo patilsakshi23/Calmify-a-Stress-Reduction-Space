@@ -3,7 +3,7 @@ from django.views.decorators.csrf import csrf_exempt
 import speech_recognition as sr
 
 @csrf_exempt
-def speech_to_text(request):
+def convert_speech_to_text(request):
     if request.method == 'POST':
         audio_file = request.FILES.get('file')
         if not audio_file:
