@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+import { Link } from 'react-scroll';
 
 const Nav = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -25,15 +26,22 @@ const Nav = () => {
           <LogoImg src="../assets/slider1.png" alt="Calmify" />
         </Logo>
         <NavLinks>
-          <NavLi><a href="#">HOME</a></NavLi>
-          <NavLi><a href="#">MINDFUL ACTIVITIES</a></NavLi>
-          <NavLi><a href="#">YOGA PRACTICES</a></NavLi>
-          <NavLi><a href="#">EXERCISES</a></NavLi>
-          <NavLi><a href="#">CONTACT US</a></NavLi>
+          <NavLi>
+            <Link to="home" smooth={true} duration={500}>HOME</Link>
+          </NavLi>
+          <NavLi>
+            <Link to="mindful-activities" smooth={true} duration={500}>MINDFUL ACTIVITIES</Link>
+          </NavLi>
+          <NavLi>
+            <Link to="yoga-practices" smooth={true} duration={500}>YOGA PRACTICES</Link>
+          </NavLi>
+          <NavLi>
+            <Link to="exercises" smooth={true} duration={500}>EXERCISES</Link>
+          </NavLi>
+          <NavLi>
+            <Link to="contact" smooth={true} duration={500}>CONTACT US</Link>
+          </NavLi>
         </NavLinks>
-        <Cart>
-          <i className="fas fa-shopping-cart"></i>
-        </Cart>
       </NavBar>
     </StickyContainer>
   );
