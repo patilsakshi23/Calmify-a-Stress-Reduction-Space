@@ -7,6 +7,7 @@ import HomePage from "../Pages/HomePage";
 import TextPage from "../Pages/TextPage";
 import InputsPage from "../Pages/InputsPage";
 
+
 export default function AppRouter() {
   return (
     <>
