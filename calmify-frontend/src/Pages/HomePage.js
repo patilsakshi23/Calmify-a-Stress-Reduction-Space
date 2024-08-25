@@ -1,45 +1,173 @@
-import React from "react";
-import Background from "../assets/bg.png";
+import React, { useState, useEffect } from "react";
+import styled from 'styled-components';
 import { useNavigate } from "react-router-dom";
-import { Button, Text, Heading } from "@chakra-ui/react";
+import NavBar from "../Pages/Nav.js";
+import image1 from '../assets/slider1.png';
+import image2 from '../assets/slider2.png';
+import image3 from '../assets/slider3.png';
+import backgroundImage from '../assets/Homebg.png';
+
+
 
 function HomePage() {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [disappearing, setDisappearing] = useState(false);
+  const slides = [image1, image2, image3];
   const navigate = useNavigate();
 
   const handleStart = () => {
     navigate("/input");
   };
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setDisappearing(true);
+      setTimeout(() => {
+        setCurrentSlide((prev) => (prev + 1) % slides.length);
+        setDisappearing(false);
+      }, 1000); // Duration of the disappearing animation
+    }, 6000); // 5 seconds visible + 2 seconds for disappearing animation
+    return () => clearInterval(interval);
+  }, [slides.length]);
+
   return (
-    <div
-      style={{
-        textAlign: "center",
-        backgroundImage: `url(${Background})`,
-        backgroundSize: "cover",
-        backgroundRepeat: "no-repeat",
-        backgroundAttachment: "fixed",
-        height: "100vh",
-        width: "100vw",
-
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        flexDirection: "column",
-      }}
-    >
-      <Heading textShadow="2px 2px #000000" size="3xl" color="White">
-        Welcome To the Calmify!
-      </Heading>
-
-      <Text color={"white"} mt={20} mb={35} fontSize="2xl">
-        Space to find the solution to your emotion blah blah blah
-      </Text>
-
-      <Button onClick={handleStart} colorScheme="whiteAlpha" size="lg">
-        <Text color={"#195a74"}>Get Started</Text>
-      </Button>
-    </div>
+    <>
+      <NavBar />
+      <HomeContainer>
+        <HomeText>
+          <Heading>Welcome To Calmify!</Heading>
+          <Text>Your space to find solutions to emotions.</Text>
+          <StartButton onClick={handleStart}>
+            <span>GET STARTED</span>
+            <ArrowIcon
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 28 24"
+              stroke="currentColor"
+              strokeWidth="3"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h26M20 5l7 7-7 7" />
+            </ArrowIcon>
+          </StartButton>
+        </HomeText>
+        <Slider>
+          <SliderImage className={disappearing ? 'disappearing' : 'active'}>
+            <SliderImageImg src={slides[currentSlide]} alt={`Slide ${currentSlide + 1}`} />
+          </SliderImage>
+        </Slider>
+      </HomeContainer>
+    </>
   );
 }
 
 export default HomePage;
+
+
+
+
+// Styled components
+const HomeContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-image: url(${backgroundImage});
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  height: 750px;
+  width: 100vw;
+  padding: 0 220px;
+`;
+
+const HomeText = styled.div`
+  max-width: calc(100% - 220px);
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+`;
+
+const Heading = styled.div`
+  color: #fff;
+  font-size: 65px;
+  font-weight: bold;
+  font-family: Helvetica;
+  text-shadow: 
+    0 1px 0 #ccc, 
+    0 2px 0 #c9c9c9, 
+    0 3px 0 #bbb, 
+    0 4px 0 #b9b9b9, 
+    0 5px 0 #aaa, 
+    0 0 5px rgba(0,0,0,.1), 
+    0 10px 10px rgba(0,0,0,.2), 
+    0 20px 20px rgba(0,0,0,.15);
+`;
+
+const Text = styled.div`
+  color: black;
+  font-size: 20px;
+`;
+
+const StartButton = styled.button`
+  background-color: #a8cc9c;
+  color: white;
+  padding: 15px 25px;
+  font-size: 16px;
+  font-family: 'Roboto', sans-serif;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 6px;
+  margin-top: 20px;
+  gap: 10px;
+  width: 200px;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: rgb(131, 172, 131);
+  }
+`;
+
+const ArrowIcon = styled.svg`
+  width: 24px;
+  height: 24px;
+  transition: transform 0.3s ease;
+
+  ${StartButton}:hover & {
+    transform: translateX(5px);
+  }
+`;
+
+const Slider = styled.div`
+  position: absolute;
+  right: 50px;
+  width: 700px;
+  height: 620px;
+  overflow: hidden;
+`;
+
+const SliderImage = styled.div`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  transition: opacity 1s ease-in-out;
+
+  &.disappearing {
+    opacity: 0;
+  }
+
+  &.active {
+    opacity: 1;
+  }
+`;
+
+const SliderImageImg = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover; 
+`;
+
