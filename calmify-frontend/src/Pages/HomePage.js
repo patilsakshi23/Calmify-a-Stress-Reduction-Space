@@ -26,7 +26,7 @@ function HomePage() {
         setCurrentSlide((prev) => (prev + 1) % slides.length);
         setDisappearing(false);
       }, 1000); // Duration of the disappearing animation
-    }, 6000); // 5 seconds visible + 2 seconds for disappearing animation
+    }, 6000); // 5 seconds visible + 2 seconds for disappearing animation~
     return () => clearInterval(interval);
   }, [slides.length]);
 
@@ -56,6 +56,41 @@ function HomePage() {
           </SliderImage>
         </Slider>
       </HomeContainer>
+      <Main>
+        
+      <p>ksdjolajd : The term 'ksdjolajd' is not recognized as the name of a cmdlet, function, script file, or operable program. Check the spelling of the name, or if a path 
+        was included, verify that the path is correct <br></br>and try again.ksdjolajd : The term 'ksdjolajd' is not recognized as the name of a cmdlet, function, script file, or operable program. Check the spelling of the name, or if a path 
+        was included, verify<br></br> that the path is correct and try again.ksdjolajd : The term 'ksdjolajd' is not recognized as the name of a cmdlet, function, script file, or operable program. Check the spelling of the name, or if a path 
+        was included, verify that the path is correct and try again.</p>
+        <br>
+        </br>
+        <hr>
+        </hr>
+        <p>ksdjolajd : The term 'ksdjolajd' is not recognized as the name of a cmdlet, function, script file, or operable program. Check the spelling of the name, or if a path 
+        was included, verify<br></br> that the path is correct and try again.ksdjolajd : The term 'ksdjolajd' is not recognized as the name of a cmdlet, function, script file, or operable program. Check the spelling of the name, or if a path 
+        was included, verify that the path is correct and try again.ksdjolajd : The term 'ksdjolajd' is not recognized as the name of a cmdlet, function, script file, or operable program. Check the spelling of the name, or if a path 
+        was included, verify that the<br></br> path is correct and try again.</p>
+        <br>
+        </br>
+        <hr>
+        </hr>
+        <p>ksdjolajd : The term 'ksdjolajd' is not recognized as the name of a cmdlet, function, script file, or operable program. Check the spelling of the name, or if a path 
+        was included, veri<br></br>fy that the path is correct and try again.ksdjolajd : The term 'ksdj<br></br>olajd' is not recognized as the name of a cmdlet, function, script file, or operable program. Check the spelling of the name, or if a path 
+        was in<br></br>cluded, verify that the path is correct and try again.ksdjolajd : The term 'ksdjolajd' is not recognized as the name of a cmdlet, function, script file, or operable program. Check the spelling of the name, or if a path 
+        was included, verify that the path is correct and try again.</p>
+        <p>ksdjolajd : The term 'ksdjolajd' is not recognized as the name of a cmdlet, function, script file, or operable program. Check the spelling of the name, or if a path 
+        was included, verify<br></br> that the path is correct and try again.ksdjolajd : The term 'ksdjolajd' is not recognized as the name of a cmdlet, function, script file, or operable program. Check the spelling of the name, or if a path 
+        was included, verify that the path is correct and try again.ksdjolajd : The term 'ksdjolajd' is not recognized as the name of a cmdlet, function, script file, or operable program. Check the spelling of the name, or if a path 
+        was included, verify that the<br></br> path is correct and try again.</p>
+        <br>
+        </br>
+        <hr>
+        </hr>
+        <p>ksdjolajd : The term 'ksdjolajd' is not recognized as the name of a cmdlet, function, script file, or operable program. Check the spelling of the name, or if a path 
+        was included, veri<br></br>fy that the path is correct and try again.ksdjolajd : The term 'ksdj<br></br>olajd' is not recognized as the name of a cmdlet, function, script file, or operable program. Check the spelling of the name, or if a path 
+        was in<br></br>cluded, verify that the path is correct and try again.ksdjolajd : The term 'ksdjolajd' is not recognized as the name of a cmdlet, function, script file, or operable program. Check the spelling of the name, or if a path 
+        was included, verify that the path is correct and try again.</p>
+      </Main>
     </>
   );
 }
@@ -77,6 +112,7 @@ const HomeContainer = styled.div`
   height: 750px;
   width: 100vw;
   padding: 0 220px;
+  margin-top: 110px; /* Adjusted for the navbar height */
 `;
 
 const HomeText = styled.div`
@@ -171,3 +207,6 @@ const SliderImageImg = styled.img`
   object-fit: cover; 
 `;
 
+const Main = styled.div
+`font-size: 15px;
+`;

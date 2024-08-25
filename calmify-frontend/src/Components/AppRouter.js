@@ -11,6 +11,7 @@ import InputsPage from "../Pages/InputsPage";
 export default function AppRouter() {
   return (
     <>
+   
       <Router>
         <Routes>
           <Route exact path="/" element={<HomePage/>} />
