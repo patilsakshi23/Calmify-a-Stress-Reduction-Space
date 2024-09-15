@@ -96,6 +96,3 @@ const NavLi = styled.li`
   color: #000;
 `;
 
-const Cart = styled.div`
-  font-size: 20px;
-`;

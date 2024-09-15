@@ -1,5 +1,6 @@
-import { Button } from '@chakra-ui/react';
-import React, { useState, useRef, useEffect } from 'react';
+import { Button } from "@chakra-ui/react";
+import React, { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 function VideoPage() {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -10,6 +11,10 @@ function VideoPage() {
   const mediaRecorderRef = useRef(null);
   const streamRef = useRef(null);
 
+  const navigate = useNavigate();
+  const handleBackClick = () => {
+    navigate("/input");
+  };
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -31,7 +36,7 @@ function VideoPage() {
   const handleRecordClick = async () => {
     if (isRecording) {
       mediaRecorderRef.current.stop();
-      streamRef.current.getTracks().forEach(track => track.stop()); // Stop the video stream
+      streamRef.current.getTracks().forEach((track) => track.stop()); // Stop the video stream
       setIsRecording(false);
     } else {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
@@ -47,7 +52,7 @@ function VideoPage() {
       };
 
       mediaRecorder.onstop = () => {
-        const blob = new Blob(recordedChunks, { type: 'video/webm' });
+        const blob = new Blob(recordedChunks, { type: "video/webm" });
         const url = URL.createObjectURL(blob);
         setVideoUrl(url);
         setSelectedFile(blob);
@@ -56,9 +61,9 @@ function VideoPage() {
         // Set the recorded video URL and reset the video element
         if (videoRef.current) {
           videoRef.current.srcObject = null; // Clear the stream
-          videoRef.current.src = url;        // Set the recorded video URL
-          videoRef.current.controls = true;  // Ensure controls are visible
-          videoRef.current.play();           // Auto-play the recorded video
+          videoRef.current.src = url; // Set the recorded video URL
+          videoRef.current.controls = true; // Ensure controls are visible
+          videoRef.current.play(); // Auto-play the recorded video
         }
       };
 
@@ -72,25 +77,25 @@ function VideoPage() {
     // Cleanup when the component unmounts to stop the stream
     return () => {
       if (streamRef.current) {
-        streamRef.current.getTracks().forEach(track => track.stop());
+        streamRef.current.getTracks().forEach((track) => track.stop());
       }
     };
   }, []);
 
   return (
-    <div style={{ textAlign: 'center', marginTop: '50px' }}>
+    <div style={{ textAlign: "center", marginTop: "50px" }}>
       <h2>Video Options</h2>
       <Button onClick={handleRecordClick} style={buttonStyle}>
-        {isRecording ? 'Stop Recording' : 'Record Video'}
+        {isRecording ? "Stop Recording" : "Record Video"}
       </Button>
       <input
         type="file"
         accept="video/*"
         onChange={handleFileChange}
-        style={{ marginTop: '20px' }}
+        style={{ marginTop: "20px" }}
       />
       <div>
-        <h3>{isRecording ? 'Recording in Progress...' : 'Video Preview'}</h3>
+        <h3>{isRecording ? "Recording in Progress..." : "Video Preview"}</h3>
         <video width="320" height="240" ref={videoRef} autoPlay>
           Your browser does not support the video tag.
         </video>
@@ -98,15 +103,18 @@ function VideoPage() {
       <Button onClick={handleUploadClick} style={buttonStyle}>
         Upload Video
       </Button>
+      <Button onClick={handleBackClick} style={buttonStyle}>
+        Back
+      </Button>
     </div>
   );
 }
 
 const buttonStyle = {
-  padding: '10px 20px',
-  fontSize: '16px',
-  margin: '10px',
-  cursor: 'pointer',
+  padding: "10px 20px",
+  fontSize: "16px",
+  margin: "10px",
+  cursor: "pointer",
 };
 
 export default VideoPage;

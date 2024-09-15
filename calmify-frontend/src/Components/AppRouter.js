@@ -3,7 +3,7 @@ import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import AudioPage from "../Pages/AudioPage";
 import VideoPage from "../Pages/VideoPage";
-import HomePage from "../Pages/HomePage";
+import HomePage from "../Pages/HomePage/HomePage";
 import TextPage from "../Pages/TextPage";
 import InputsPage from "../Pages/InputsPage";
 
