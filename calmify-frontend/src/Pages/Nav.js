@@ -63,6 +63,7 @@ const Solgan = styled.div`
   height: 40px;
   background-color: #a8cc9c;
   text-align: center;
+  padding-top: 8px;
   color: white;
 `;
 
