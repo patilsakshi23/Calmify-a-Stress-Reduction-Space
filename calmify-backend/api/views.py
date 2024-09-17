@@ -39,3 +39,4 @@ def convert_audio_to_text(audio_path):
             return "Could not understand the audio."
         except sr.RequestError:
             return "Error with the Google API."
+        
