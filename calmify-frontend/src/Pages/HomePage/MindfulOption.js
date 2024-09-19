@@ -30,7 +30,7 @@ const MindfulOption = () => {
   // Fetch data from Firebase Realtime Database
   useEffect(() => {
     const db = getDatabase();
-    const cardsRef = ref(db, "mindFullness");
+    const cardsRef = ref(db, "yogaCards");
     const unsubscribe = onValue(cardsRef, (snapshot) => {
       const data = snapshot.val();
       console.log("Fetched data:", data); // Log data

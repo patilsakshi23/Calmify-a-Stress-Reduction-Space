@@ -38,7 +38,7 @@ function InputsPage({ user }) {
         <Button onClick={handleLogout}>Logout</Button>
       </nav>
       <div style={{ textAlign: "center", marginTop: "100px", marginLeft: "50px" }}>
-        <h2>Welcome, {user.displayName || user.email}</h2>
+        {/* <h2>Welcome, {user.displayName || user.email}</h2> */}
         <Stack direction="row" spacing={4} justify="center" align="center">
           <Card maxW="sm" onClick={handleVideoClick}>
             <CardBody>

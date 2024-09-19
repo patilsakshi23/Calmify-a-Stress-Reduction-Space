@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 const YOUTUBE_API_KEY = 'AIzaSyDJmuL33cv6GiuksMNlVb6hXPp6XHItgCA'; // Replace with your YouTube API key
@@ -11,7 +10,6 @@ const TextPage = () => {
   const [videos, setVideos] = useState([]);
   const [feedbackGiven, setFeedbackGiven] = useState(false);
 
-  const navigate = useNavigate();
 
   const handleSubmit = async () => {
     if (!inputText.trim()) {

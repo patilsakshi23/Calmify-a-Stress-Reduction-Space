@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-scroll';
+import CalmifyLogo from "../assets/logocalmify.png";
 
 const Nav = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -23,7 +24,7 @@ const Nav = () => {
       </Solgan>
       <NavBar>
         <Logo>
-          <LogoImg src="../assets/slider1.png" alt="Calmify" />
+          <LogoImg src={CalmifyLogo} alt="Calmify" />
         </Logo>
         <NavLinks>
           <NavLi>
