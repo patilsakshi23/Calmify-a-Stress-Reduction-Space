@@ -27,19 +27,19 @@ const Nav = () => {
         </Logo>
         <NavLinks>
           <NavLi>
-            <Link to="home" smooth={true} duration={500}>HOME</Link>
+            <StyledLink to="home" smooth={true} duration={500}>HOME</StyledLink>
           </NavLi>
           <NavLi>
-            <Link to="mindful-activities" smooth={true} duration={500}>MINDFUL ACTIVITIES</Link>
+            <StyledLink to="yoga-practices" smooth={true} duration={500}>YOGA</StyledLink>
           </NavLi>
           <NavLi>
-            <Link to="yoga-practices" smooth={true} duration={500}>YOGA PRACTICES</Link>
+            <StyledLink to="mindful-activities" smooth={true} duration={500}>MINDFULLNESS</StyledLink>
           </NavLi>
           <NavLi>
-            <Link to="exercises" smooth={true} duration={500}>EXERCISES</Link>
+            <StyledLink to="exercises" smooth={true} duration={500}>EXERCISES</StyledLink>
           </NavLi>
           <NavLi>
-            <Link to="contact" smooth={true} duration={500}>CONTACT US</Link>
+            <StyledLink to="contact" smooth={true} duration={500}>CONTACT US</StyledLink>
           </NavLi>
         </NavLinks>
       </NavBar>
@@ -97,3 +97,12 @@ const NavLi = styled.li`
   color: #000;
 `;
 
+const StyledLink = styled(Link)`
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer; /* This ensures the pointer appears on hover */
+  
+  &:hover {
+    color: #a8cc9c; /* Optional: Adds a hover effect */
+  }
+`;

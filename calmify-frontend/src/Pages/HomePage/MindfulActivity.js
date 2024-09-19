@@ -1,9 +1,11 @@
-import React from 'react';
-import styled from 'styled-components';
+import React from "react";
+import styled from "styled-components";
+import { Heading } from "@chakra-ui/react";
+import { useNavigate } from "react-router-dom";
 
 const YouTubeCard = ({ videoUrl, thumbnail }) => {
   const handleClick = () => {
-    window.open(videoUrl, '_blank');
+    window.open(videoUrl, "_blank");
   };
 
   return (
@@ -14,18 +16,47 @@ const YouTubeCard = ({ videoUrl, thumbnail }) => {
 };
 
 const MindfulActivity = () => {
+  
+  const navigate = useNavigate();
+
+  const handleStart = () => {
+    navigate("/mindfuloption");
+  };
+  
   return (
     <Section>
       <LeftSection>
-        <YouTubeCard 
-          videoUrl="https://youtu.be/JVwLjC5etEQ?si=0IXte-TOzJkfNLdL"
-          thumbnail="https://img.youtube.com/vi/JVwLjC5etEQ/0.jpg" 
-        />
+        <Content>
+          <Heading as="h2" size="2xl" mb={10}>
+            Importance of Mindfulness
+          </Heading>
+          Mindfulness exercises help you stay grounded and focused. They reduce
+          stress, improve mental clarity, and enhance emotional regulation.
+          Incorporating these exercises into your daily routine can lead to a
+          healthier, more balanced life.
+          <StartButton onClick={handleStart}>
+            <span>GET STARTED</span>
+            <ArrowIcon
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 28 24"
+              stroke="currentColor"
+              strokeWidth="3"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M5 12h26M20 5l7 7-7 7"
+              />
+            </ArrowIcon>
+          </StartButton>
+        </Content>
       </LeftSection>
       <RightSection>
-        <Content>
-          Mindfulness exercises help you stay grounded and focused. They reduce stress, improve mental clarity, and enhance emotional regulation. Incorporating these exercises into your daily routine can lead to a healthier, more balanced life.
-        </Content>
+        <YouTubeCard
+          videoUrl="https://youtu.be/JVwLjC5etEQ?si=0IXte-TOzJkfNLdL"
+          thumbnail="https://img.youtube.com/vi/JVwLjC5etEQ/0.jpg"
+        />
       </RightSection>
     </Section>
   );
@@ -82,4 +113,35 @@ const Thumbnail = styled.img`
   width: 100%;
   height: 100%;
   object-fit: cover;
+`;
+
+const StartButton = styled.button`
+  background-color: #a8cc9c;
+  color: white;
+  padding: 15px 25px;
+  font-size: 16px;
+  font-family: "Roboto", sans-serif;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 6px;
+  margin-top: 20px;
+  gap: 10px;
+  width: 200px;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: rgb(131, 172, 131);
+  }
+`;
+
+const ArrowIcon = styled.svg`
+  width: 24px;
+  height: 24px;
+  transition: transform 0.3s ease;
+
+  ${StartButton}:hover & {
+    transform: translateX(5px);
+  }
 `;
