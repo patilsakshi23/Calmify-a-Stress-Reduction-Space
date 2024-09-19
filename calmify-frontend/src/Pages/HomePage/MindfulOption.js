@@ -18,7 +18,7 @@ import React, { useEffect, useState } from "react";
 import { getDatabase, ref, onValue } from "firebase/database";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { database } from '../../firebase'; 
+// import { database } from '../../firebase'; 
 import yoga from "../../assets/Yoga/yoga.jpg"
 
 const MindfulOption = () => {
@@ -30,7 +30,7 @@ const MindfulOption = () => {
   // Fetch data from Firebase Realtime Database
   useEffect(() => {
     const db = getDatabase();
-    const cardsRef = ref(db, "yogaCards");
+    const cardsRef = ref(db, "mindFullness");
     const unsubscribe = onValue(cardsRef, (snapshot) => {
       const data = snapshot.val();
       console.log("Fetched data:", data); // Log data

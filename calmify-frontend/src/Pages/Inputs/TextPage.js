@@ -2,13 +2,16 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
+const YOUTUBE_API_KEY = 'AIzaSyDJmuL33cv6GiuksMNlVb6hXPp6XHItgCA'; // Replace with your YouTube API key
+const YOUTUBE_API_URL = 'https://www.googleapis.com/youtube/v3/search';
+
 const TextPage = () => {
   const [inputText, setInputText] = useState("");
   const [prediction, setPrediction] = useState("");
+  const [videos, setVideos] = useState([]);
   const [feedbackGiven, setFeedbackGiven] = useState(false);
 
   const navigate = useNavigate();
-
 
   const handleSubmit = async () => {
     if (!inputText.trim()) {
@@ -32,8 +35,25 @@ const TextPage = () => {
       const data = await response.json();
       setPrediction(data.stress);
       setFeedbackGiven(false);
+
+      if (data.stress === 1) {
+        fetchYouTubeVideos();
+      }
+
     } catch (error) {
       console.error("Error while submitting text:", error);
+    }
+  };
+
+  const fetchYouTubeVideos = async () => {
+    try {
+      const response = await fetch(
+        `${YOUTUBE_API_URL}?part=snippet&type=video&maxResults=3&q=stress+relief&key=${YOUTUBE_API_KEY}`
+      );
+      const data = await response.json();
+      setVideos(data.items);
+    } catch (error) {
+      console.error("Error fetching YouTube videos:", error);
     }
   };
 
@@ -82,7 +102,29 @@ const TextPage = () => {
         </div>
       )}
 
-      
+      {videos.length > 0 && (
+        <VideoSection>
+          <h3>Suggested Videos to Reduce Stress: </h3>
+          <VideoGrid>
+            {videos.map((video) => (
+              <VideoCard key={video.id.videoId}>
+                <Thumbnail
+                  src={video.snippet.thumbnails.medium.url}
+                  alt={video.snippet.title}
+                />
+                <VideoTitle>{video.snippet.title}</VideoTitle>
+                <VideoLink
+                  href={`https://www.youtube.com/watch?v=${video.id.videoId}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Watch Video
+                </VideoLink>
+              </VideoCard>
+            ))}
+          </VideoGrid>
+        </VideoSection>
+      )}
     </Container>
   );
 };
@@ -95,16 +137,15 @@ const Container = styled.div`
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background-color: #eaf4f9;
 `;
 
 const TextArea = styled.textarea`
   width: 1000px;
-  height: 500px;
+  height: 400px;
   padding: 10px;
   border-radius: 10px;
-  border: 2px solid #c8d6db;
-  font-size: 16px;
+  border: 2px solid #a8cc9c;
+  font-size: 22px;
   outline: none;
   margin-bottom: 20px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
@@ -112,18 +153,18 @@ const TextArea = styled.textarea`
 `;
 
 const SubmitButton = styled.button`
-  background-color: #8ab4d9;
+  background-color:  rgb(131, 172, 131);
   color: white;
   padding: 12px 20px;
   border-radius: 8px;
   border: none;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 20px;
   margin: 10px;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
   transition: background-color 0.3s;
   &:hover {
-    background-color: #7ca9c8;
+    background-color: #a8cc9c;
   }
 `;
 
@@ -143,3 +184,45 @@ const FeedbackButton = styled.button`
   }
 `;
 
+const VideoSection = styled.div`
+  margin-top: 20px;
+  width: 80%;
+`;
+
+const VideoGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+`;
+
+const VideoCard = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: white;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+`;
+
+const Thumbnail = styled.img`
+  width: 100%;
+  border-radius: 8px;
+  margin-bottom: 10px;
+`;
+
+const VideoTitle = styled.h4`
+  text-align: center;
+  margin: 10px 0;
+  font-size: 16px;
+  color: #333;
+`;
+
+const VideoLink = styled.a`
+  text-decoration: none;
+  color: #4b9cdf;
+  font-weight: bold;
+  &:hover {
+    text-decoration: underline;
+  }
+`;
