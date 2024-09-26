@@ -18,28 +18,36 @@ import React, { useEffect, useState } from "react";
 import { getDatabase, ref, onValue } from "firebase/database";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-// import { database } from '../../firebase'; 
-import yoga from "../../assets/Yoga/yoga.jpg"
+// import { database } from '../../firebase';
+import yoga from "../../assets/Yoga/yoga.jpg";
+import yoga1 from "../../assets/slider3.png";
+import yoga2 from "../../assets/slider2.png";
+import yoga3 from "../../assets/slider1.png";
 
 const YogaOption = () => {
   const navigate = useNavigate();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedCard, setSelectedCard] = useState(null);
   const [cards, setCards] = useState([]);
+  const images = [yoga, yoga1, yoga2, yoga3];
 
   // Fetch data from Firebase Realtime Database
   useEffect(() => {
     const db = getDatabase();
     const cardsRef = ref(db, "yogaCards");
-    const unsubscribe = onValue(cardsRef, (snapshot) => {
-      const data = snapshot.val();
-      console.log("Fetched data:", data); // Log data
-      if (data) {
-        setCards(Object.values(data));
+    const unsubscribe = onValue(
+      cardsRef,
+      (snapshot) => {
+        const data = snapshot.val();
+        console.log("Fetched data:", data); // Log data
+        if (data) {
+          setCards(Object.values(data));
+        }
+      },
+      (error) => {
+        console.error("Error fetching data:", error);
       }
-    }, (error) => {
-      console.error("Error fetching data:", error);
-    });
+    );
     return () => unsubscribe(); // Clean up subscription
   }, []);
 
@@ -75,13 +83,19 @@ const YogaOption = () => {
       </nav>
 
       <div style={{ textAlign: "center" }}>
-        <Stack direction="row" spacing={20} justify="center" align="center" m={20}>
+        <Stack
+          direction="row"
+          spacing={20}
+          justify="center"
+          align="center"
+          m={20}
+        >
           {/* <h1>dfhg</h1> */}
           {cards.map((card, index) => (
             <Card maxW="sm" key={index}>
               <CardBody onClick={() => handleCardClick(card)}>
                 {/* <Image src={card.image} alt={card.title} borderRadius="lg" /> */}
-                <Image src={yoga} alt={card.title} borderRadius="lg" />
+                <Image src={images[index]} alt={card.title} borderRadius="lg" />
                 <Stack mt="6" spacing="3">
                   <Heading size="md">{card.title}</Heading>
                   <Text>{card.shortInfo}</Text>

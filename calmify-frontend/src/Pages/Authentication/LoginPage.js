@@ -30,7 +30,7 @@ function LoginPage({ setUser }) {
   return (
     <Container maxW="md" centerContent>
       <Box w="100%" p={6} borderRadius="md" boxShadow="md" bg="white" mt={200}>
-        <Heading mb={6}><Center> Login</Center></Heading>
+        <Heading mb={6}><Center> Login  </Center></Heading>
         <Stack spacing={4}>
           <FormControl id="email">
             <FormLabel>Email</FormLabel>
