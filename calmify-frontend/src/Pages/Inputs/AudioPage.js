@@ -4,55 +4,68 @@ import microphoneImage from "../../assets/microphone.png"; // Import the image
 
 const AudioPage = () => {
   const [isRecording, setIsRecording] = useState(false);
+  const [audioBlob, setAudioBlob] = useState(null);
+  const [audioURL, setAudioURL] = useState("");
   const [transcript, setTranscript] = useState("");
   const [recognition, setRecognition] = useState(null);
   const [prediction, setPrediction] = useState("");
   const [feedbackGiven, setFeedbackGiven] = useState(false);
-
+  const [mediaRecorder, setMediaRecorder] = useState(null);
 
   useEffect(() => {
+    // Initialize the Speech Recognition API
     const SpeechRecognition =
       window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
       const recog = new SpeechRecognition();
-      recog.continuous = true;
+      recog.continuous = false;
       recog.interimResults = false;
       recog.lang = "en-US";
 
       recog.onresult = (event) => {
-        let interimTranscript = "";
+        let finalTranscript = "";
         for (let i = event.resultIndex; i < event.results.length; i++) {
-          const transcriptPiece = event.results[i][0].transcript;
-          interimTranscript += transcriptPiece;
+          finalTranscript += event.results[i][0].transcript;
         }
-        setTranscript(interimTranscript);
+        setTranscript(finalTranscript);
       };
 
       recog.onerror = (event) => {
         console.error("Speech recognition error:", event.error);
       };
 
-      recog.onend = () => {
-        if (isRecording) {
-          recog.start();
-        }
-      };
-
       setRecognition(recog);
     } else {
       console.error("SpeechRecognition API not supported.");
     }
-  }, [isRecording]);
+  }, []);
 
-  const toggleRecording = () => {
-    if (recognition && isRecording) {
-      recognition.stop();
+  const toggleRecording = async () => {
+    if (isRecording) {
+      recognition.stop(); // Stop speech recognition
+      mediaRecorder.stop(); // Stop recording
       setIsRecording(false);
-    } else if (recognition && !isRecording) {
+    } else {
       setTranscript("");
       setPrediction("");
-      recognition.start();
+      recognition.start(); // Start speech recognition
       setIsRecording(true);
+
+      // Start recording audio
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const recorder = new MediaRecorder(stream);
+        
+        recorder.ondataavailable = (event) => {
+          setAudioBlob(event.data);
+          setAudioURL(URL.createObjectURL(event.data)); // Create a URL for the audio blob
+        };
+        
+        recorder.start();
+        setMediaRecorder(recorder);
+      } catch (error) {
+        console.error("Error accessing microphone:", error);
+      }
     }
   };
 
@@ -83,32 +96,6 @@ const AudioPage = () => {
     }
   };
 
-  const handleFeedback = async (feedback) => {
-    try {
-      const response = await fetch("http://127.0.0.1:8000/api/feedback/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          text: transcript,
-          prediction,
-          feedback,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      console.log("Feedback response:", data);
-      setFeedbackGiven(true);
-    } catch (error) {
-      console.error("Error while sending feedback:", error);
-    }
-  };
-
   return (
     <AudioPageContainer>
       <AudioHeading>Start Recording</AudioHeading>
@@ -116,7 +103,7 @@ const AudioPage = () => {
         <MicrophoneButton
           isRecording={isRecording}
           onClick={toggleRecording}
-          image={microphoneImage} // Pass the image to the component
+          image={microphoneImage}
         >
           {isRecording ? <i className="fas fa-stop"></i> : <i className="fas fa-microphone"></i>}
         </MicrophoneButton>
@@ -124,20 +111,25 @@ const AudioPage = () => {
 
       {transcript && (
         <TranscriptContainer>
-          <p>Transcribed Text: {transcript}</p>
-          <StyledButton onClick={handleSubmitTranscript}>Predict</StyledButton>
+          {/* <p>Transcribed Text: {transcript}</p> */}
+          
         </TranscriptContainer>
+      )}
+
+      {audioBlob && (
+        
+        <AudioPreviewContainer>
+          <audio controls>
+            <source src={audioURL} type="audio/wav" />
+            Your browser does not support the audio element.
+          </audio>
+          <StyledButton onClick={handleSubmitTranscript}>Predict</StyledButton>
+        </AudioPreviewContainer>
       )}
 
       {prediction !== "" && (
         <PredictionContainer>
           <p>Prediction: {prediction === 1 ? "Stressed" : "Not Stressed"}</p>
-          {!feedbackGiven && (
-            <FeedbackContainer>
-              <FeedbackButton onClick={() => handleFeedback("like")}>👍</FeedbackButton>
-              <FeedbackButton onClick={() => handleFeedback("dislike")}>👎</FeedbackButton>
-            </FeedbackContainer>
-          )}
         </PredictionContainer>
       )}
     </AudioPageContainer>
@@ -147,6 +139,12 @@ const AudioPage = () => {
 export default AudioPage;
 
 // Styled Components
+
+const AudioPreviewContainer = styled.div`
+  margin-top: 20px;
+  text-align: center;
+`;
+
 const AudioPageContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -160,8 +158,8 @@ const AudioPageContainer = styled.div`
 const AudioHeading = styled.label`
   margin-bottom: 20px;
   font-size: 30px;
-  font-weight: bold; // Make text bold
-  text-align: center; // Center text
+  font-weight: bold; 
+  text-align: center; 
 `;
 
 const MicrophoneButtonContainer = styled.div`
@@ -177,44 +175,45 @@ const MicrophoneButton = styled.button`
   border: none;
   background-color: transparent;
   border: 2px solid #a8cc9c;
-  background-image: url(${(props) => props.image}); // Ensure this is correct
-  background-size: 60%; // Adjust size if needed
+  background-image: url(${(props) => props.image});
+  background-size: 60%; 
   background-position: center;
   background-repeat: no-repeat;
-  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   cursor: pointer;
 
-  /* Small red accent circle */
-  &::after {
-    content: "";
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    border: 10px solid ${(props) => (props.isRecording ? "#d32f2f" : "#ff5722")};
-    background-color: transparent; /* Make center transparent */
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: -1;
+  /* Glowing effect when recording */
+  ${(props) =>
+    props.isRecording &&
+    `
+    animation: glowing 1.5s infinite;
+    border-color: #ff1744;
+  `}
+
+  @keyframes glowing {
+    0% {
+      box-shadow: 0 0 5px #ff1744;
+    }
+    50% {
+      box-shadow: 0 0 20px #ff1744;
+    }
+    100% {
+      box-shadow: 0 0 5px #ff1744;
+    }
   }
 
-  /* FontAwesome icons */
   i {
     font-size: 40px;
     color: ${(props) => (props.isRecording ? "white" : "#ff5722")};
   }
 
-  /* Hover effect */
   &:hover {
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
   }
 `;
-
 
 const TranscriptContainer = styled.div`
   margin-top: 20px;
@@ -224,10 +223,6 @@ const TranscriptContainer = styled.div`
 const PredictionContainer = styled.div`
   margin-top: 20px;
   text-align: center;
-`;
-
-const FeedbackContainer = styled.div`
-  margin-top: 10px;
 `;
 
 const StyledButton = styled.button`
@@ -243,21 +238,5 @@ const StyledButton = styled.button`
 
   &:hover {
     background-color: rgb(131, 172, 131);
-  }
-`;
-
-const FeedbackButton = styled.button`
-  background-color: #d9e2e8;
-  color: #000;
-  padding: 8px 16px;
-  border-radius: 5px;
-  border: none;
-  cursor: pointer;
-  font-size: 18px;
-  margin: 5px;
-  transition: background-color 0.3s;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
-  &:hover {
-    background-color: #c8d6db;
   }
 `;
