@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import styled from "styled-components";
+import backgroundImage from './../../assets/textpagebg.avif'; // Import your image here
 
 const YOUTUBE_API_KEY = 'AIzaSyDJmuL33cv6GiuksMNlVb6hXPp6XHItgCA'; // Replace with your YouTube API key
 const YOUTUBE_API_URL = 'https://www.googleapis.com/youtube/v3/search';
@@ -77,6 +78,8 @@ const TextPage = () => {
 
   return (
     <Container>
+      <Tagline>Let's find your calm together!</Tagline>
+
       <TextArea
         placeholder="how was your day....."
         value={inputText}
@@ -135,6 +138,11 @@ const Container = styled.div`
   align-items: center;
   justify-content: center;
   min-height: 100vh;
+  background-image: url(${backgroundImage}); /* Update this with the correct path */
+  background-size: cover;
+  background-position: center;
+  color: white;
+  padding: 20px;
 `;
 
 const TextArea = styled.textarea`
@@ -223,4 +231,10 @@ const VideoLink = styled.a`
   &:hover {
     text-decoration: underline;
   }
+`;
+
+const Tagline = styled.h1`
+  margin-bottom: 20px;
+  font-size: 2rem;
+  color: #a8cc9c;
 `;

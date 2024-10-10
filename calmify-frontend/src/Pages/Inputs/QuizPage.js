@@ -1,4 +1,3 @@
-// src/Pages/QuizPage.js
 import React, { useState } from 'react';
 import {
   Box,
@@ -8,13 +7,15 @@ import {
   Step,
   StepIndicator,
   StepStatus,
-  StepTitle,
-  StepDescription,
-  StepSeparator,
   Stepper,
   StepIcon,
   StepNumber,
+  StepSeparator,
 } from '@chakra-ui/react';
+import styled from "styled-components";
+
+const YOUTUBE_API_KEY = 'AIzaSyDJmuL33cv6GiuksMNlVb6hXPp6XHItgCA';  // Replace with your YouTube API key
+const YOUTUBE_API_URL = 'https://www.googleapis.com/youtube/v3/search';
 
 const QuizPage = () => {
   const questions = [
@@ -35,6 +36,8 @@ const QuizPage = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [responses, setResponses] = useState([]);
   const [detectedEmotion, setDetectedEmotion] = useState('');
+  const [videos, setVideos] = useState([]);
+  const [quizCompleted, setQuizCompleted] = useState(false); // New state to track quiz completion
 
   const handleResponse = (response) => {
     setResponses((prevResponses) => {
@@ -43,9 +46,9 @@ const QuizPage = () => {
       return updatedResponses;
     });
 
-    // Move to the next question only if all previous questions are answered
-    if (responses.length === questions.length - 1) {
+    if (currentQuestionIndex === questions.length - 1) {
       analyzeEmotions();
+      setQuizCompleted(true); // Mark quiz as completed after last question
     } else {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     }
@@ -62,15 +65,15 @@ const QuizPage = () => {
 
     responses.forEach((response, index) => {
       if (response === 'yes') {
-        if (index === 0) emotionCounts.happy += 1; // Question 0
-        if (index === 2) emotionCounts.happy += 1; // Question 2
-        if (index === 4) emotionCounts.excited += 1; // Question 4
-        if (index === 6) emotionCounts.happy += 1; // Question 6
+        if (index === 0) emotionCounts.happy += 1;
+        if (index === 2) emotionCounts.happy += 1;
+        if (index === 4) emotionCounts.excited += 1;
+        if (index === 6) emotionCounts.happy += 1;
       } else {
-        if (index === 1) emotionCounts.stressed += 1; // Question 1
-        if (index === 3) emotionCounts.sad += 1; // Question 3
-        if (index === 5) emotionCounts.stressed += 1; // Question 5
-        if (index === 6) emotionCounts.sad += 1; // Question 6
+        if (index === 1) emotionCounts.stressed += 1;
+        if (index === 3) emotionCounts.sad += 1;
+        if (index === 5) emotionCounts.stressed += 1;
+        if (index === 6) emotionCounts.sad += 1;
       }
     });
 
@@ -78,7 +81,28 @@ const QuizPage = () => {
       emotionCounts[a] > emotionCounts[b] ? a : b
     );
 
-    setDetectedEmotion(detectedEmotion.charAt(0).toUpperCase() + detectedEmotion.slice(1));
+    const formattedEmotion = detectedEmotion.charAt(0).toUpperCase() + detectedEmotion.slice(1);
+    setDetectedEmotion(formattedEmotion);
+
+    // Skip fetching YouTube videos for "excited" or "happy"
+    if (detectedEmotion !== 'excited' && detectedEmotion !== 'happy') {
+      fetchYouTubeVideos(detectedEmotion);
+    } else {
+      setVideos([]);  // Clear any existing videos when "excited" or "happy" is detected
+    }
+  };
+
+  const fetchYouTubeVideos = async (emotion) => {
+    try {
+      const query = `${emotion}+relief`;
+      const response = await fetch(
+        `${YOUTUBE_API_URL}?part=snippet&type=video&maxResults=3&q=${query}&key=${YOUTUBE_API_KEY}`
+      );
+      const data = await response.json();
+      setVideos(data.items);
+    } catch (error) {
+      console.error("Error fetching YouTube videos:", error);
+    }
   };
 
   return (
@@ -96,7 +120,7 @@ const QuizPage = () => {
               </StepIndicator>
 
               <Box flexShrink='0'>
-                <StepTitle>{step.title}</StepTitle>
+                <Text>{step.title}</Text>
               </Box>
 
               <StepSeparator />
@@ -105,7 +129,11 @@ const QuizPage = () => {
         </Stepper>
 
         <Box textAlign="center" mt={5}>
-          {currentQuestionIndex < questions.length ? (
+          {quizCompleted ? (  // Check if quiz is completed
+            <>
+              <Text fontSize="lg" mt={4}>All questions answered. Analyzing your emotion...</Text>
+            </>
+          ) : (
             <>
               <Text fontSize="lg" mt={4}>
                 {steps[currentQuestionIndex].description}
@@ -113,9 +141,6 @@ const QuizPage = () => {
               <Button
                 onClick={() => handleResponse('yes')}
                 colorScheme="teal"
-                isDisabled={responses[currentQuestionIndex] === 'no'}
-                bg={responses[currentQuestionIndex] === 'yes' ? 'teal.600' : 'teal.400'}
-                color="white"
                 isFullWidth
                 m={2}
               >
@@ -124,17 +149,12 @@ const QuizPage = () => {
               <Button
                 onClick={() => handleResponse('no')}
                 colorScheme="teal"
-                isDisabled={responses[currentQuestionIndex] === 'yes'}
-                bg={responses[currentQuestionIndex] === 'no' ? 'teal.600' : 'teal.400'}
-                color="white"
                 isFullWidth
                 m={2}
               >
                 No
               </Button>
             </>
-          ) : (
-            <Text fontSize="lg" mt={4}>Answer all the questions asked to detect you emotion!</Text>
           )}
         </Box>
 
@@ -143,9 +163,76 @@ const QuizPage = () => {
             Detected Emotion: {detectedEmotion}
           </Text>
         )}
+
+        {videos.length > 0 && (
+          <VideoSection>
+            <Text fontSize="xl" mt={4}>Suggested Videos for {detectedEmotion}:</Text>
+            <VideoGrid>
+              {videos.map((video) => (
+                <VideoCard key={video.id.videoId}>
+                  <Thumbnail
+                    src={video.snippet.thumbnails.medium.url}
+                    alt={video.snippet.title}
+                  />
+                  <VideoTitle>{video.snippet.title}</VideoTitle>
+                  <VideoLink
+                    href={`https://www.youtube.com/watch?v=${video.id.videoId}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Watch Video
+                  </VideoLink>
+                </VideoCard>
+              ))}
+            </VideoGrid>
+          </VideoSection>
+        )}
       </VStack>
     </Box>
   );
 };
 
 export default QuizPage;
+
+const VideoSection = styled.div`
+  margin-top: 20px;
+  width: 80%;
+`;
+
+const VideoGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+`;
+
+const VideoCard = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: white;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+`;
+
+const Thumbnail = styled.img`
+  width: 100%;
+  border-radius: 8px;
+  margin-bottom: 10px;
+`;
+
+const VideoTitle = styled.h4`
+  text-align: center;
+  margin: 10px 0;
+  font-size: 16px;
+  color: #333;
+`;
+
+const VideoLink = styled.a`
+  text-decoration: none;
+  color: #4b9cdf;
+  font-weight: bold;
+  &:hover {
+    text-decoration: underline;
+  }
+`;
