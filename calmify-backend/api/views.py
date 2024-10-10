@@ -10,33 +10,29 @@ import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from .retrain_model import retrain_model  # Import the retraining logic
+import speech_recognition as sr
+from PIL import Image
+import cv2
+import base64
+from io import BytesIO
 
 # Paths to files
 MODEL_PATH = 'text_model/Text_Prediction_Model.keras'
 TOKENIZER_PATH = 'text_model/tokenizer_stress.pkl'
 TEXT_DATASET = 'text_model/text_dataset.csv'
+EMOTION_MODEL_PATH = 'video_model/emotion.h5'  # Path to your emotion detection model
 MAX_LEN = 100  # Max length used during training
 
-# Load the trained model and tokenizer
+# Load the trained text model and tokenizer
 with open(TOKENIZER_PATH, 'rb') as file:
     text_tokenizer = pickle.load(file)
 text_model = load_model(MODEL_PATH)
 
+# Load the emotion detection model
+emotion_model = load_model(EMOTION_MODEL_PATH)
+
 def home(request):
     return HttpResponse("Welcome to the Stress Detection API!")
-
-@api_view(['POST'])
-def upload_video(request):
-    file = request.FILES['file']
-    video_path = os.path.join('uploads', file.name)
-    with open(video_path, 'wb+') as destination:
-        for chunk in file.chunks():
-            destination.write(chunk)
-
-    audio_path = extract_audio(video_path)
-    text = convert_audio_to_text(audio_path)
-
-    return JsonResponse({"text": text})
 
 def extract_audio(video_path):
     from moviepy.editor import VideoFileClip
@@ -45,7 +41,7 @@ def extract_audio(video_path):
     video.audio.write_audiofile(audio_path)
     return audio_path
 
-def convert_audio_to_text(audio_path):
+# def convert_audio_to_text(audio_path):
     import speech_recognition as sr
     recognizer = sr.Recognizer()
     with sr.AudioFile(audio_path) as source:
@@ -109,3 +105,68 @@ def save_feedback(request):
         print("Retraining completed")
 
     return JsonResponse({"status": "Feedback saved"})
+
+
+def extract_frames(video_path, frame_interval=30):
+    video = cv2.VideoCapture(video_path)
+    frames = []
+    frame_count = 0
+    while True:
+        ret, frame = video.read()
+        if not ret:
+            break
+        if frame_count % frame_interval == 0:
+            frames.append(frame)
+        frame_count += 1
+    video.release()
+    return frames
+
+def get_emotion_from_predictions(predictions):
+    emotion_labels = ['Anger', 'Disgust', 'Fear', 'Happy', 'Sad', 'Surprise', 'Neutral']
+    max_index = np.argmax(predictions)
+    return emotion_labels[max_index]
+
+
+def process_video(video_path):
+    frames = extract_frames(video_path, frame_interval=30)
+    frames_info = []
+
+    for frame in frames:
+        # Convert frame (numpy array) to base64
+        img = Image.fromarray(frame)
+        buffered = BytesIO()
+        img.save(buffered, format="JPEG")
+        frame_base64 = base64.b64encode(buffered.getvalue()).decode("utf-8")
+
+        # Predict emotion
+        img = img.resize((224, 224))
+        img_array = np.array(img) / 255.0
+        img_array = np.expand_dims(img_array, axis=0)
+        predictions = emotion_model.predict(img_array)
+        detected_emotion = get_emotion_from_predictions(predictions)
+
+        # Append frame information with emotion
+        frames_info.append({"emotion": detected_emotion, "frame": frame_base64})
+
+    return frames_info
+
+
+
+@api_view(['POST'])
+def upload_video(request):
+    file = request.FILES.get('file')
+    if not file:
+        return JsonResponse({"error": "No file provided"}, status=400)
+
+    video_path = os.path.join('uploads', file.name)
+    with open(video_path, 'wb+') as destination:
+        for chunk in file.chunks():
+            destination.write(chunk)
+
+    frames_info = process_video(video_path)
+    os.remove(video_path)  # Clean up uploaded video
+
+    # Print out frames_info to debug
+    print("Frames info:", frames_info) 
+
+    return JsonResponse({"frames": frames_info})
