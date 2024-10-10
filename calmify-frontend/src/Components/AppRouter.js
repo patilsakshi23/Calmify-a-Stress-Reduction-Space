@@ -11,6 +11,7 @@ import MindfulOption from "../Pages/HomePage/MindfulOption";
 import LoginPage from "../Pages/Authentication/LoginPage";
 import SignupPage from "../Pages/Authentication/SigupPage";
 import { useAuth } from "../Pages/Authentication/AuthContext";
+import QuizPage from "../Pages/Inputs/QuizPage";
 
 
 export default function AppRouter() {
@@ -25,6 +26,7 @@ export default function AppRouter() {
         <Route path="/audio" element={user ? <AudioPage /> : <LoginPage setUser={setUser} />} />
         <Route path="/video" element={user ? <VideoPage /> : <LoginPage setUser={setUser} />} />
         <Route path="/text" element={user ? <TextPage /> : <LoginPage setUser={setUser} />} />
+        <Route path="/quiz" element={user ? <QuizPage /> : <LoginPage setUser={setUser} />} />
         <Route path="/input" element={user ? <InputsPage user={user} /> : <LoginPage setUser={setUser} />} />
         <Route path="/yogaoption" element={<YogaOption />} />
         <Route path="/exerciseoption" element={<ExerciseOption />} />

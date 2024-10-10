@@ -31,6 +31,10 @@ function InputsPage({ user }) {
     navigate("/text");
   };
 
+  const handleQuizClick = () => {
+    navigate("/quiz");
+  };
+
   return (
     <div>
       <nav style={{ display: "flex", justifyContent: "space-between", alignItems: "center", backgroundColor: "#f8f9fa", padding: "10px 20px", fontFamily: "Arial, sans-serif" }}>
@@ -63,6 +67,15 @@ function InputsPage({ user }) {
               <Image src={TextImage} alt="Text" borderRadius="lg" />
               <Stack mt="6" spacing="3">
                 <Heading size="md">Text</Heading>
+                <Text>Convey your message or thoughts by uploading or recording text.</Text>
+              </Stack>
+            </CardBody>
+          </Card>
+          <Card maxW="sm" onClick={handleQuizClick}>
+            <CardBody>
+              <Image src={TextImage} alt="Text" borderRadius="lg" />
+              <Stack mt="6" spacing="3">
+                <Heading size="md">Quiz</Heading>
                 <Text>Convey your message or thoughts by uploading or recording text.</Text>
               </Stack>
             </CardBody>
