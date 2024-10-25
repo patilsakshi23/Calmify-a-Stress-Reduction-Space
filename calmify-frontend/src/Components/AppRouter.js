@@ -23,10 +23,16 @@ export default function AppRouter() {
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage setUser={setUser} />} />
         <Route path="/signup" element={<SignupPage setUser={setUser} />} />
+        <Route path="/audio" element={<AudioPage setUser={setUser} />} />
+        <Route path="/video" element={<VideoPage setUser={setUser} />} />
+        <Route path="/text" element={<TextPage setUser={setUser} />} />
+        <Route path="/quiz" element={<QuizPage setUser={setUser} />} />
+        {/* 
         <Route path="/audio" element={user ? <AudioPage /> : <LoginPage setUser={setUser} />} />
         <Route path="/video" element={user ? <VideoPage /> : <LoginPage setUser={setUser} />} />
         <Route path="/text" element={user ? <TextPage /> : <LoginPage setUser={setUser} />} />
-        <Route path="/quiz" element={user ? <QuizPage /> : <LoginPage setUser={setUser} />} />
+        <Route path="/quiz" element={user ? <QuizPage /> : <LoginPage setUser={setUser} />} /> */}
+
         <Route path="/input" element={user ? <InputsPage user={user} /> : <LoginPage setUser={setUser} />} />
         <Route path="/yogaoption" element={<YogaOption />} />
         <Route path="/exerciseoption" element={<ExerciseOption />} />

@@ -152,6 +152,7 @@ const TextArea = styled.textarea`
   border-radius: 10px;
   border: 2px solid #a8cc9c;
   font-size: 22px;
+  color: #000000;
   outline: none;
   margin-bottom: 20px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
@@ -235,6 +236,6 @@ const VideoLink = styled.a`
 
 const Tagline = styled.h1`
   margin-bottom: 20px;
-  font-size: 2rem;
-  color: #a8cc9c;
+  font-size: 3rem;
+  color: #ffffff;
 `;

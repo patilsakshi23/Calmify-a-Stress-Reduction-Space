@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Box, Center, Button, Container, FormControl, FormLabel, Input, Stack, Text, Heading, useToast } from "@chakra-ui/react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
+import { getDatabase, ref, set } from "firebase/database";
 import { auth } from "../../firebaseConfig";
 import { useNavigate } from "react-router-dom";
 
@@ -14,8 +15,23 @@ function SignupPage({ setUser }) {
     e.preventDefault();
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      setUser(userCredential.user);
-      navigate("/input");
+      const user = userCredential.user;
+      setUser(user);
+
+      // Save the newly created user to Firebase Realtime Database
+      const database = getDatabase();
+      const userRef = ref(database, `users/${user.uid}`);
+
+      set(userRef, {
+        email: user.email,
+        sessions: {} // You can initialize empty sessions for Text, Video, Audio, Quiz
+      }).then(() => {
+        console.log("User data saved to Firebase.");
+      }).catch((error) => {
+        console.error("Error saving user data:", error);
+      });
+
+      navigate("/input"); // Redirect to input page after signup
     } catch (error) {
       toast({
         title: "Signup failed.",

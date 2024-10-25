@@ -1,53 +1,53 @@
-import React from "react";
+import React from 'react'
 import styled from "styled-components";
 import yoga from "../../assets/Yoga/yoga.jpg";
 import { useNavigate } from "react-router-dom";
-import { Heading } from "@chakra-ui/react";
-
+import { Heading } from '@chakra-ui/react';
 const Yoga = () => {
   const navigate = useNavigate();
   const handleStart = () => {
     navigate("/yogaoption");
   };
 
-  return (
-    <Section>
-      <LeftSection>
+    return (
+      <Section>
+        <LeftSection>
         <Img src={yoga} alt="yoga img" />
-      </LeftSection>
-      <RightSection>
-        <Content >
+        </LeftSection>
+        <RightSection>
+          <Content>
           <Heading as="h2"  size="2xl" mb={10}>
-            How Yoga Relieves Stress
+            How Yoga Relieves Stress ?
           </Heading>
           Nearly everyone is affected by stressful situations on a regular
           basis, especially if you have a high-pressure job. Yoga allows you to
           focus on meditation, mindful breathing, and beneficial postures, which
           can help lower blood pressure, increase lung capacity, and improve
           respiratory function and heart rate.
-        <StartButton onClick={handleStart}>
-          <span>GET STARTED</span>
-          <ArrowIcon
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 28 24"
-            stroke="currentColor"
-            strokeWidth="3"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M5 12h26M20 5l7 7-7 7"
-            />
-          </ArrowIcon>
-        </StartButton>
-        </Content>
-      </RightSection>
-    </Section>
-  );
-};
+          </Content>
+          <StartButton onClick={handleStart}>
+            <span>GET STARTED</span>
+            <ArrowIcon
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 28 24"
+              stroke="currentColor"
+              strokeWidth="3"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M5 12h26M20 5l7 7-7 7"
+              />
+            </ArrowIcon>
+          </StartButton>
+        </RightSection>
+      </Section>
+    );
+  };
 
-export default Yoga;
+export default Yoga
+
 
 const Img = styled.img`
   width: 80%;
@@ -67,9 +67,6 @@ const LeftSection = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  max-width: calc(100% - 220px);
-  text-align: left;
-  flex-direction: column;
 `;
 
 const RightSection = styled.div`
@@ -79,6 +76,7 @@ const RightSection = styled.div`
   align-items: center;
   text-align: justify;
   padding-left: 20px;
+  flex-direction: column;
 `;
 
 const Content = styled.p`
@@ -86,11 +84,32 @@ const Content = styled.p`
   line-height: 1.7; /* Adjust line spacing */
   max-width: 650px; /* Adjust the maximum width of text */
   text-align: justify;
-  justify-content: center;
 `;
 
+const Card = styled.div`
+  width: 650px;
+  height: 400px;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.2s;
+
+  &:hover {
+    transform: scale(1.05);
+  }
+`;
+
+const Thumbnail = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+`;
+
+
 const StartButton = styled.button`
-  background-color: #a8cc9c;
+  background-color: rgb(131, 172, 131);
   color: white;
   padding: 15px 25px;
   font-size: 16px;
@@ -106,7 +125,7 @@ const StartButton = styled.button`
   transition: background-color 0.3s ease;
 
   &:hover {
-    background-color: rgb(131, 172, 131);
+    background-color: #a8cc9c;
   }
 `;
 

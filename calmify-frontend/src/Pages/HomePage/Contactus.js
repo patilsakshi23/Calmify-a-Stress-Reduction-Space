@@ -2,90 +2,6 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Text } from '@chakra-ui/react';
 
-const ContactFormContainer = styled.div`
-  padding: 10px 0;
-`;
-
-const Form = styled.form`
-  display: flex;
-  flex-wrap: wrap;
-`;
-
-const Input = styled.input`
-  width: 100%;
-  padding: 15px;
-  background: #f8f8f8;
-  border: 1px solid rgba(0, 0, 0, 0.075);
-  margin-bottom: 25px;
-  color: #727272;
-  font-size: 13px;
-  transition: all 0.4s;
-
-  &:hover {
-    border: 1px solid #8bc3a3;
-  }
-
-  &:focus {
-    color: white;
-    outline: none;
-    border: 1px solid #8bc3a3;
-  }
-`;
-
-const Textarea = styled.textarea`
-  width: 100%;
-  padding: 15px;
-  height: 200px;
-  max-height: 200px;
-  max-width: 100%;
-  background: #f8f8f8;
-  border: 1px solid rgba(0, 0, 0, 0.075);
-  color: #727272;
-  font-size: 13px;
-  transition: all 0.4s;
-
-  &:hover {
-    border: 1px solid #8bc3a3;
-  }
-
-  &:focus {
-    color: white;
-    outline: none;
-    border: 1px solid #8bc3a3;
-  }
-`;
-
-const SubmitButton = styled.button`
-  background-color: #a8cc9c;
-  color: white;
-  padding: 15px 25px;
-  font-size: 16px;
-  font-family: "Roboto", sans-serif;
-  border: none;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  border-radius: 6px;
-  margin-top: 20px;
-  gap: 10px;
-  width: 200px;
-  transition: background-color 0.3s ease;
-
-  &:hover {
-    background-color: rgb(131, 172, 131);
-  }
-`;
-
-const MessageBox = styled.div`
-  width: 100%;
-  background: rgba(255, 255, 255, 0.8);
-  transition: all 0.7s;
-  margin: 25px auto 0;
-  opacity: ${props => (props.visible ? 1 : 0)};
-  height: ${props => (props.visible ? 'auto' : '0px')};
-`;
-
-
 const Contactus = () => {
   const [messageVisible, setMessageVisible] = useState(false);
 
@@ -96,29 +12,123 @@ const Contactus = () => {
 
   return (
     <>
-    <ContactFormContainer style={{ padding: '20px' }}>
-    <Text style={{ paddingTop: '40px' }}> Contact Us </Text>
-      <Form id="contact-us" onSubmit={handleSubmit}>
-        <div style={{ flex: '1', paddingRight: '10px' }}>
-          <Input type="text" name="name" required placeholder="Name" />
-          <Input type="email" name="mail" required placeholder="Email" />
-          <Input type="text" name="subject" required placeholder="Subject" />
-        </div>
-        <div style={{ flex: '1', paddingLeft: '10px' }}>
-          <Textarea name="message" placeholder="Message" />
-        </div>
-        <div style={{ width: '100%', textAlign: 'center' }}>
-          <SubmitButton type="submit">Send Message</SubmitButton>
-        </div>
-      </Form>
+      <ContactFormContainer>
+        <Header>Contact Us</Header>
+        <Form id="contact-us" onSubmit={handleSubmit}>
+          <LeftContainer>
+            <Input type="text" name="name" required placeholder="Name" />
+            <Input type="email" name="mail" required placeholder="Email" />
+            <Input type="text" name="subject" required placeholder="Subject" />
+          </LeftContainer>
+          <RightContainer>
+            <Textarea name="message" placeholder="Message" />
+          </RightContainer>
+        </Form>
+        <SubmitButton type="submit">Send Message</SubmitButton>
 
-      <MessageBox visible={messageVisible}>
-        <strong>Thank You!</strong> Your email has been delivered.
-      </MessageBox>
-
-    </ContactFormContainer>
-    </> 
+        <MessageBox visible={messageVisible}>
+          <strong>Thank You!</strong> Your email has been delivered.
+        </MessageBox>
+      </ContactFormContainer>
+    </>
   );
 };
 
 export default Contactus;
+
+const ContactFormContainer = styled.div`
+  padding: 40px 20px;
+  background-color: #f7f7f7;
+  max-width: 900px;
+  margin: 0 auto;
+  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+`;
+
+const Header = styled(Text)`
+  text-align: center;
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 20px;
+`;
+
+const Form = styled.form`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+`;
+
+const LeftContainer = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+`;
+
+const RightContainer = styled.div`
+  flex: 1;
+`;
+
+const Input = styled.input`
+  width: 100%;
+  padding: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+  background-color: #fff;
+  color: #333;
+  transition: border-color 0.3s;
+
+  &:hover, &:focus {
+    border-color: #a8cc9c;
+    outline: none;
+  }
+`;
+
+const Textarea = styled.textarea`
+  width: 100%;
+  padding: 15px;
+  height: 200px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+  background-color: #fff;
+  color: #333;
+  transition: border-color 0.3s;
+
+  &:hover, &:focus {
+    border-color: #a8cc9c;
+    outline: none;
+  }
+`;
+
+const SubmitButton = styled.button`
+  background-color: #a8cc9c;
+  color: white;
+  padding: 15px 30px;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  margin-top: 20px;
+  display: block;
+  width: 100%;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: rgb(131, 172, 131);
+  }
+`;
+
+const MessageBox = styled.div`
+  background-color: #f0f8f1;
+  padding: 15px;
+  margin-top: 20px;
+  border-radius: 5px;
+  opacity: ${props => (props.visible ? 1 : 0)};
+  transition: opacity 0.5s;
+  text-align: center;
+  font-size: 16px;
+  color: #3a7a3a;
+  height: ${props => (props.visible ? 'auto' : '0')};
+`;
