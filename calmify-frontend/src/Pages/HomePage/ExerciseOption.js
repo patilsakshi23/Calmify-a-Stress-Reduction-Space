@@ -2,94 +2,95 @@ import {
   Button,
   Card,
   CardBody,
-  CardFooter,
   Image,
-  Divider,
   Stack,
   Heading,
   Text,
-  ButtonGroup,
-  Center,
   Modal,
-  Box,
   ModalOverlay,
   ModalContent,
   ModalHeader,
-  ModalFooter,
   ModalBody,
   ModalCloseButton,
   useDisclosure,
+  SimpleGrid,
 } from "@chakra-ui/react";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { getDatabase, ref, onValue } from "firebase/database";
 import { useNavigate } from "react-router-dom";
-import Yoga from "../../assets/Yoga/yoga.jpg";
 import styled from "styled-components";
+import YouTube from 'react-youtube'; // Import YouTube component
+import yoga from "../../assets/Yoga/yoga.jpg";
+import yoga1 from "../../assets/slider3.png";
+import yoga2 from "../../assets/slider2.png";
+import yoga3 from "../../assets/slider1.png";
 
 const ExerciseOption = () => {
   const navigate = useNavigate();
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [selectedCard, setSelectedCard] = useState(null);
+  const [cards, setCards] = useState([]);
+  const images = [yoga, yoga1, yoga2, yoga3];
+  
+  // Array of YouTube video links
+  const videos = [
+    "https://youtu.be/1xRX1MuoImw?feature=shared&t=17",
+    "https://youtu.be/EC7RGJ975iM?feature=shared",
+    "https://youtu.be/1VYlOKUdylM?feature=shared",
+    "https://youtu.be/a4thkiW2uPA?feature=shared"
+  ];
 
-  const OverlayOne = () => <ModalOverlay backdropFilter="blur(10px)" />;
-  const {
-    isOpen: isOpen1,
-    onOpen: onOpen1,
-    onClose: onClose1,
-  } = useDisclosure();
+  // Extract video ID from YouTube URL
+  // Extract video ID from YouTube URL
+const getVideoId = (url) => {
+  if (!url) return null; // Check if the URL exists
+  const urlParts = url.split("v=");
+  if (urlParts.length > 1) {
+    return urlParts[1].split("&")[0]; // Return the video ID if it's a standard YouTube link
+  } else if (url.includes("youtu.be/")) {
+    return url.split("youtu.be/")[1]?.split("?")[0]; // Handle shortened youtu.be links
+  }
+  return null; // Return null if no valid video ID is found
+};
 
-  const {
-    isOpen: isOpen2,
-    onOpen: onOpen2,
-    onClose: onClose2,
-  } = useDisclosure();
 
-  const {
-    isOpen: isOpen3,
-    onOpen: onOpen3,
-    onClose: onClose3,
-  } = useDisclosure();
+  // Fetch data from Firebase Realtime Database
+  useEffect(() => {
+    const db = getDatabase();
+    const cardsRef = ref(db, "ExcerciseCards");
+    const unsubscribe = onValue(
+      cardsRef,
+      (snapshot) => {
+        const data = snapshot.val();
+        console.log("Fetched data:", data); // Log data
+        if (data) {
+          setCards(Object.values(data));
+        }
+      },
+      (error) => {
+        console.error("Error fetching data:", error);
+      }
+    );
+    return () => unsubscribe(); // Clean up subscription
+  }, []);
 
-  const {
-    isOpen: isOpen4,
-    onOpen: onOpen4,
-    onClose: onClose4,
-  } = useDisclosure();
+  // Handle card click and open modal with video and details
+  const handleCardClick = (card, videoId) => {
+    setSelectedCard({ ...card, videoId });
+    onOpen();
+  };
 
-  const {
-    isOpen: isOpen5,
-    onOpen: onOpen5,
-    onClose: onClose5,
-  } = useDisclosure();
-
-  const {
-    isOpen: isOpen6,
-    onOpen: onOpen6,
-    onClose: onClose6,
-  } = useDisclosure();
-
-  const {
-    isOpen: isOpen7,
-    onOpen: onOpen7,
-    onClose: onClose7,
-  } = useDisclosure();
-
-  const {
-    isOpen: isOpen8,
-    onOpen: onOpen8,
-    onClose: onClose8,
-  } = useDisclosure();
-
-  //   const handleVideoClick = () => {
-  //     navigate("/video");
-  //   };
-
-  //   const handleAudioClick = () => {
-  //     navigate("/audio");
-  //   };
-
-  //   const handleTextClick = () => {
-  //     navigate("/text");
-  //   };
   const handleBackClick = () => {
     navigate("/");
+  };
+
+  // YouTube video options
+  const videoOptions = {
+    height: '315',
+    width: '530',
+    playerVars: {
+      autoplay: 0,
+    },
   };
 
   return (
@@ -106,7 +107,7 @@ const ExerciseOption = () => {
       >
         <div style={{ fontSize: "24px", fontWeight: "bold" }}>Calmify</div>
         <Heading justify="center" m={5}>
-          Exercise
+        Exercise
         </Heading>
         <Button onClick={handleBackClick} style={buttonStyle}>
           Back
@@ -114,351 +115,41 @@ const ExerciseOption = () => {
       </nav>
 
       <div style={{ textAlign: "center" }}>
-        <Stack
-          direction="row"
-          spacing={20}
-          justify="center"
-          align="center"
-          m={20}
-        >
-          <Card maxW="sm">
-            <CardBody>
-              <Image src={Yoga} alt="Videoimage" borderRadius="lg" />
-              <Stack mt="6" spacing="3">
-                <Heading size="md">Sun Salutation Pose</Heading>
-                <Text>
-                  covey your message your thoughts to us by uploading or
-                  recording a video of yours
-                </Text>
-                <Button
-                  style={buttonStyle}
-                  onClick={() => {
-                    onOpen1();
-                  }}
-                >
-                  Video
-                </Button>
-              </Stack>
-            </CardBody>
-          </Card>
-          <Card maxW="sm">
-            <CardBody>
-              <Image src={Yoga} alt="Audioimage" borderRadius="lg" />
-              <Stack mt="6" spacing="3">
-                <Heading size="md">Sitting Pose</Heading>
-                <Text>
-                  covey your message your thoughts to us by uploading or
-                  recording a video of yours
-                </Text>
-                <Button
-                  style={buttonStyle}
-                  onClick={() => {
-                    onOpen2();
-                  }}
-                >
-                  Audio
-                </Button>
-              </Stack>
-            </CardBody>
-          </Card>
-          <Card maxW="sm">
-            <CardBody>
-              <Image src={Yoga} alt="Textimage" borderRadius="lg" />
-              <Stack mt="6" spacing="3">
-                <Heading size="md">Child’s Pose</Heading>
-                <Text>
-                  covey your message your thoughts to us by uploading or
-                  recording a video of yours
-                </Text>
-                <Button
-                  style={buttonStyle}
-                  onClick={() => {
-                    onOpen3();
-                  }}
-                >
-                  Text
-                </Button>
-              </Stack>
-            </CardBody>
-          </Card>
-        </Stack>
+        <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={10} m={20}>
+          {cards.map((card, index) => {
+            const videoId = getVideoId(videos[index]); // Get videoId from array
+            return (
+              <Card maxW="sm" key={index} onClick={() => handleCardClick(card, videoId)}>
+                <CardBody>
+                <Image src={images[index]} alt={card.title} borderRadius="lg" />
+                  <Stack mt="6" spacing="3">
+                    <Heading size="md">{card.title}</Heading>
+                    <Text>{card.shortInfo}</Text>
+                  </Stack>
+                </CardBody>
+              </Card>
+            );
+          })}
+        </SimpleGrid>
 
-        <Stack
-          direction="row"
-          spacing={20}
-          justify="center"
-          align="center"
-          m={20}
-        >
-          <Card maxW="sm">
-            <CardBody>
-              <Image src={Yoga} alt="Videoimage" borderRadius="lg" />
-              <Stack mt="6" spacing="3">
-                <Heading size="md">Sun Salutation Pose</Heading>
-                <Text>
-                  covey your message your thoughts to us by uploading or
-                  recording a video of yours
-                </Text>
-                <Button
-                  style={buttonStyle}
-                  onClick={() => {
-                    onOpen4();
-                  }}
-                >
-                  Video
-                </Button>
-              </Stack>
-            </CardBody>
-          </Card>
-          <Card maxW="sm">
-            <CardBody>
-              <Image src={Yoga} alt="Audioimage" borderRadius="lg" />
-              <Stack mt="6" spacing="3">
-                <Heading size="md">Sitting Pose</Heading>
-                <Text>
-                  covey your message your thoughts to us by uploading or
-                  recording a video of yours
-                </Text>
-                <Button
-                  style={buttonStyle}
-                  onClick={() => {
-                    onOpen5();
-                  }}
-                >
-                  Audio
-                </Button>
-              </Stack>
-            </CardBody>
-          </Card>
-          <Card maxW="sm">
-            <CardBody>
-              <Image src={Yoga} alt="Textimage" borderRadius="lg" />
-              <Stack mt="6" spacing="3">
-                <Heading size="md">Child’s Pose</Heading>
-                <Text>
-                  covey your message your thoughts to us by uploading or
-                  recording a video of yours
-                </Text>
-                <Button
-                  style={buttonStyle}
-                  onClick={() => {
-                    onOpen6();
-                  }}
-                >
-                  Text
-                </Button>
-              </Stack>
-            </CardBody>
-          </Card>
-        </Stack>
-        <Stack
-          direction="row"
-          spacing={20}
-          justify="center"
-          align="center"
-          m={20}
-        >
-          <Card maxW="sm">
-            <CardBody>
-              <Image src={Yoga} alt="Videoimage" borderRadius="lg" />
-              <Stack mt="6" spacing="3">
-                <Heading size="md">Sun Salutation Pose</Heading>
-                <Text>
-                  covey your message your thoughts to us by uploading or
-                  recording a video of yours
-                </Text>
-                <Button
-                  style={buttonStyle}
-                  onClick={() => {
-                    onOpen7();
-                  }}
-                >
-                  Video
-                </Button>
-              </Stack>
-            </CardBody>
-          </Card>
-          <Card maxW="sm">
-            <CardBody>
-              <Image src={Yoga} alt="Audioimage" borderRadius="lg" />
-              <Stack mt="6" spacing="3">
-                <Heading size="md">Sitting Pose</Heading>
-                <Text>
-                  covey your message your thoughts to us by uploading or
-                  recording a video of yours
-                </Text>
-                <Button
-                  style={buttonStyle}
-                  onClick={() => {
-                    onOpen8();
-                  }}
-                >
-                  Audio
-                </Button>
-              </Stack>
-            </CardBody>
-          </Card>
-        </Stack>
-
-        <Modal isOpen={isOpen1} onClose={onClose1} motionPreset="slideInBottom">
-          <OverlayOne />
-          <ModalContent>
-            <ModalHeader>Mail Details</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <InfoCard>
-                covey your message your thoughts to us by uploading or recording
-                a video of yourscovey your message your thoughts to us by
-                uploading or recording a video of yourscovey your message your
-                thoughts to us by uploading or recording a video of yourscovey
-                your message your thoughts to us by uploading or recording a
-                video of yourscovey your message your thoughts to us by
-                uploading or recording a video of yourscovey your message your
-                thoughts to us by uploading or recording a video of yours
-              </InfoCard>
-            </ModalBody>
-          </ModalContent>
-        </Modal>
-
-        <Modal isOpen={isOpen2} onClose={onClose2} motionPreset="slideInBottom">
-          <OverlayOne />
-          <ModalContent>
-            <ModalHeader>Mail Details</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <InfoCard>
-                covey your message your thoughts to us by uploading or recording
-                a video of yourscovey your message your thoughts to us by
-                uploading or recording a video of yourscovey your message your
-                thoughts to us by uploading or recording a video of yourscovey
-                your message your thoughts to us by uploading or recording a
-                video of yourscovey your message your thoughts to us by
-                uploading or recording a video of yourscovey your message your
-                thoughts to us by uploading or recording a video of yours
-              </InfoCard>
-            </ModalBody>
-          </ModalContent>
-        </Modal>
-
-        <Modal isOpen={isOpen3} onClose={onClose3} motionPreset="slideInBottom">
-          <OverlayOne />
-          <ModalContent>
-            <ModalHeader>Mail Details</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <InfoCard>
-                covey your message your thoughts to us by uploading or recording
-                a video of yourscovey your message your thoughts to us by
-                uploading or recording a video of yourscovey your message your
-                thoughts to us by uploading or recording a video of yourscovey
-                your message your thoughts to us by uploading or recording a
-                video of yourscovey your message your thoughts to us by
-                uploading or recording a video of yourscovey your message your
-                thoughts to us by uploading or recording a video of yours
-              </InfoCard>
-            </ModalBody>
-          </ModalContent>
-        </Modal>
-
-        <Modal isOpen={isOpen4} onClose={onClose4} motionPreset="slideInBottom">
-          <OverlayOne />
-          <ModalContent>
-            <ModalHeader>Mail Details</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <InfoCard>
-                covey your message your thoughts to us by uploading or recording
-                a video of yourscovey your message your thoughts to us by
-                uploading or recording a video of yourscovey your message your
-                thoughts to us by uploading or recording a video of yourscovey
-                your message your thoughts to us by uploading or recording a
-                video of yourscovey your message your thoughts to us by
-                uploading or recording a video of yourscovey your message your
-                thoughts to us by uploading or recording a video of yours
-              </InfoCard>
-            </ModalBody>
-          </ModalContent>
-        </Modal>
-
-        <Modal isOpen={isOpen5} onClose={onClose5} motionPreset="slideInBottom">
-          <OverlayOne />
-          <ModalContent>
-            <ModalHeader>Mail Details</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <InfoCard>
-                covey your message your thoughts to us by uploading or recording
-                a video of yourscovey your message your thoughts to us by
-                uploading or recording a video of yourscovey your message your
-                thoughts to us by uploading or recording a video of yourscovey
-                your message your thoughts to us by uploading or recording a
-                video of yourscovey your message your thoughts to us by
-                uploading or recording a video of yourscovey your message your
-                thoughts to us by uploading or recording a video of yours
-              </InfoCard>
-            </ModalBody>
-          </ModalContent>
-        </Modal>
-
-        <Modal isOpen={isOpen6} onClose={onClose6} motionPreset="slideInBottom">
-          <OverlayOne />
-          <ModalContent>
-            <ModalHeader>Mail Details</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <InfoCard>
-                covey your message your thoughts to us by uploading or recording
-                a video of yourscovey your message your thoughts to us by
-                uploading or recording a video of yourscovey your message your
-                thoughts to us by uploading or recording a video of yourscovey
-                your message your thoughts to us by uploading or recording a
-                video of yourscovey your message your thoughts to us by
-                uploading or recording a video of yourscovey your message your
-                thoughts to us by uploading or recording a video of yours
-              </InfoCard>
-            </ModalBody>
-          </ModalContent>
-        </Modal>
-
-        <Modal isOpen={isOpen7} onClose={onClose7} motionPreset="slideInBottom">
-          <OverlayOne />
-          <ModalContent>
-            <ModalHeader>Mail Details</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <InfoCard>
-                covey your message your thoughts to us by uploading or recording
-                a video of yourscovey your message your thoughts to us by
-                uploading or recording a video of yourscovey your message your
-                thoughts to us by uploading or recording a video of yourscovey
-                your message your thoughts to us by uploading or recording a
-                video of yourscovey your message your thoughts to us by
-                uploading or recording a video of yourscovey your message your
-                thoughts to us by uploading or recording a video of yours
-              </InfoCard>
-            </ModalBody>
-          </ModalContent>
-        </Modal>
-
-        <Modal isOpen={isOpen8} onClose={onClose8} motionPreset="slideInBottom">
-          <OverlayOne />
-          <ModalContent>
-            <ModalHeader>Mail Details</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <InfoCard>
-                covey your message your thoughts to us by uploading or recording
-                a video of yourscovey your message your thoughts to us by
-                uploading or recording a video of yourscovey your message your
-                thoughts to us by uploading or recording a video of yourscovey
-                your message your thoughts to us by uploading or recording a
-                video of yourscovey your message your thoughts to us by
-                uploading or recording a video of yourscovey your message your
-                thoughts to us by uploading or recording a video of yours
-              </InfoCard>
-            </ModalBody>
-          </ModalContent>
-        </Modal>
+        {/* Modal to display long info and YouTube video */}
+        {selectedCard && (
+          <Modal isOpen={isOpen} size={'xl'} onClose={onClose}>
+            <ModalOverlay backdropFilter="blur(10px)" />
+            <ModalContent>
+              <ModalHeader>{selectedCard.title}</ModalHeader>
+              <ModalCloseButton />
+              <ModalBody>
+                {/* YouTube Video Player */}
+                <YouTube 
+                  videoId={selectedCard.videoId} // Use extracted videoId
+                  opts={videoOptions}
+                />
+                <InfoCard>{selectedCard.longInfo}</InfoCard>
+              </ModalBody>
+            </ModalContent>
+          </Modal>
+        )}
       </div>
     </div>
   );

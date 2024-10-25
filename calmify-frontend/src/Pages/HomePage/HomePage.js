@@ -223,7 +223,7 @@ const Text = styled.div`
 `;
 
 const StartButton = styled.button`
-  background-color: #a8cc9c;
+  background-color: rgb(131, 172, 131);
   color: white;
   padding: 15px 25px;
   font-size: 16px;
@@ -239,7 +239,7 @@ const StartButton = styled.button`
   transition: background-color 0.3s ease;
 
   &:hover {
-    background-color: rgb(131, 172, 131);
+    background-color: #a8cc9c;
   }
 `;
 

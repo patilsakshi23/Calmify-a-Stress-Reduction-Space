@@ -85,30 +85,8 @@ const Content = styled.p`
   text-align: justify;
 `;
 
-const Card = styled.div`
-  width: 650px;
-  height: 400px;
-  border: 2px solid #ccc;
-  border-radius: 8px;
-  overflow: hidden;
-  cursor: pointer;
-  position: relative;
-  transition: transform 0.2s;
-
-  &:hover {
-    transform: scale(1.05);
-  }
-`;
-
-const Thumbnail = styled.img`
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-`;
-
-
 const StartButton = styled.button`
-  background-color: #a8cc9c;
+  background-color: rgb(131, 172, 131);
   color: white;
   padding: 15px 25px;
   font-size: 16px;
@@ -124,7 +102,7 @@ const StartButton = styled.button`
   transition: background-color 0.3s ease;
 
   &:hover {
-    background-color: rgb(131, 172, 131);
+    background-color: #a8cc9c;
   }
 `;
 
