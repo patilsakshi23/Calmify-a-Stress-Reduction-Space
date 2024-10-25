@@ -20,17 +20,20 @@ import { getDatabase, ref, onValue } from "firebase/database";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import YouTube from 'react-youtube'; // Import YouTube component
-import yoga from "../../assets/Yoga/yoga.jpg";
-import yoga1 from "../../assets/slider3.png";
-import yoga2 from "../../assets/slider2.png";
-import yoga3 from "../../assets/slider1.png";
+import exercise1 from "../../assets/Yoga/child_pose.png";
+import exercise2 from "../../assets/Yoga/downward_facing_dog.png";
+import exercise3 from "../../assets/Yoga/savasana.png";
+import exercise4 from "../../assets/Yoga/viparita_karani.png";
+import exercise5 from "../../assets/Yoga/utthita_trikonasana.png";
+import exercise6 from "../../assets/Yoga/utthita_trikonasana.png";
+import exercise7 from "../../assets/Yoga/utthita_trikonasana.png";
 
 const ExerciseOption = () => {
   const navigate = useNavigate();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedCard, setSelectedCard] = useState(null);
   const [cards, setCards] = useState([]);
-  const images = [yoga, yoga1, yoga2, yoga3];
+  const images = [exercise1, exercise2, exercise3, exercise4, exercise5, exercise6, exercise7];
   
   // Array of YouTube video links
   const videos = [
@@ -40,24 +43,27 @@ const ExerciseOption = () => {
     "https://youtu.be/a4thkiW2uPA?feature=shared"
   ];
 
-  // Extract video ID from YouTube URL
-  // Extract video ID from YouTube URL
-const getVideoId = (url) => {
-  if (!url) return null; // Check if the URL exists
-  const urlParts = url.split("v=");
-  if (urlParts.length > 1) {
-    return urlParts[1].split("&")[0]; // Return the video ID if it's a standard YouTube link
-  } else if (url.includes("youtu.be/")) {
-    return url.split("youtu.be/")[1]?.split("?")[0]; // Handle shortened youtu.be links
-  }
-  return null; // Return null if no valid video ID is found
-};
+  // Extract video ID and start time from YouTube URL
+  const getVideoIdAndStartTime = (url) => {
+    if (!url) return { videoId: null, startTime: 0 };
+    let videoId, startTime = 0;
 
+    if (url.includes("v=")) {
+      videoId = url.split("v=")[1].split("&")[0];
+    } else if (url.includes("youtu.be/")) {
+      videoId = url.split("youtu.be/")[1]?.split("?")[0];
+    }
+
+    const urlObj = new URL(url);
+    startTime = urlObj.searchParams.get('t') ? parseInt(urlObj.searchParams.get('t')) : 0;
+
+    return { videoId, startTime };
+  };
 
   // Fetch data from Firebase Realtime Database
   useEffect(() => {
     const db = getDatabase();
-    const cardsRef = ref(db, "ExcerciseCards");
+    const cardsRef = ref(db, "ExerciseCards");
     const unsubscribe = onValue(
       cardsRef,
       (snapshot) => {
@@ -75,8 +81,8 @@ const getVideoId = (url) => {
   }, []);
 
   // Handle card click and open modal with video and details
-  const handleCardClick = (card, videoId) => {
-    setSelectedCard({ ...card, videoId });
+  const handleCardClick = (card, videoId, startTime) => {
+    setSelectedCard({ ...card, videoId, startTime });
     onOpen();
   };
 
@@ -84,12 +90,13 @@ const getVideoId = (url) => {
     navigate("/");
   };
 
-  // YouTube video options
+  // YouTube video options, dynamically set start time
   const videoOptions = {
     height: '315',
     width: '530',
     playerVars: {
       autoplay: 0,
+      start: selectedCard?.startTime || 0, // Set start time if available
     },
   };
 
@@ -107,7 +114,7 @@ const getVideoId = (url) => {
       >
         <div style={{ fontSize: "24px", fontWeight: "bold" }}>Calmify</div>
         <Heading justify="center" m={5}>
-        Exercise
+          Exercise
         </Heading>
         <Button onClick={handleBackClick} style={buttonStyle}>
           Back
@@ -117,11 +124,11 @@ const getVideoId = (url) => {
       <div style={{ textAlign: "center" }}>
         <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={10} m={20}>
           {cards.map((card, index) => {
-            const videoId = getVideoId(videos[index]); // Get videoId from array
+            const { videoId, startTime } = getVideoIdAndStartTime(videos[index]); // Get videoId and startTime
             return (
-              <Card maxW="sm" key={index} onClick={() => handleCardClick(card, videoId)}>
+              <Card maxW="sm" key={index} onClick={() => handleCardClick(card, videoId, startTime)}>
                 <CardBody>
-                <Image src={images[index]} alt={card.title} borderRadius="lg" />
+                  <Image src={images[index]} alt={card.title} borderRadius="lg" />
                   <Stack mt="6" spacing="3">
                     <Heading size="md">{card.title}</Heading>
                     <Text>{card.shortInfo}</Text>
