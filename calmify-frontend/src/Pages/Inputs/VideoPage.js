@@ -55,23 +55,23 @@ const Button = styled.button`
   }
 `;
 
-const UploadButton = styled.input`
-  display: none;
-`;
-
-const Label = styled.label`
-  padding: 12px 20px;
-  font-size: 16px;
-  background-color: #6a89cc; /* Soft green for success */
+const IconButton = styled.button`
+  padding: 10px;
+  font-size: 20px;
+  background-color: #6a89cc;
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 50%;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
   transition: background-color 0.3s ease;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 
   &:hover {
-    background-color: #4a69bd; /* Darker shade on hover */
+    background-color: #4a69bd;
   }
 `;
 
@@ -97,26 +97,25 @@ const EmotionText = styled.p`
   color: #333;
 `;
 
+const HiddenInput = styled.input`
+  display: none;
+`;
+
 const VideoPage = () => {
   const videoRef = useRef(null);
   const [videoBlob, setVideoBlob] = useState(null);
   const [emotion, setEmotion] = useState([]);
   const [recording, setRecording] = useState(false);
-  const [showButtons, setShowButtons] = useState(true); // Initially, show only record/upload buttons
+  const [showMainButtons, setShowMainButtons] = useState(true);
+  const [showRecordingScreen, setShowRecordingScreen] = useState(false);
+  const [showProcessButtons, setShowProcessButtons] = useState(false);
   const mediaRecorderRef = useRef(null);
   const recordedChunks = useRef([]);
-  const [showEmotionResults, setShowEmotionResults] = useState(false); // To control display of emotion results
+  const fileInputRef = useRef(null);
 
-  const handleUpload = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const url = URL.createObjectURL(file);
-      videoRef.current.src = url;
-      videoRef.current.play();
-      setVideoBlob(file);
-      setShowButtons(false); // Hide initial buttons after upload
-      setShowEmotionResults(false); // Reset emotion results display
-    }
+  const handleStartRecordingScreen = () => {
+    setShowMainButtons(false);
+    setShowRecordingScreen(true);
   };
 
   const handleStartRecording = async () => {
@@ -138,11 +137,11 @@ const VideoPage = () => {
         type: 'video/webm',
       });
       const videoUrl = URL.createObjectURL(blob);
-      videoRef.current.srcObject = null;  // Stop the live stream
-      videoRef.current.src = videoUrl;    // Load the recorded video
-      setVideoBlob(blob);  // Store the recorded video as a blob
-      setShowButtons(false); // Hide initial buttons after recording
-      setShowEmotionResults(false); // Reset emotion results display
+      videoRef.current.srcObject = null;
+      videoRef.current.src = videoUrl;
+      setVideoBlob(blob);
+      setShowRecordingScreen(false);
+      setShowProcessButtons(true);
     };
 
     mediaRecorderRef.current.start();
@@ -151,7 +150,7 @@ const VideoPage = () => {
 
   const handleStopRecording = () => {
     mediaRecorderRef.current.stop();
-    videoRef.current.srcObject.getTracks().forEach(track => track.stop());  // Stop the camera stream
+    videoRef.current.srcObject.getTracks().forEach((track) => track.stop());
     setRecording(false);
   };
 
@@ -169,52 +168,72 @@ const VideoPage = () => {
 
       if (data.frames) {
         setEmotion(data.frames);
-        setShowEmotionResults(true); // Show emotion results
       }
     } catch (error) {
       console.error('Error processing video:', error);
     }
   };
 
+  const handleUploadVideo = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const videoUrl = URL.createObjectURL(file);
+      videoRef.current.src = videoUrl;
+      setVideoBlob(file);
+      setShowMainButtons(false);
+      setShowProcessButtons(true);
+    }
+  };
+
+  const handleOpenFileSystem = () => {
+    fileInputRef.current.click();
+  };
+
   const handleBack = () => {
-    setShowButtons(true); // Show the initial buttons again
-    setVideoBlob(null); // Reset video blob
-    setEmotion([]); // Clear emotions
-    videoRef.current.src = ""; // Clear video source
-    setShowEmotionResults(false); // Hide emotion results
+    setShowMainButtons(true);
+    setShowRecordingScreen(false);
+    setShowProcessButtons(false);
+    setVideoBlob(null);
+    setEmotion([]);
+    videoRef.current.src = '';
   };
 
   return (
     <Container>
       <Heading>Video Emotion Detection</Heading>
 
-      {/* Video Element: Show when recording or after upload */}
-      <VideoContainer ref={videoRef} autoPlay playsInline muted show={recording || !!videoBlob}></VideoContainer>
+      <VideoContainer ref={videoRef} autoPlay playsInline muted show={!showMainButtons}></VideoContainer>
 
-      {/* Display record/upload buttons initially */}
-      {showButtons && (
+      {showMainButtons && (
+        <>
+          <Button onClick={handleStartRecordingScreen}>Shoot Video</Button>
+          <Button onClick={handleOpenFileSystem}>Upload Video</Button>
+          <HiddenInput
+            type="file"
+            accept="video/*"
+            ref={fileInputRef}
+            onChange={handleUploadVideo}
+          />
+        </>
+      )}
+
+      {showRecordingScreen && (
         <ButtonGroup>
-          <Label htmlFor="upload">Upload Video</Label>
-          <UploadButton id="upload" type="file" accept="video/*" onChange={handleUpload} />
-          
-          {recording ? (
-            <Button onClick={handleStopRecording}>Stop Recording</Button>
-          ) : (
-            <Button onClick={handleStartRecording}>Start Recording</Button>
-          )}
+          <IconButton onClick={recording ? handleStopRecording : handleStartRecording}>
+            {recording ? '🔴' : '🎥'}
+          </IconButton>
+          <Button onClick={handleBack}>Back</Button>
         </ButtonGroup>
       )}
 
-      {/* Process video and Back buttons (only after video upload or recording) */}
-      {!showButtons && (
+      {showProcessButtons && (
         <ButtonGroup>
           <Button onClick={handleProcessVideo}>Process Video</Button>
           <Button onClick={handleBack}>Back</Button>
         </ButtonGroup>
       )}
 
-      {/* Display the frames with detected emotions */}
-      {showEmotionResults && emotion.length > 0 && (
+      {emotion.length > 0 && (
         <EmotionFrame>
           <h2>Detected Emotions:</h2>
           {emotion.map((emo, index) => (
