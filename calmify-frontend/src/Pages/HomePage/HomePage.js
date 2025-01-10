@@ -6,7 +6,7 @@ import image1 from "../../assets/slider1.png";
 import image2 from "../../assets/slider2.png";
 import image3 from "../../assets/slider3.png";
 import backgroundImage from "../../assets/Homebg.png";
-import MindfulActivity from "./MindfulActivity.js";
+import FunActivities from "./FunActivities.js";
 import Yoga from "./Yoga.js";
 import Exercise from "./Exercise.js";
 import Contactus from "./Contactus.js";
@@ -96,8 +96,8 @@ function HomePage() {
         <Main id="yoga-practices">
           <Yoga />
         </Main>
-        <Main id="mindful-activities">
-          <MindfulActivity />
+        <Main id="fun-activities">
+          <FunActivities />
         </Main>
         <Main id="exercises">
           <Exercise />
