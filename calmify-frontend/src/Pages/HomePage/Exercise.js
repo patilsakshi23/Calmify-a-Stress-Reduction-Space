@@ -1,6 +1,6 @@
 import React from 'react'
 import styled from "styled-components";
-import exercise from "../../assets/exercise.webp";
+import exercise from "../../assets/exercise.jpg";
 import { useNavigate } from "react-router-dom";
 import { Heading } from '@chakra-ui/react';
 const Exercise = () => {
@@ -86,7 +86,7 @@ const Content = styled.p`
 `;
 
 const StartButton = styled.button`
-  background-color: rgb(131, 172, 131);
+  background-color: rgb(190, 152, 117);
   color: white;
   padding: 15px 25px;
   font-size: 16px;
@@ -102,7 +102,7 @@ const StartButton = styled.button`
   transition: background-color 0.3s ease;
 
   &:hover {
-    background-color: #a8cc9c;
+    background-color: rgb(235, 190, 148);
   }
 `;
 
