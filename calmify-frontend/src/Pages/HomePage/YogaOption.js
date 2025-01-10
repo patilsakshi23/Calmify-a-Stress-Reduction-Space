@@ -108,7 +108,7 @@ const YogaOption = () => {
           justifyContent: "space-between",
           alignItems: "center",
           backgroundColor: "#f8f9fa",
-          padding: "10px 20px",
+          padding: "15px 20px",
           fontFamily: "Arial, sans-serif",
         }}
       >
