@@ -1,10 +1,17 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from "react-router-dom";
 import styled from 'styled-components';
 import { Link } from 'react-scroll';
 import CalmifyLogo from "../assets/logocalmify.png";
 
 const Nav = () => {
   const [isScrolled, setIsScrolled] = useState(false);
+
+  const navigate = useNavigate();
+
+  const handleLogoClick = () => {
+    navigate("/"); // Navigate to the home route
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -19,11 +26,11 @@ const Nav = () => {
 
   return (
     <StickyContainer isScrolled={isScrolled}>
-      <Solgan>
+      <Solgan style={{ display: isScrolled ? 'none' : 'block' }}>
         <h3>Nothing is <b>Impossible</b>!!</h3>
       </Solgan>
       <NavBar>
-        <Logo>
+        <Logo onClick={handleLogoClick} >
           <LogoImg src={CalmifyLogo} alt="Calmify" />
         </Logo>
         <NavLinks>
@@ -34,7 +41,7 @@ const Nav = () => {
             <StyledLink to="yoga-practices" smooth={true} duration={500}>YOGA</StyledLink>
           </NavLi>
           <NavLi>
-            <StyledLink to="mindful-activities" smooth={true} duration={500}>MINDFULLNESS</StyledLink>
+            <StyledLink to="fun-activities" smooth={true} duration={500}>FUN ACTIVITIES</StyledLink>
           </NavLi>
           <NavLi>
             <StyledLink to="exercises" smooth={true} duration={500}>EXERCISES</StyledLink>
@@ -84,7 +91,8 @@ const Logo = styled.div`
 
 const LogoImg = styled.img`
   height: 40px;
-  margin-right: 10px;
+  margin-right: 20px;
+  cursor: pointer;
 `;
 
 const NavLinks = styled.div`
