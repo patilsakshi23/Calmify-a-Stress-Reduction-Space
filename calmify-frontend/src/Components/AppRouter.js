@@ -8,6 +8,12 @@ import HomePage from "../Pages/HomePage/HomePage";
 import ExerciseOption from "../Pages/HomePage/ExerciseOption";
 import YogaOption from "../Pages/HomePage/YogaOption";
 import MindfulOption from "../Pages/HomePage/MindfulOption";
+import FunActivitiesOption from "../Pages/HomePage/FunActivitiesOption";
+import GamePage from "../Pages/HomePage/GamePage";
+import MusicPage from "../Pages/HomePage/MusicPage";
+
+
+
 import LoginPage from "../Pages/Authentication/LoginPage";
 import SignupPage from "../Pages/Authentication/SigupPage";
 import { useAuth } from "../Pages/Authentication/AuthContext";
@@ -37,6 +43,11 @@ export default function AppRouter() {
         <Route path="/yogaoption" element={<YogaOption />} />
         <Route path="/exerciseoption" element={<ExerciseOption />} />
         <Route path="/mindfuloption" element={<MindfulOption />} />
+        <Route path="/funactivitiesoption" element={<FunActivitiesOption />} />
+        <Route path="/games" element={<GamePage />} />
+        <Route path="/music" element={<MusicPage />} />
+
+
       </Routes>
     </Router>
   );
