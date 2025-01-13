@@ -1,238 +1,183 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   Box,
   Button,
-  Text,
   VStack,
-  Step,
-  StepIndicator,
-  StepStatus,
-  Stepper,
-  StepIcon,
-  StepNumber,
-  StepSeparator,
-} from '@chakra-ui/react';
-import styled from "styled-components";
+  RadioGroup,
+  Radio,
+  Text,
+  Progress,
+  Stack,
+} from "@chakra-ui/react";
+import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
+import "react-circular-progressbar/dist/styles.css";
 
-const YOUTUBE_API_KEY = 'AIzaSyDJmuL33cv6GiuksMNlVb6hXPp6XHItgCA';  // Replace with your YouTube API key
-const YOUTUBE_API_URL = 'https://www.googleapis.com/youtube/v3/search';
+const questions = [
+  {
+    id: 1,
+    question: "How often do you feel stressed in your daily life?",
+    options: [
+      { text: "Rarely", score: 1 },
+      { text: "Sometimes", score: 2 },
+      { text: "Often", score: 3 },
+      { text: "Always", score: 4 },
+    ],
+  },
+  {
+    id: 2,
+    question: "How well do you sleep at night?",
+    options: [
+      { text: "Very well", score: 1 },
+      { text: "Fairly well", score: 2 },
+      { text: "Poorly", score: 3 },
+      { text: "Very poorly", score: 4 },
+    ],
+  },
+  {
+    id: 3,
+    question: "How often do you feel overwhelmed by your tasks?",
+    options: [
+      { text: "Rarely", score: 1 },
+      { text: "Sometimes", score: 2 },
+      { text: "Often", score: 3 },
+      { text: "Always", score: 4 },
+    ],
+  },
+  {
+    id: 4,
+    question: "How often do you take breaks during work or study?",
+    options: [
+      { text: "Frequently", score: 1 },
+      { text: "Sometimes", score: 2 },
+      { text: "Rarely", score: 3 },
+      { text: "Never", score: 4 },
+    ],
+  },
+  {
+    id: 5,
+    question: "How would you describe your eating habits?",
+    options: [
+      { text: "Healthy", score: 1 },
+      { text: "Moderate", score: 2 },
+      { text: "Unhealthy", score: 3 },
+      { text: "Very unhealthy", score: 4 },
+    ],
+  },
+  {
+    id: 6,
+    question: "How much time do you spend on physical activities weekly?",
+    options: [
+      { text: "More than 5 hours", score: 1 },
+      { text: "2-5 hours", score: 2 },
+      { text: "Less than 2 hours", score: 3 },
+      { text: "None", score: 4 },
+    ],
+  },
+  {
+    id: 7,
+    question: "How often do you feel supported by friends or family?",
+    options: [
+      { text: "Always", score: 1 },
+      { text: "Often", score: 2 },
+      { text: "Sometimes", score: 3 },
+      { text: "Never", score: 4 },
+    ],
+  },
+];
+
+const calculateMood = (score) => {
+  if (score <= 10) return { mood: "Relaxed", color: "#4caf50" }; // Green
+  if (score <= 20) return { mood: "Moderately Stressed", color: "#ffeb3b" }; // Yellow
+  if (score <= 28) return { mood: "Highly Stressed", color: "#ff9800" }; // Orange
+  return { mood: "Severely Stressed", color: "#f44336" }; // Red
+};
 
 const QuizPage = () => {
-  const questions = [
-    "Do you feel happy today?",
-    "Are you feeling stressed about anything?",
-    "Do you often find yourself laughing?",
-    "Are you feeling sad lately?",
-    "Do you get excited about things easily?",
-    "Do you often feel overwhelmed?",
-    "Are you enjoying your current activities?",
-  ];
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [score, setScore] = useState(0);
+  const [selectedOption, setSelectedOption] = useState(null);
+  const [isFinished, setIsFinished] = useState(false);
 
-  const steps = questions.map((question, index) => ({
-    title: `Question ${index + 1}`,
-    description: question,
-  }));
+  const handleNext = () => {
+    if (selectedOption === null) return;
 
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [responses, setResponses] = useState([]);
-  const [detectedEmotion, setDetectedEmotion] = useState('');
-  const [videos, setVideos] = useState([]);
-  const [quizCompleted, setQuizCompleted] = useState(false); // New state to track quiz completion
+    setScore((prevScore) => prevScore + selectedOption);
+    setSelectedOption(null);
 
-  const handleResponse = (response) => {
-    setResponses((prevResponses) => {
-      const updatedResponses = [...prevResponses];
-      updatedResponses[currentQuestionIndex] = response;
-      return updatedResponses;
-    });
-
-    if (currentQuestionIndex === questions.length - 1) {
-      analyzeEmotions();
-      setQuizCompleted(true); // Mark quiz as completed after last question
+    if (currentQuestion < questions.length - 1) {
+      setCurrentQuestion(currentQuestion + 1);
     } else {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
+      setIsFinished(true);
     }
   };
 
-  const analyzeEmotions = () => {
-    const emotionCounts = {
-      happy: 0,
-      sad: 0,
-      angry: 0,
-      stressed: 0,
-      excited: 0,
-    };
-
-    responses.forEach((response, index) => {
-      if (response === 'yes') {
-        if (index === 0) emotionCounts.happy += 1;
-        if (index === 2) emotionCounts.happy += 1;
-        if (index === 4) emotionCounts.excited += 1;
-        if (index === 6) emotionCounts.happy += 1;
-      } else {
-        if (index === 1) emotionCounts.stressed += 1;
-        if (index === 3) emotionCounts.sad += 1;
-        if (index === 5) emotionCounts.stressed += 1;
-        if (index === 6) emotionCounts.sad += 1;
-      }
-    });
-
-    const detectedEmotion = Object.keys(emotionCounts).reduce((a, b) =>
-      emotionCounts[a] > emotionCounts[b] ? a : b
-    );
-
-    const formattedEmotion = detectedEmotion.charAt(0).toUpperCase() + detectedEmotion.slice(1);
-    setDetectedEmotion(formattedEmotion);
-
-    // Skip fetching YouTube videos for "excited" or "happy"
-    if (detectedEmotion !== 'excited' && detectedEmotion !== 'happy') {
-      fetchYouTubeVideos(detectedEmotion);
-    } else {
-      setVideos([]);  // Clear any existing videos when "excited" or "happy" is detected
-    }
-  };
-
-  const fetchYouTubeVideos = async (emotion) => {
-    try {
-      const query = `${emotion}+relief`;
-      const response = await fetch(
-        `${YOUTUBE_API_URL}?part=snippet&type=video&maxResults=3&q=${query}&key=${YOUTUBE_API_KEY}`
-      );
-      const data = await response.json();
-      setVideos(data.items);
-    } catch (error) {
-      console.error("Error fetching YouTube videos:", error);
-    }
-  };
+  const result = calculateMood(score);
 
   return (
-    <Box p={5}>
-      <VStack spacing={4}>
-        <Stepper index={currentQuestionIndex} colorScheme="teal" size="lg">
-          {steps.map((step, index) => (
-            <Step key={index} onClick={() => setCurrentQuestionIndex(index)}>
-              <StepIndicator>
-                <StepStatus
-                  complete={responses[index] !== undefined ? <StepIcon /> : null}
-                  incomplete={<StepNumber />}
-                  active={<StepNumber />}
-                />
-              </StepIndicator>
-
-              <Box flexShrink='0'>
-                <Text>{step.title}</Text>
-              </Box>
-
-              <StepSeparator />
-            </Step>
-          ))}
-        </Stepper>
-
-        <Box textAlign="center" mt={5}>
-          {quizCompleted ? (  // Check if quiz is completed
-            <>
-              <Text fontSize="lg" mt={4}>All questions answered. Analyzing your emotion...</Text>
-            </>
-          ) : (
-            <>
-              <Text fontSize="lg" mt={4}>
-                {steps[currentQuestionIndex].description}
-              </Text>
-              <Button
-                onClick={() => handleResponse('yes')}
-                colorScheme="teal"
-                isFullWidth
-                m={2}
-              >
-                Yes
-              </Button>
-              <Button
-                onClick={() => handleResponse('no')}
-                colorScheme="teal"
-                isFullWidth
-                m={2}
-              >
-                No
-              </Button>
-            </>
-          )}
-        </Box>
-
-        {detectedEmotion && (
-          <Text fontSize="xl" mt={4} color="blue.500">
-            Detected Emotion: {detectedEmotion}
+    <Box maxW="700px" mx="auto" mt="10" p="5" borderWidth="1px" borderRadius="lg">
+      {!isFinished ? (
+        <VStack spacing={5}>
+          <Text fontSize="xl" fontWeight="bold">
+            Question {currentQuestion + 1} of {questions.length}
           </Text>
-        )}
+          <Text fontSize="lg" textAlign="center">
+            {questions[currentQuestion].question}
+          </Text>
 
-        {videos.length > 0 && (
-          <VideoSection>
-            <Text fontSize="xl" mt={4}>Suggested Videos for {detectedEmotion}:</Text>
-            <VideoGrid>
-              {videos.map((video) => (
-                <VideoCard key={video.id.videoId}>
-                  <Thumbnail
-                    src={video.snippet.thumbnails.medium.url}
-                    alt={video.snippet.title}
-                  />
-                  <VideoTitle>{video.snippet.title}</VideoTitle>
-                  <VideoLink
-                    href={`https://www.youtube.com/watch?v=${video.id.videoId}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Watch Video
-                  </VideoLink>
-                </VideoCard>
+          <RadioGroup
+            onChange={(value) => setSelectedOption(Number(value))}
+            value={selectedOption !== null ? String(selectedOption) : ""}
+          >
+            <Stack spacing={3} direction="column" alignItems="start">
+              {questions[currentQuestion].options.map((option, index) => (
+                <Radio key={index} value={String(option.score)}>
+                  {option.text}
+                </Radio>
               ))}
-            </VideoGrid>
-          </VideoSection>
-        )}
-      </VStack>
+            </Stack>
+          </RadioGroup>
+
+          <Button colorScheme="teal" onClick={handleNext} isDisabled={selectedOption === null}>
+            {currentQuestion === questions.length - 1 ? "Finish" : "Next"}
+          </Button>
+
+          <Progress
+            value={((currentQuestion + 1) / questions.length) * 100}
+            size="sm"
+            width="100%"
+            colorScheme="teal"
+          />
+        </VStack>
+      ) : (
+        <VStack spacing={5}>
+          <Text fontSize="2xl" fontWeight="bold">
+            Quiz Complete!
+          </Text>
+          <Box width="150px" height="150px">
+            <CircularProgressbar
+              value={(score / (questions.length * 4)) * 100}
+              text={`${score}`}
+              styles={buildStyles({
+                textSize: "16px",
+                pathColor: result.color,
+                textColor: result.color,
+                trailColor: "#d6d6d6",
+              })}
+            />
+          </Box>
+          <Text fontSize="lg" textAlign="center">
+            Your stress level is: <strong>{result.mood}</strong>
+          </Text>
+          <Text fontSize="sm" textAlign="center" color="gray.600">
+            Total Score: {score}
+          </Text>
+          <Button colorScheme="teal" onClick={() => window.location.reload()}>
+            Retake Quiz
+          </Button>
+        </VStack>
+      )}
     </Box>
   );
 };
 
 export default QuizPage;
-
-const VideoSection = styled.div`
-  margin-top: 20px;
-  width: 80%;
-`;
-
-const VideoGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-`;
-
-const VideoCard = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background-color: white;
-  padding: 15px;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-`;
-
-const Thumbnail = styled.img`
-  width: 100%;
-  border-radius: 8px;
-  margin-bottom: 10px;
-`;
-
-const VideoTitle = styled.h4`
-  text-align: center;
-  margin: 10px 0;
-  font-size: 16px;
-  color: #333;
-`;
-
-const VideoLink = styled.a`
-  text-decoration: none;
-  color: #4b9cdf;
-  font-weight: bold;
-  &:hover {
-    text-decoration: underline;
-  }
-`;

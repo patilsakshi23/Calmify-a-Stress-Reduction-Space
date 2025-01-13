@@ -7,6 +7,8 @@ import TextImage from "../../assets/textoption.jpeg";
 import AudioImage from "../../assets/audiooption.jpeg";
 import VideoImage from "../../assets/videooption.jpeg";
 import QuizeImage from "../../assets/quizeoption.jpeg";
+
+import Mindful from "./Activities/Mindful.js";
 import { signOut } from "firebase/auth";
 import { auth } from "../../firebaseConfig";
 
@@ -150,7 +152,7 @@ function InputsPage({ user }) {
             <CardContent>
               <StyledHeading>Audio</StyledHeading>
               <StyledText>Convey your feelings or thoughts by uploading or recording audio.</StyledText>
-              <StarRating>{renderStars("audio")}</StarRating>
+             
             </CardContent>
           </StyledCard>
           <StyledCard onClick={handleTextClick}>
@@ -171,6 +173,8 @@ function InputsPage({ user }) {
           </StyledCard>
         </StyledStack>
       </div>
+      <div style={{ textAlign: "center", marginTop: "1000px" }}>
+      <Mindful/></div>
     </div>
   );
 }

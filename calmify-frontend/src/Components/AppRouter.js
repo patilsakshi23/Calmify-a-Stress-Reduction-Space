@@ -5,13 +5,13 @@ import VideoPage from "../Pages/Inputs/VideoPage";
 import TextPage from "../Pages/Inputs/TextPage";
 import InputsPage from "../Pages/Inputs/InputsPage";
 import HomePage from "../Pages/HomePage/HomePage";
-import ExerciseOption from "../Pages/HomePage/ExerciseOption";
-import YogaOption from "../Pages/HomePage/YogaOption";
-import MindfulOption from "../Pages/HomePage/MindfulOption";
-import FunActivitiesOption from "../Pages/HomePage/FunActivitiesOption";
-import GamePage from "../Pages/HomePage/GamePage";
-import MusicPage from "../Pages/HomePage/MusicPage";
-
+import ExerciseOption from "../Pages/HomePage/Exercise/ExerciseOption";
+import YogaOption from "../Pages/HomePage/Yoga/YogaOption";
+// import MindfulOption from "../Pages/HomePage/MindfulOption";
+import FunActivitiesOption from "../Pages/HomePage/FunActivity/FunActivitiesOption";
+import GamePage from "../Pages/HomePage/FunActivity/Games/GamePage";
+import MusicPage from "../Pages/HomePage/FunActivity/Music/MusicPage";
+import MindfulActivity from "../Pages/Inputs/Activities/Mindful"
 
 
 import LoginPage from "../Pages/Authentication/LoginPage";
@@ -42,10 +42,12 @@ export default function AppRouter() {
         <Route path="/input" element={user ? <InputsPage user={user} /> : <LoginPage setUser={setUser} />} />
         <Route path="/yogaoption" element={<YogaOption />} />
         <Route path="/exerciseoption" element={<ExerciseOption />} />
-        <Route path="/mindfuloption" element={<MindfulOption />} />
+        {/* <Route path="/mindful" element={<MindfulOption />} /> */}
         <Route path="/funactivitiesoption" element={<FunActivitiesOption />} />
         <Route path="/games" element={<GamePage />} />
         <Route path="/music" element={<MusicPage />} />
+
+        <Route path="/mindful" element={<MindfulActivity />} />
 
 
       </Routes>
