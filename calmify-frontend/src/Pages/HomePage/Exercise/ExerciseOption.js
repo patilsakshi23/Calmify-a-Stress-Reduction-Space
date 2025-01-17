@@ -20,13 +20,14 @@ import { getDatabase, ref, onValue } from "firebase/database";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import YouTube from 'react-youtube'; // Import YouTube component
-import exercise1 from "../../../assets/Yoga/child_pose.png";
-import exercise2 from "../../../assets/Yoga/downward_facing_dog.png";
-import exercise3 from "../../../assets/Yoga/savasana.png";
-import exercise4 from "../../../assets/Yoga/viparita_karani.png";
-import exercise5 from "../../../assets/Yoga/utthita_trikonasana.png";
-import exercise6 from "../../../assets/Yoga/utthita_trikonasana.png";
-import exercise7 from "../../../assets/Yoga/utthita_trikonasana.png";
+import CalmifyLogo from "../../../assets/logocalmify.png";
+import exercise1 from "../../../assets/Exercise/exercise1.jpg";
+import exercise2 from "../../../assets/Exercise/exercise2.jpg";
+import exercise3 from "../../../assets/Exercise/exercise3.jpg";
+import exercise4 from "../../../assets/Exercise/exercise4.jpg";
+import exercise5 from "../../../assets/Exercise/exercise5.jpg";
+import exercise6 from "../../../assets/Exercise/exercise6.jpg";
+import exercise7 from "../../../assets/Exercise/exercise7.jpg";
 
 const ExerciseOption = () => {
   const navigate = useNavigate();
@@ -37,10 +38,14 @@ const ExerciseOption = () => {
   
   // Array of YouTube video links
   const videos = [
-    "https://youtu.be/1xRX1MuoImw?feature=shared&t=17",
-    "https://youtu.be/EC7RGJ975iM?feature=shared",
-    "https://youtu.be/1VYlOKUdylM?feature=shared",
-    "https://youtu.be/a4thkiW2uPA?feature=shared"
+    "https://youtu.be/AbPufvvYiSw?t=44",
+    "https://youtu.be/qEVNj4tcr0Y?t=3",
+    "https://youtu.be/g_tea8ZNk5A?t=8",
+    "https://youtu.be/yUNvvuJZa_c",
+    "https://youtu.be/FEo514Kp_ys?t=6",
+    "https://youtu.be/16qCwSMGqx4",
+    "https://youtu.be/2zMMjowsfB0"
+
   ];
 
   // Extract video ID and start time from YouTube URL
@@ -63,7 +68,7 @@ const ExerciseOption = () => {
   // Fetch data from Firebase Realtime Database
   useEffect(() => {
     const db = getDatabase();
-    const cardsRef = ref(db, "ExerciseCards");
+    const cardsRef = ref(db, "ExcerciseCards");
     const unsubscribe = onValue(
       cardsRef,
       (snapshot) => {
@@ -86,8 +91,8 @@ const ExerciseOption = () => {
     onOpen();
   };
 
-  const handleBackClick = () => {
-    navigate("/");
+  const handleLogoClick = () => {
+    navigate("/"); 
   };
 
   // YouTube video options, dynamically set start time
@@ -102,33 +107,21 @@ const ExerciseOption = () => {
 
   return (
     <div>
-      <nav
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          backgroundColor: "#f8f9fa",
-          padding: "10px 20px",
-          fontFamily: "Arial, sans-serif",
-        }}
-      >
-        <div style={{ fontSize: "24px", fontWeight: "bold" }}>Calmify</div>
-        <Heading justify="center" m={5}>
-          Exercise
-        </Heading>
-        <Button onClick={handleBackClick} style={buttonStyle}>
-          Back
-        </Button>
-      </nav>
+     <StyledNav>
+             <Logo onClick={handleLogoClick} >
+                 <LogoImg src={CalmifyLogo} alt="Calmify" />
+             </Logo>
+           </StyledNav>
+           <Heading justify="center" m={15} textAlign={"center"} >Exercise</Heading>
 
       <div style={{ textAlign: "center" }}>
-        <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={10} m={20}>
+        <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={10} m={10} >
           {cards.map((card, index) => {
             const { videoId, startTime } = getVideoIdAndStartTime(videos[index]); // Get videoId and startTime
             return (
-              <Card maxW="sm" key={index} onClick={() => handleCardClick(card, videoId, startTime)}>
-                <CardBody>
-                  <Image src={images[index]} alt={card.title} borderRadius="lg" />
+              <Card maxW="sm" key={index} onClick={() => handleCardClick(card, videoId, startTime)} style={StyledCard}>
+                <CardBody >
+                  <Image src={images[index]} alt={card.title} borderRadius="lg"   style={ImageStyle}/>
                   <Stack mt="6" spacing="3">
                     <Heading size="md">{card.title}</Heading>
                     <Text>{card.shortInfo}</Text>
@@ -164,11 +157,14 @@ const ExerciseOption = () => {
 
 export default ExerciseOption;
 
-const buttonStyle = {
-  padding: "10px 20px",
-  fontSize: "16px",
-  margin: "10px",
-  cursor: "pointer",
+
+
+const ImageStyle = {
+  width: "100%",
+  height: "300px",
+  objectFit: "cover",
+  borderTopLeftRadius: "10px",
+  borderTopRightRadius: "10px"
 };
 
 const InfoCard = styled.div`
@@ -176,4 +172,41 @@ const InfoCard = styled.div`
   border-radius: 5px;
   padding: 10px;
   margin-bottom: 10px;
+`;
+
+
+const StyledCard = {
+  width: "360px",
+  height: "510px",
+  boxShadow: "0 4px 10px  rgba(0, 0, 0, 0.23)",
+  borderRadius: "10px",
+  overflow: "hidden",
+  transition: "transform 0.3s ease-in-out", // Smooth transition for hover effect
+  display: "flex",
+  flexDirection: "column",
+  cursor: "pointer",
+};
+
+
+
+const StyledNav = styled.nav`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color:rgb(239, 241, 244);
+  padding: 15px 20px;
+  font-family: Arial, sans-serif;
+  font-size: 24px;
+  font-weight: bold;
+`;
+
+const Logo = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const LogoImg = styled.img`
+  height: 40px;
+  margin-right: 20px;
+  cursor: pointer;
 `;

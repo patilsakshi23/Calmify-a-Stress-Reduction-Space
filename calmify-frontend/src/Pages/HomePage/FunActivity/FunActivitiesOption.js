@@ -101,7 +101,7 @@ function FunActivitiesOption() {
             <LogoImg src={CalmifyLogo} alt="Calmify" />
         </Logo>
       </StyledNav>
-      <Heading justify="center" m={15} marginLeft={700}>Fun Activities</Heading>
+      <Heading justify="center" m={15} textAlign={"center"} >Fun Activities</Heading>
       <StyledStack>
         <StyledCard onClick={handleGamesClick}>
             <StyledImage src={GameImage} alt="Audio" />
