@@ -18,8 +18,10 @@ import backgroundImage from "../../assets/loginsignup.png";
 
 import styled from "styled-components";
 import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth, googleProvider, db } from "../../firebaseConfig";
+
 import { getDatabase, ref, set } from "firebase/database";
-import { auth } from "../../firebaseConfig";
+// import { auth } from "../../firebaseConfig";
 import { useNavigate } from "react-router-dom";
 import showeye from "../../assets/12.png";
 import hideeye from "../../assets/13.png";
@@ -27,6 +29,8 @@ import hideeye from "../../assets/13.png";
 function SignupPage({ setUser }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [lname, setLname] = useState("");
   const navigate = useNavigate();
   const toast = useToast();
   const handleClick = () => setShow(!show);
@@ -35,40 +39,38 @@ function SignupPage({ setUser }) {
   const handleSignup = async (e) => {
     e.preventDefault();
     try {
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
-      setUser(user);
-
-      // Save the newly created user to Firebase Realtime Database
+  
+      // Save user details to Firebase
       const database = getDatabase();
       const userRef = ref(database, `users/${user.uid}`);
-
-      set(userRef, {
+      await set(userRef, {
+        firstName: name,
+        lastName: lname,
         email: user.email,
-        sessions: {}, // You can initialize empty sessions for Text, Video, Audio, Quiz
-      })
-        .then(() => {
-          console.log("User data saved to Firebase.");
-        })
-        .catch((error) => {
-          console.error("Error saving user data:", error);
-        });
-
-      navigate("/input"); // Redirect to input page after signup
+        sessions: {},
+      });
+  
+      // Update user context
+      setUser({
+        ...user,
+        firstName: name,
+        lastName: lname,
+      });
+  
+      navigate("/input"); // Redirect after signup
     } catch (error) {
       toast({
         title: "Signup failed.",
-        description: "Please check your email and password.",
+        description: "Please check all the information.",
         status: "error",
         duration: 5000,
         isClosable: true,
       });
     }
   };
+  
 
   return (
     <Section>
@@ -85,7 +87,7 @@ function SignupPage({ setUser }) {
           // boxShadow="2xl"
           borderRadius={40}
           position="fixed"
-          top="120px"
+          top="40px"
           right="60px"
           left="150px"
           height={600}
@@ -103,10 +105,37 @@ function SignupPage({ setUser }) {
             >
               Sign Up
             </Heading>
-            <FormControl pl="30px" id="email">
-              <Text fontSize="xl" mb={5}>
+            <Text pl="30px" fontSize="xl" mb={5}>
                 Signup for creating new account
               </Text>
+              <FormControl pl="30px" id="name">
+              
+              <Input
+                mb={5}
+                h="50px"
+                w="350px"
+                type="text"
+                placeholder="Enter your Name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                isRequired
+              />
+            </FormControl>  
+            <FormControl pl="30px" id="lname">
+              
+              <Input
+                mb={5}
+                h="50px"
+                w="350px"
+                type="text"
+                placeholder="Enter your Last Name"
+                value={lname}
+                onChange={(e) => setLname(e.target.value)}
+                isRequired
+              />
+            </FormControl> 
+            <FormControl pl="30px" id="email">
+              
               <Input
                 mb={5}
                 h="50px"

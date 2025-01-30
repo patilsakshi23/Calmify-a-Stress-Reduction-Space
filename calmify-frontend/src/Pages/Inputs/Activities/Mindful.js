@@ -4,12 +4,19 @@ import {
   Button,
   Text,
   Grid,
-  GridItem,
   HStack,
   Heading,
   useToast,
   Card,
+  Stack,
   CardBody,
+  // CardHeader,
+  // Fade,
+  // ScaleFade,
+  // Slide,
+  useDisclosure,
+  // SlideFade,
+  Collapse,
   CardHeader,
 } from "@chakra-ui/react";
 import styled from "styled-components";
@@ -135,6 +142,7 @@ const Mindful = () => {
   const [isPaused, setIsPaused] = useState(false);
   const toast = useToast();
   const navigate = useNavigate();
+  const { isOpen, onToggle } = useDisclosure();
 
   const handleActivitySelection = (activity) => {
     setSelectedActivity(activity);
@@ -210,119 +218,89 @@ const Mindful = () => {
   };
 
   return (
-    <Section>
-      <LeftSection>
-        <Img src={yoga} alt="yoga img" />
-      </LeftSection>
-
-      <RightSection>
-        <Card
-          size="xl"
-          align="center"
-          padding={10}
-          display="flex"
-          boxShadow="2xl"
-          borderRadius={40}
-          // position="fixed"
-          // zIndex={1}
-          top="120px"
-          right="60px"
-          left="950px"
-          height={600}
-          width={500}
-          bgColor="white"
-        >
-          <CardHeader>
-            <Heading as="h2" size="2xl" color={"#404060"}>
-              Mindful Activity
-            </Heading>
-          </CardHeader>
-
+    <>
+      <Heading as="h2" size="2xl" mt={190} left="10px" color={"#404060"}>
+        Mindful Activity
+      </Heading>
+      <Section>
+        <LeftSection>
           {!selectedActivity ? (
-            <CardBody
-              position="fixed"
-              align="center"
-              top="220px"
-              // right="60px"
-              // left="950px"
-              height={600}
-            >
-              <Box>
-                <Heading mb={4}>Choose an activity</Heading>
-                <Grid templateColumns="repeat(2, 1fr)" gap={6}>
-                  {Object.keys(mindfulActivities).map((activity) => (
-                    <Button
-                      key={activity}
-                      onClick={() => handleActivitySelection(activity)}
-                      borderRadius={10}
-                      bg="#E6E7F1"
-                      color="#404060"
-                      _hover={{ bg: "#BDBFD9" }}
-                      w="150px"
-                      h="150px"
-                    >
-                      <Text fontSize="xl">{activity}</Text>
-                    </Button>
-                  ))}
-                </Grid>
-              </Box>
-            </CardBody>
-          ) : (
-            <CardBody
-              position="fixed"
-              align="center"
-              top="260px"
-              // ml={20}
-              // mr={20}
-              // right="60px"
-              // left="950px"
-              height={600}
-            >
-              <Box>
-                <Heading mb={4}>
-                  {mindfulActivities[selectedActivity][0].name}
-                </Heading>
-                <Text fontSize="lg" mb={2}>
-                  {mindfulActivities[selectedActivity][currentStepIndex].step}
-                </Text>
-                <Text fontSize="md" mb={2}>
-                  Timer: {timer} seconds
-                </Text>
-                <HStack justifyContent="space-between" mt={4}>
-                  <Button onClick={handleBackButton} colorScheme="red">
-                    Back
-                  </Button>
-                  {!isTimerRunning && (
-                    <Button
-                      onClick={startTimer}
-                      colorScheme="green"
-                      isDisabled={isTimerRunning}
-                    >
-                      Start
-                    </Button>
-                  )}
-                  {isTimerRunning && (
-                    <Button onClick={handlePauseResume} colorScheme="yellow">
-                      {isPaused ? "Resume" : "Pause"}
-                    </Button>
-                  )}
-                  <Button
-                    onClick={handleNextStep}
-                    isDisabled={
-                      currentStepIndex ===
-                      mindfulActivities[selectedActivity].length - 1
-                    }
-                    colorScheme="blue"
+            <Box>
+              <Text fontSize='2xl' mb={7}>Choose an activity</Text>
+              <Stack spacing={4}>
+                {Object.keys(mindfulActivities).map((activity) => (
+                  <Card
+                    box-shadow=" 0 4px 8px rgba(0, 0, 0, 0.1);"
+                    border-radius="10px"
+                    outline='rgba(0, 0, 0, 0.1)'
+                    overflow=" hidden"
+                    display=" flex"
+                    h="100px"
+                    align="center"
+                    w="500px"
+                    boxShadow="lg"
+                    size="sm"
+                    key={activity}
+                    onClick={() => handleActivitySelection(activity)}
+                    transition="all 0.5s ease-in-out"
+                    _hover={{ transform: "scale(1.1)", boxShadow: "xl" }}
                   >
-                    Next
+                    <Text pt={10}>
+                      <Text fontSize="2xl">{activity}</Text>
+                    </Text>
+                  </Card>
+                ))}
+              </Stack>
+            </Box>
+          ) : (
+            <Box>
+              <Heading mb={4}>
+                {mindfulActivities[selectedActivity][0].name}
+              </Heading>
+              <Text fontSize="lg" mb={2}>
+                {mindfulActivities[selectedActivity][currentStepIndex].step}
+              </Text>
+              <Text fontSize="md" mb={2}>
+                Timer: {timer} seconds
+              </Text>
+              <HStack justifyContent="space-between" mt={4}>
+                <Button onClick={handleBackButton} colorScheme="red">
+                  Back
+                </Button>
+                {!isTimerRunning && (
+                  <Button
+                    onClick={startTimer}
+                    colorScheme="green"
+                    isDisabled={isTimerRunning}
+                  >
+                    Start
                   </Button>
-                </HStack>
-              </Box>
-            </CardBody>
+                )}
+                {isTimerRunning && (
+                  <Button onClick={handlePauseResume} colorScheme="yellow">
+                    {isPaused ? "Resume" : "Pause"}
+                  </Button>
+                )}
+                <Button
+                  onClick={handleNextStep}
+                  isDisabled={
+                    currentStepIndex ===
+                    mindfulActivities[selectedActivity].length - 1
+                  }
+                  colorScheme="blue"
+                >
+                  Next
+                </Button>
+              </HStack>
+            </Box>
           )}
-        </Card>
-      </RightSection>
-    </Section>
+        </LeftSection>
+
+        <RightSection>
+          <Img src={yoga} alt="yoga img" />
+        </RightSection>
+      </Section>
+    </>
   );
 };
 

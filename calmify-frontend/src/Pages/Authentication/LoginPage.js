@@ -36,31 +36,30 @@ function LoginPage({ setUser }) {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
-      setUser(user);
-
+  
       // Fetch user data from Firebase Database
       const database = getDatabase();
       const userRef = ref(database, `users/${user.uid}`);
-
+  
       get(userRef)
         .then((snapshot) => {
-          if (!snapshot.exists()) {
-            // If no data exists, you can initialize some default data for the user
-            console.log("No user data found, initializing data...");
+          if (snapshot.exists()) {
+            const userData = snapshot.val();
+            setUser({
+              ...user,
+              firstName: userData.firstName,
+              lastName: userData.lastName,
+            });
           } else {
-            console.log("User data:", snapshot.val());
+            console.log("No user data found");
           }
         })
         .catch((error) => {
           console.error("Error fetching user data:", error);
         });
-
+  
       navigate("/input"); // Redirect to the input page after login
     } catch (error) {
       toast({
@@ -72,6 +71,7 @@ function LoginPage({ setUser }) {
       });
     }
   };
+  
 
   return (
     <Section >
