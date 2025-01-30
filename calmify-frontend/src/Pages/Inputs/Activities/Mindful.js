@@ -219,14 +219,14 @@ const Mindful = () => {
 
   return (
     <>
-      <Heading as="h2" size="2xl" mt={190} left="10px" color={"#404060"}>
+      <Heading as="h2" size="2xl" mt={170} left="10px" color={"#404060"}>
         Mindful Activity
       </Heading>
       <Section>
         <LeftSection>
           {!selectedActivity ? (
             <Box>
-              <Text fontSize='2xl' mb={7}>Choose an activity</Text>
+              <Text fontSize='2xl' mb={7} color="grey"    >Choose an activity</Text>
               <Stack spacing={4}>
                 {Object.keys(mindfulActivities).map((activity) => (
                   <Card
@@ -246,7 +246,7 @@ const Mindful = () => {
                     _hover={{ transform: "scale(1.1)", boxShadow: "xl" }}
                   >
                     <Text pt={10}>
-                      <Text fontSize="2xl">{activity}</Text>
+                      <Text fontSize="2xl" >{activity}</Text>
                     </Text>
                   </Card>
                 ))}

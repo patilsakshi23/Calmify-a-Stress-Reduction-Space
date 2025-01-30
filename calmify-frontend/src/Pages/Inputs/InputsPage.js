@@ -14,6 +14,8 @@ import QuizeImage from "../../assets/quizeoption.jpeg";
 import CalmifyLogo from "../../assets/logocalmify.png";
 
 import Mindful from "./Activities/Mindful.js";
+import ConsultDr from "./Activities/ConsultDr.js";
+
 import { signOut } from "firebase/auth";
 import { auth } from "../../firebaseConfig";
 import { useAuth } from "../Authentication/AuthContext.js";
@@ -78,7 +80,7 @@ function InputsPage() {
           Hello, {user?.firstName} {user?.lastName}
         </Heading>
         <Text fontSize="2xl" color="grey" pt="5">
-          Select any option to convey your thought or feeling to us!!
+          Select any option to convey your thoughts or feelings to us!!
         </Text>
       </div>
 
@@ -134,6 +136,9 @@ function InputsPage() {
       {/* Mindfulness Section */}
       <div style={{ textAlign: "center", marginTop: "90px" }}>
         <Mindful />
+      </div>
+      <div style={{ textAlign: "center", marginTop: "120px" }}>
+        <ConsultDr />
       </div>
     </div>
   );

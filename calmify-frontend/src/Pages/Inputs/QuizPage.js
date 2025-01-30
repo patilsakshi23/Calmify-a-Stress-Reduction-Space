@@ -8,9 +8,12 @@ import {
   Text,
   Progress,
   Stack,
+  Card,
 } from "@chakra-ui/react";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
+import styled from "styled-components";
+import quiz from "../../assets/quiz.jpg";
 
 const questions = [
   {
@@ -114,70 +117,131 @@ const QuizPage = () => {
   const result = calculateMood(score);
 
   return (
-    <Box maxW="700px" mx="auto" mt="10" p="5" borderWidth="1px" borderRadius="lg">
-      {!isFinished ? (
-        <VStack spacing={5}>
-          <Text fontSize="xl" fontWeight="bold">
-            Question {currentQuestion + 1} of {questions.length}
-          </Text>
-          <Text fontSize="lg" textAlign="center">
-            {questions[currentQuestion].question}
-          </Text>
+    <div>
+      <Section>
+        <LeftSection>
+          <Card
+            h="600px"
+            w="700px"
+            alignItems="center"
+            // justifyContent="center"
+            // display="flex"
+            // maxW="700px"
+            // mx="auto"
+            // mt="10"
+            p="10"
+            pt="100px"
 
-          <RadioGroup
-            onChange={(value) => setSelectedOption(Number(value))}
-            value={selectedOption !== null ? String(selectedOption) : ""}
+            // borderRadius="lg"
           >
-            <Stack spacing={3} direction="column" alignItems="start">
-              {questions[currentQuestion].options.map((option, index) => (
-                <Radio key={index} value={String(option.score)}>
-                  {option.text}
-                </Radio>
-              ))}
-            </Stack>
-          </RadioGroup>
+            {!isFinished ? (
+              <VStack spacing={5}>
+                <Progress
+                  value={((currentQuestion + 1) / questions.length) * 100}
+                  size="sm"
+                  width="400px"
+                  color="#a693ec"
+                />
+                <Text fontSize="2xl" fontWeight="bold">
+                  Question {currentQuestion + 1} of {questions.length}
+                </Text>
+                <Text fontSize="xl" textAlign="center">
+                  {questions[currentQuestion].question}
+                </Text>
 
-          <Button colorScheme="teal" onClick={handleNext} isDisabled={selectedOption === null}>
-            {currentQuestion === questions.length - 1 ? "Finish" : "Next"}
-          </Button>
+                <RadioGroup
+                  onChange={(value) => setSelectedOption(Number(value))}
+                  value={selectedOption !== null ? String(selectedOption) : ""}
+                >
+                  <Stack spacing={6} direction="column" alignItems="start">
+                    {questions[currentQuestion].options.map((option, index) => (
+                      <Radio
+                        color="#a693ec"
+                        key={index}
+                        value={String(option.score)}
+                      >
+                        {option.text}
+                      </Radio>
+                    ))}
+                  </Stack>
+                </RadioGroup>
 
-          <Progress
-            value={((currentQuestion + 1) / questions.length) * 100}
-            size="sm"
-            width="100%"
-            colorScheme="teal"
-          />
-        </VStack>
-      ) : (
-        <VStack spacing={5}>
-          <Text fontSize="2xl" fontWeight="bold">
-            Quiz Complete!
-          </Text>
-          <Box width="150px" height="150px">
-            <CircularProgressbar
-              value={(score / (questions.length * 4)) * 100}
-              text={`${score}`}
-              styles={buildStyles({
-                textSize: "16px",
-                pathColor: result.color,
-                textColor: result.color,
-                trailColor: "#d6d6d6",
-              })}
-            />
-          </Box>
-          <Text fontSize="lg" textAlign="center">
-            Your stress level is: <strong>{result.mood}</strong>
-          </Text>
-          <Text fontSize="sm" textAlign="center" color="gray.600">
-            Total Score: {score}
-          </Text>
-          <Button colorScheme="teal" onClick={() => window.location.reload()}>
-            Retake Quiz
-          </Button>
-        </VStack>
-      )}
-    </Box>
+                <Button
+                bgColor="#a693ec"
+                  color="rgb(0, 0, 0)"
+                  onClick={handleNext}
+                  isDisabled={selectedOption === null}
+                >
+                  {currentQuestion === questions.length - 1 ? "Finish" : "Next"}
+                </Button>
+              </VStack>
+            ) : (
+              <VStack spacing={5}>
+                <Text fontSize="2xl" fontWeight="bold">
+                  Quiz Complete!
+                </Text>
+                <Box width="150px" height="150px">
+                  <CircularProgressbar
+                    value={(score / (questions.length * 4)) * 100}
+                    text={`${score}`}
+                    styles={buildStyles({
+                      textSize: "16px",
+                      pathColor: result.color,
+                      textColor: result.color,
+                      trailColor: "#d6d6d6",
+                    })}
+                  />
+                </Box>
+                <Text fontSize="lg" textAlign="center">
+                  Your stress level is: <strong>{result.mood}</strong>
+                </Text>
+                <Text fontSize="sm" textAlign="center" color="gray.600">
+                  Total Score: {score}
+                </Text>
+                <Button
+                  color="#a693ec"
+                  onClick={() => window.location.reload()}
+                >
+                  Retake Quiz
+                </Button>
+              </VStack>
+            )}
+          </Card>
+        </LeftSection>
+
+        <RightSection>
+          <Img src={quiz} alt="img" />
+        </RightSection>
+      </Section>
+    </div>
   );
 };
 
 export default QuizPage;
+const Img = styled.img`
+  width: 80%;
+  height: 80%;
+  object-fit: cover;
+`;
+
+const Section = styled.div`
+  display: flex;
+  height: 100vh;
+  padding: 20px;
+  box-sizing: border-box;
+`;
+
+const LeftSection = styled.div`
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const RightSection = styled.div`
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+`;
