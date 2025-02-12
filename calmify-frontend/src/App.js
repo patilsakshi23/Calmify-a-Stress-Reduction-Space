@@ -1,5 +1,6 @@
 import React from "react";
 import AppRouter from "./Components/AppRouter";
+
 import { createGlobalStyle } from 'styled-components';
 
 const GlobalStyle = createGlobalStyle`
@@ -17,6 +18,7 @@ function App() {
   return (
     <div className="App">
      <GlobalStyle />
+    
       <AppRouter />
     </div>
   );
