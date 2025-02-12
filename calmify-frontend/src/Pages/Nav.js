@@ -1,16 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
-import styled from 'styled-components';
+import styled, { css }  from 'styled-components';
 import { Link } from 'react-scroll';
 import CalmifyLogo from "../assets/logocalmify.png";
 
 const Nav = () => {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isNavOpen, setIsNavOpen] = useState(false);
 
   const navigate = useNavigate();
 
   const handleLogoClick = () => {
     navigate("/"); // Navigate to the home route
+  };
+
+  const toggleNav = () => {
+    setIsNavOpen(!isNavOpen);
   };
 
   useEffect(() => {
@@ -30,24 +35,27 @@ const Nav = () => {
         <h3>Nothing is <b>Impossible</b>!!</h3>
       </Solgan>
       <NavBar>
-        <Logo onClick={handleLogoClick} >
+        <Logo onClick={handleLogoClick}>
           <LogoImg src={CalmifyLogo} alt="Calmify" />
         </Logo>
-        <NavLinks>
+        <HamburgerButton onClick={toggleNav}>
+          <HamburgerIcon isNavOpen={isNavOpen} />
+        </HamburgerButton>
+        <NavLinks isNavOpen={isNavOpen}>
           <NavLi>
-            <StyledLink to="home" smooth={true} duration={500}>HOME</StyledLink>
+            <StyledLink to="home" smooth={true} duration={500} onClick={() => setIsNavOpen(false)}>HOME</StyledLink>
           </NavLi>
           <NavLi>
-            <StyledLink to="yoga-practices" smooth={true} duration={500}>YOGA</StyledLink>
+            <StyledLink to="yoga-practices" smooth={true} duration={500} onClick={() => setIsNavOpen(false)}>YOGA</StyledLink>
           </NavLi>
           <NavLi>
-            <StyledLink to="fun-activities" smooth={true} duration={500}>FUN ACTIVITIES</StyledLink>
+            <StyledLink to="fun-activities" smooth={true} duration={500} onClick={() => setIsNavOpen(false)}>FUN ACTIVITIES</StyledLink>
           </NavLi>
           <NavLi>
-            <StyledLink to="exercises" smooth={true} duration={500}>EXERCISES</StyledLink>
+            <StyledLink to="exercises" smooth={true} duration={500} onClick={() => setIsNavOpen(false)}>EXERCISES</StyledLink>
           </NavLi>
           <NavLi>
-            <StyledLink to="contact" smooth={true} duration={500}>CONTACT US</StyledLink>
+            <StyledLink to="contact" smooth={true} duration={500} onClick={() => setIsNavOpen(false)}>CONTACT US</StyledLink>
           </NavLi>
         </NavLinks>
       </NavBar>
@@ -95,10 +103,80 @@ const LogoImg = styled.img`
   cursor: pointer;
 `;
 
-const NavLinks = styled.div`
+const HamburgerButton = styled.button`
+  display: none;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 30px;
+  height: 24px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 10;
+
+  @media (max-width: 768px) {
+    display: flex;
+  }
+`;
+
+const HamburgerIcon = styled.div`
+  width: 30px;
+  height: 3px;
+  background: black;
+  transition: all 0.3s ease;
+  position: relative;
+
+  &::before,
+  &::after {
+    content: "";
+    width: 30px;
+    height: 3px;
+    background: black;
+    position: absolute;
+    left: 0;
+    transition: all 0.3s ease;
+  }
+
+  &::before {
+    top: -8px;
+  }
+
+  &::after {
+    top: 8px;
+  }
+
+  ${({ isNavOpen }) =>
+    isNavOpen &&
+    css`
+      background: transparent;
+
+      &::before {
+        transform: rotate(45deg) translate(7px, 7px);
+      }
+
+      &::after {
+        transform: rotate(-45deg) translate(7px, -7px);
+      }
+    `}
+`;
+
+const NavLinks = styled.ul`
   list-style: none;
   display: flex;
   gap: 50px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    width: 100%;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: white;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: ${({ isNavOpen }) => (isNavOpen ? 'flex' : 'none')};
+  }
 `;
 
 const NavLi = styled.li`
@@ -110,7 +188,7 @@ const StyledLink = styled(Link)`
   color: inherit;
   text-decoration: none;
   cursor: pointer; /* This ensures the pointer appears on hover */
-  
+
   &:hover {
     color: #a8cc9c; /* Optional: Adds a hover effect */
   }
