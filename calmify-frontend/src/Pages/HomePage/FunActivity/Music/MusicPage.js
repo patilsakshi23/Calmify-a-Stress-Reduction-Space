@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import styled from "styled-components";
 import { FaPlay, FaPause, FaMusic } from "react-icons/fa";
-import { Tooltip } from '@chakra-ui/react'
+import { Tooltip } from '@chakra-ui/react';
 import CalmifyLogo from "../../../../assets/logocalmify.png";
 import { useNavigate } from "react-router-dom";
 // Import music files
@@ -15,14 +15,13 @@ import music7 from "../../../../assets/Music/The Winding Path.mp3";
 import music8 from "../../../../assets/Music/Weightless.mp3";
 import playlistImage from "../../../../assets/Music/song_cover.jpg"; // Add a suitable image
 
-
 // Styled Components
 
 const StyledNav = styled.nav`
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
-  background-color:rgb(239, 241, 244);
+  background-color: rgb(239, 241, 244);
   padding: 15px 20px;
   font-family: Arial, sans-serif;
   font-size: 24px;
@@ -42,20 +41,19 @@ const LogoImg = styled.img`
 
 const MusicContainer = styled.div`
   display: flex;
-  //  flex-direction: column;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  // height: 90vh;
-  // background: linear-gradient(135deg,rgba(140, 213, 235, 0.32),rgba(211, 123, 233, 0.16));
   padding: 20px;
   color: white;
-  // margin-top: 20px;
-  //  background: rgba(167, 193, 203, 0.11)
+
+  @media (max-width: 768px) {
+    padding: 10px;
+  }
 `;
 
 const Player = styled.div`
   background: rgba(167, 193, 203, 0.21);
-  // background: white;
   backdrop-filter: blur(10px);
   padding: 20px;
   border-radius: 15px;
@@ -63,8 +61,14 @@ const Player = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 900px;
-  height: 700px;
+  width: 90%;
+  max-width: 900px;
+  height: auto;
+
+  @media (max-width: 768px) {
+    width: 100%;
+    padding: 15px;
+  }
 `;
 
 const Playlist = styled.div`
@@ -75,13 +79,11 @@ const Playlist = styled.div`
   color: rgba(42, 56, 59, 0.82);
   border-radius: 10px;
   max-height: 450px;
-  
   overflow-y: auto;
 
-/* Custom Scrollbar */
+  /* Custom Scrollbar */
   &::-webkit-scrollbar {
     width: 8px; /* Scrollbar width */
-  
   }
 
   &::-webkit-scrollbar-track {
@@ -94,7 +96,11 @@ const Playlist = styled.div`
     border-radius: 10px;
   }
 
-  `;
+  @media (max-width: 768px) {
+    padding: 15px;
+    max-height: 400px; /* Increased height for small screens */
+  }
+`;
 
 const SongItem = styled.div`
   display: flex;
@@ -110,6 +116,31 @@ const SongItem = styled.div`
   &:hover {
     background: rgba(255, 255, 255, 0.71);
   }
+
+  @media (max-width: 768px) {
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 10px;
+  }
+`;
+
+const SongTitle = styled.span`
+  flex: 1;
+  text-align: left;
+  margin-left: 10px;
+
+  @media (max-width: 768px) {
+    margin-left: 5px;
+  }
+`;
+
+const MusicIcon = styled(FaMusic)`
+  display: inline-block;
+  margin-right: 10px;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 
 const PlaylistImage = styled.img`
@@ -118,12 +149,17 @@ const PlaylistImage = styled.img`
   object-fit: cover;
   border-radius: 10px;
   margin-bottom: 15px;
+
+  @media (max-width: 768px) {
+    width: 100px;
+    height: 100px;
+    margin-bottom: 10px;
+  }
 `;
 
 const PlayAllButton = styled.button`
-  background:rgba(6, 92, 158, 0.55);
+  background: rgba(6, 92, 158, 0.55);
   color: white;
-  // padding: 10px ;
   border: none;
   border-radius: 50px;
   cursor: pointer;
@@ -132,8 +168,15 @@ const PlayAllButton = styled.button`
   padding-left: 13px;
   width: 40px;
   height: 40px;
+
   &:hover {
     background: rgba(66, 155, 223, 0.55);
+  }
+
+  @media (max-width: 768px) {
+    width: 30px;
+    height: 30px;
+    font-size: 14px;
   }
 `;
 
@@ -156,7 +199,7 @@ const MusicPage = () => {
 
   const navigate = useNavigate();
   const handleLogoClick = () => {
-    navigate("/"); 
+    navigate("/");
   };
 
   const togglePlayPause = (index) => {
@@ -193,37 +236,38 @@ const MusicPage = () => {
 
   return (
     <div>
-    <StyledNav>
-      <Logo onClick={handleLogoClick} >
-        <LogoImg src={CalmifyLogo} alt="Calmify" />
-      </Logo>
-    </StyledNav>
-  
-    <MusicContainer>
-      <Player>
-        <PlaylistImage src={playlistImage} alt="Playlist Cover" />
-        <Tooltip label="Play All">
-        <PlayAllButton onClick={playAllSongs}> <FaPlay /></PlayAllButton>
-        </Tooltip>
-        <audio ref={audioRef} src={songs[currentSongIndex].src} onEnded={handleSongEnd} />
+      <StyledNav>
+        <Logo onClick={handleLogoClick}>
+          <LogoImg src={CalmifyLogo} alt="Calmify" />
+        </Logo>
+      </StyledNav>
 
-        {/* Playlist Section */}
-        <Playlist>
-          {songs.map((song, index) => (
-            <SongItem
-              key={index}
-              isPlaying={index === currentSongIndex}
-              onClick={() => togglePlayPause(index)}
-            >
-              <FaMusic />
-              <span>{song.title}</span>
-              {index === currentSongIndex && isPlaying ? <FaPause /> : <FaPlay />}
-            </SongItem>
-          ))}
-        </Playlist>
-      </Player>
-    </MusicContainer>
+      <MusicContainer>
+        <Player>
+          <PlaylistImage src={playlistImage} alt="Playlist Cover" />
+          <Tooltip label="Play All">
+            <PlayAllButton onClick={playAllSongs}>
+              <FaPlay />
+            </PlayAllButton>
+          </Tooltip>
+          <audio ref={audioRef} src={songs[currentSongIndex].src} onEnded={handleSongEnd} />
 
+          {/* Playlist Section */}
+          <Playlist>
+            {songs.map((song, index) => (
+              <SongItem
+                key={index}
+                isPlaying={index === currentSongIndex}
+                onClick={() => togglePlayPause(index)}
+              >
+                <MusicIcon />
+                <SongTitle>{song.title}</SongTitle>
+                {index === currentSongIndex && isPlaying ? <FaPause /> : <FaPlay />}
+              </SongItem>
+            ))}
+          </Playlist>
+        </Player>
+      </MusicContainer>
     </div>
   );
 };
