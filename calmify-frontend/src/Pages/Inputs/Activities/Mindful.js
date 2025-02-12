@@ -3,25 +3,14 @@ import {
   Box,
   Button,
   Text,
-  // Grid,
   HStack,
   Heading,
   useToast,
   Card,
   Stack,
-  // CardBody,
-  // CardHeader,
-  // Fade,
-  // ScaleFade,
-  // Slide,
-  // useDisclosure,
-  // SlideFade,
-  // Collapse,
-  // CardHeader,
 } from "@chakra-ui/react";
 import styled from "styled-components";
 import yoga from "../../../assets/Mindful/image_processing20200602-24882-19tmhn3.gif";
-// import { useNavigate } from "react-router-dom";
 
 const mindfulActivities = {
   Meditation: [
@@ -141,8 +130,6 @@ const Mindful = () => {
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const toast = useToast();
-  // const navigate = useNavigate();
-  // const { isOpen, onToggle } = useDisclosure();
 
   const handleActivitySelection = (activity) => {
     setSelectedActivity(activity);
@@ -207,7 +194,6 @@ const Mindful = () => {
       return () => clearTimeout(countdown);
     } else if (timer === 0 && isTimerRunning) {
       setIsTimerRunning(false);
-      // handleNextStep();
     }
   }, [timer, isTimerRunning, isPaused]);
 
@@ -219,34 +205,30 @@ const Mindful = () => {
 
   return (
     <>
-      <Heading as="h2" size="2xl" mt={170} left="10px" color={"#404060"}>
+      <Heading as="h2" size="2xl" mt={10} color="#404060" textAlign="center" marginTop={"100px"}>
         Mindful Activity
       </Heading>
       <Section>
         <LeftSection>
           {!selectedActivity ? (
             <Box>
-              <Text fontSize='2xl' mb={7} color="grey"    >Choose an activity</Text>
-              <Stack spacing={4}>
+              <Text fontSize="2xl" mb={7} color="grey" textAlign="center">
+                Choose an activity
+              </Text>
+              <Stack spacing={4} align="center" width="280px">
                 {Object.keys(mindfulActivities).map((activity) => (
                   <Card
-                    box-shadow=" 0 4px 8px rgba(0, 0, 0, 0.1);"
-                    border-radius="10px"
-                    outline='rgba(0, 0, 0, 0.1)'
-                    overflow=" hidden"
-                    display=" flex"
-                    h="100px"
-                    align="center"
-                    w="500px"
-                    boxShadow="lg"
-                    size="sm"
                     key={activity}
                     onClick={() => handleActivitySelection(activity)}
                     transition="all 0.5s ease-in-out"
                     _hover={{ transform: "scale(1.1)", boxShadow: "xl" }}
+                    boxShadow="lg"
+                    borderRadius="10px"
+                    p={4}
+                    width={{ base: "100%", md: "500px" }}
                   >
-                    <Text pt={10}>
-                      <Text fontSize="2xl" >{activity}</Text>
+                    <Text fontSize="2xl" textAlign="center">
+                      {activity}
                     </Text>
                   </Card>
                 ))}
@@ -254,13 +236,13 @@ const Mindful = () => {
             </Box>
           ) : (
             <Box>
-              <Heading mb={4}>
+              <Heading mb={4} textAlign="center">
                 {mindfulActivities[selectedActivity][0].name}
               </Heading>
-              <Text fontSize="lg" mb={2}>
+              <Text fontSize="lg" mb={2} textAlign="center">
                 {mindfulActivities[selectedActivity][currentStepIndex].step}
               </Text>
-              <Text fontSize="md" mb={2}>
+              <Text fontSize="md" mb={2} textAlign="center">
                 Timer: {timer} seconds
               </Text>
               <HStack justifyContent="space-between" mt={4}>
@@ -307,16 +289,28 @@ const Mindful = () => {
 export default Mindful;
 
 const Img = styled.img`
-  width: 80%;
-  height: 80%;
+  width: 100%;
+  height: auto;
   object-fit: cover;
+  max-width: 800px;
+
+  @media (max-width: 768px) {
+    width: 90%;
+    margin-bottom: 20px;
+  }
 `;
 
 const Section = styled.div`
   display: flex;
-  height: 100vh;
+  flex-direction: column;
+  align-items: center;
   padding: 20px;
   box-sizing: border-box;
+
+  @media (min-width: 769px) {
+    flex-direction: row;
+    justify-content: space-around;
+  }
 `;
 
 const LeftSection = styled.div`
@@ -324,6 +318,13 @@ const LeftSection = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
+  width: 100%;
+  padding: 20px;
+
+  @media (min-width: 769px) {
+    order: 1;
+  }
 `;
 
 const RightSection = styled.div`
@@ -332,4 +333,14 @@ const RightSection = styled.div`
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  width: 100%;
+  // padding: 20px;
+
+  @media (min-width: 769px) {
+    order: 2;
+  }
+
+  @media (max-width: 768px) {
+    order: -1;
+  }
 `;

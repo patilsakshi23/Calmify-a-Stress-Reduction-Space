@@ -11,7 +11,7 @@ import CalmifyLogo from "../../assets/logocalmify.png";
 import ActiveAlert from "../../assets/activealert.png";
 import Alert1 from "../../assets/alert.png";
 import Mindful from "./Activities/Mindful.js";
-import ConsultDr from "./Activities/ConsultDr.js";
+// import ConsultDr from "./Activities/ConsultDr.js";
 import { signOut } from "firebase/auth";
 import { auth } from "../../firebaseConfig";
 import { useAuth } from "../Authentication/AuthContext.js";
@@ -109,6 +109,8 @@ function InputsPage() {
           ) : (
             <StaticAlert onClick={handleAlertDR} src={Alert1} alt="Alert" />
           )}
+        
+        
         </AlertContainer>
         <Button onClick={handleLogout}>Logout</Button>
       </StyledNav>
@@ -176,9 +178,6 @@ function InputsPage() {
       <div style={{ textAlign: "center", marginTop: "50px" }}>
         <Mindful />
       </div>
-      <div style={{ textAlign: "center", marginTop: "50px" }}>
-        <ConsultDr />
-      </div>
     </div>
   );
 }
@@ -203,8 +202,14 @@ const StyledCard = styled.div`
     transform: translateY(-10px);
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 1024px) {
     max-width: 48%;
+    height: auto;
+    margin-bottom: 20px;
+  }
+
+  @media (max-width: 768px) {
+    max-width: 100%;
     height: auto;
     margin-bottom: 20px;
   }
@@ -245,9 +250,14 @@ const StyledStack = styled.div`
   margin-top: 50px;
   padding: 0 20px;
 
-  @media (max-width: 768px) {
+  @media (max-width: 1024px) {
     flex-direction: row;
     flex-wrap: wrap;
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: center;
   }
 `;
 
@@ -262,28 +272,36 @@ const StyledNav = styled.nav`
 
   @media (max-width: 768px) {
     justify-content: space-between;
+    flex-direction: row;
   }
 `;
 
 const Logo = styled.div`
   display: flex;
   align-items: center;
+  margin-right: auto;
+
+  @media (max-width: 768px) {
+    margin-right: 0;
+  }
 `;
 
 const LogoImg = styled.img`
   height: 40px;
-  margin-right: 20px;
   cursor: pointer;
 `;
 
 const AlertContainer = styled.div`
   display: flex;
   align-items: center;
-  margin-left: auto;
+  margin-left: 10px;
 
   @media (max-width: 768px) {
-    margin-left: 0;
-    order: 2;
+    margin-left: 10px;
+    // margin-right: 10px;
+
+    // padding: 10px;
+    order: 1;
   }
 `;
 
