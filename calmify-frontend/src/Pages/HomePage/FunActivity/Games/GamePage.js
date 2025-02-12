@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import FlipCard from "./FlipCard.js";
@@ -119,7 +119,7 @@ const StyledText = styled.p`
 
 const GamePage = () => {
   const navigate = useNavigate();
-  const [selectedCard, setSelectedCard] = useState(null);
+  // const [selectedCard, setSelectedCard] = useState(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const handleLogoClick = () => {
@@ -127,7 +127,7 @@ const GamePage = () => {
   };
 
   const handleCardOpen = () => {
-    setSelectedCard({});
+    // setSelectedCard({});
     onOpen();
   };
 
