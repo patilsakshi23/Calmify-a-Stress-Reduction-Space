@@ -19,7 +19,7 @@ import styled from "styled-components";
 import { getDatabase, ref, get } from "firebase/database";
 import { auth } from "../../firebaseConfig";
 import { useNavigate } from "react-router-dom";
-import img from "../../assets/Authentication/img.gif";
+// import img from "../../assets/Authentication/img.gif";
 import backgroundImage from "../../assets/loginsignup.png"
 import showeye from "../../assets/12.png";
 import hideeye from "../../assets/13.png";
@@ -173,23 +173,4 @@ const Section = styled.div`
   background-repeat: no-repeat;
 `;
 
-const LeftSection = styled.div`
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
 
-const RightSection = styled.div`
-  flex: 1;
-  display: flex;
-  position: fixed
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-`;
-const Img = styled.img`
-  width: 80%;
-  height: 80%;
-  object-fit: cover;
-`;

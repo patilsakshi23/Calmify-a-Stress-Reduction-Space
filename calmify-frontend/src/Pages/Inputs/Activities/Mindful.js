@@ -3,25 +3,25 @@ import {
   Box,
   Button,
   Text,
-  Grid,
+  // Grid,
   HStack,
   Heading,
   useToast,
   Card,
   Stack,
-  CardBody,
+  // CardBody,
   // CardHeader,
   // Fade,
   // ScaleFade,
   // Slide,
-  useDisclosure,
+  // useDisclosure,
   // SlideFade,
-  Collapse,
-  CardHeader,
+  // Collapse,
+  // CardHeader,
 } from "@chakra-ui/react";
 import styled from "styled-components";
 import yoga from "../../../assets/Mindful/image_processing20200602-24882-19tmhn3.gif";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 
 const mindfulActivities = {
   Meditation: [
@@ -141,8 +141,8 @@ const Mindful = () => {
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const toast = useToast();
-  const navigate = useNavigate();
-  const { isOpen, onToggle } = useDisclosure();
+  // const navigate = useNavigate();
+  // const { isOpen, onToggle } = useDisclosure();
 
   const handleActivitySelection = (activity) => {
     setSelectedActivity(activity);
@@ -207,7 +207,7 @@ const Mindful = () => {
       return () => clearTimeout(countdown);
     } else if (timer === 0 && isTimerRunning) {
       setIsTimerRunning(false);
-      handleNextStep();
+      // handleNextStep();
     }
   }, [timer, isTimerRunning, isPaused]);
 

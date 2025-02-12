@@ -13,7 +13,7 @@ const AudioPage = () => {
   const [transcript, setTranscript] = useState("");
   const [recognition, setRecognition] = useState(null);
   const [prediction, setPrediction] = useState("");
-  const [feedbackGiven, setFeedbackGiven] = useState(false);
+  // const [feedbackGiven, setFeedbackGiven] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState(null);
   const [videos, setVideos] = useState([]); // To store fetched YouTube videos
 
@@ -94,7 +94,7 @@ const AudioPage = () => {
 
       const data = await response.json();
       setPrediction(data.stress);
-      setFeedbackGiven(false);
+      // setFeedbackGiven(false);
 
       // If stressed, fetch YouTube videos
       if (data.stress === 1) {

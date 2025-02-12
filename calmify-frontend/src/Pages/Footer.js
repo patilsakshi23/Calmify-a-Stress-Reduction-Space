@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Box, Text, Link, HStack } from '@chakra-ui/react';
+import { Box, Text} from '@chakra-ui/react';
 
 const FooterContainer = styled(Box)`
   background-color: #2D3748;  /* Dark background */

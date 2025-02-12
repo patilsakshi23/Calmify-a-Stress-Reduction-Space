@@ -219,14 +219,6 @@ const Image = styled.img`
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 `;
 
-const EmotionImage = styled.img`
-  width: 200px;
-  height: auto;
-  border-radius: 12px;
-  margin-bottom: 10px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-`;
-
 const EmotionText = styled.p`
   font-size: 18px;
   font-weight: bold;

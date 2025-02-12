@@ -7,7 +7,7 @@ import InputsPage from "../Pages/Inputs/InputsPage";
 import HomePage from "../Pages/HomePage/HomePage";
 import ExerciseOption from "../Pages/HomePage/Exercise/ExerciseOption";
 import YogaOption from "../Pages/HomePage/Yoga/YogaOption";
-import Loader from "../Pages/Loader";
+// import Loader from "../Pages/Loader";
 // import MindfulOption from "../Pages/HomePage/MindfulOption";
 import FunActivitiesOption from "../Pages/HomePage/FunActivity/FunActivitiesOption";
 import GamePage from "../Pages/HomePage/FunActivity/Games/GamePage";

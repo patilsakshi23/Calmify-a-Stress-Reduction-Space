@@ -18,7 +18,7 @@ import backgroundImage from "../../assets/loginsignup.png";
 
 import styled from "styled-components";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth, googleProvider, db } from "../../firebaseConfig";
+import { auth} from "../../firebaseConfig";
 
 import { getDatabase, ref, set } from "firebase/database";
 // import { auth } from "../../firebaseConfig";
@@ -208,23 +208,3 @@ const Section = styled.div`
   background-repeat: no-repeat;
 `;
 
-const LeftSection = styled.div`
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
-const RightSection = styled.div`
-  flex: 1;
-  display: flex;
-  position: fixed
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-`;
-const Img = styled.img`
-  width: 80%;
-  height: 80%;
-  object-fit: cover;
-`;

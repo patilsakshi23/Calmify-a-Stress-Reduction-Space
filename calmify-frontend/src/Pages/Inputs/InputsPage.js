@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { Button, Heading, Text } from "@chakra-ui/react";
 import { motion } from "framer-motion";
-
 import { useNavigate } from "react-router-dom";
 import TextImage from "../../assets/textoption.jpeg";
 import AudioImage from "../../assets/audiooption.jpeg";
@@ -11,14 +10,11 @@ import QuizeImage from "../../assets/quizeoption.jpeg";
 import CalmifyLogo from "../../assets/logocalmify.png";
 import ActiveAlert from "../../assets/activealert.png";
 import Alert1 from "../../assets/alert.png";
-
 import Mindful from "./Activities/Mindful.js";
 import ConsultDr from "./Activities/ConsultDr.js";
-
 import { signOut } from "firebase/auth";
 import { auth } from "../../firebaseConfig";
 import { useAuth } from "../Authentication/AuthContext.js";
-
 import { getDatabase, ref, onValue } from "firebase/database";
 
 function InputsPage() {
@@ -44,7 +40,6 @@ function InputsPage() {
       const stressCount = snapshot.val()?.count || 0;
       if (stressCount >= 4) {
         setStressOverloaded(true);
-        console.log("STRESSED OVERLOADED!");
       } else {
         setStressOverloaded(false);
       }
@@ -60,7 +55,6 @@ function InputsPage() {
       console.error("Error logging out: ", error.message);
     }
   };
-
 
   const handleAlertDR = () => {
     navigate("/alertDr");
@@ -96,93 +90,93 @@ function InputsPage() {
         <Logo>
           <LogoImg src={CalmifyLogo} alt="Calmify" />
         </Logo>
-        {stressOverloaded ? (
-          <MotionAlert
-          onClick={handleAlertDR}
-            src={ActiveAlert}
-            alt="Active alert"
-            animate={{
-              scale: [1, 1.2, 1],
-              rotate: [0, 10, -10, 0],
-            }}
-            transition={{
-              duration: 0.5,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-          />
-        ) : (
-          <StaticAlert onClick={handleAlertDR} src={Alert1} alt="Alert" />
-        )}
+        <AlertContainer>
+          {stressOverloaded ? (
+            <MotionAlert
+              onClick={handleAlertDR}
+              src={ActiveAlert}
+              alt="Active alert"
+              animate={{
+                scale: [1, 1.2, 1],
+                rotate: [0, 10, -10, 0],
+              }}
+              transition={{
+                duration: 0.5,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+            />
+          ) : (
+            <StaticAlert onClick={handleAlertDR} src={Alert1} alt="Alert" />
+          )}
+        </AlertContainer>
         <Button onClick={handleLogout}>Logout</Button>
       </StyledNav>
 
       {/* Greeting Message */}
-      <div style={{ padding: "30px 0px 0px 100px" }}>
+      <GreetingContainer>
         <Heading as="h2" size="2xl">
           Hello, {user?.firstName} {user?.lastName}
         </Heading>
         <Text fontSize="2xl" color="grey" pt="5">
           Select any option to convey your thoughts or feelings to us!!
         </Text>
-      </div>
+      </GreetingContainer>
 
       {/* Options for Input */}
-      <div style={{ textAlign: "center" }}>
-        <StyledStack>
-          <StyledCard onClick={() => handleNavigation("/video")}>
-            <StyledImage src={VideoImage} alt="Video" />
-            <CardContent>
-              <StyledHeading>Video</StyledHeading>
-              <StyledText>
-                Convey your feelings or thoughts by uploading or recording a
-                video.
-              </StyledText>
-              <StarRating>{renderStars("video")}</StarRating>
-            </CardContent>
-          </StyledCard>
+      <StyledStack>
+        <StyledCard onClick={() => handleNavigation("/video")}>
+          <StyledImage src={VideoImage} alt="Video" />
+          <CardContent>
+            <StyledHeading>Video</StyledHeading>
+            <StyledText>
+              Convey your feelings or thoughts by uploading or recording a
+              video.
+            </StyledText>
+            <StarRating>{renderStars("video")}</StarRating>
+          </CardContent>
+        </StyledCard>
 
-          <StyledCard onClick={() => handleNavigation("/audio")}>
-            <StyledImage src={AudioImage} alt="Audio" />
-            <CardContent>
-              <StyledHeading>Audio</StyledHeading>
-              <StyledText>
-                Convey your feelings or thoughts by uploading or recording
-                audio.
-              </StyledText>
-              <StarRating>{renderStars("audio")}</StarRating>
-            </CardContent>
-          </StyledCard>
+        <StyledCard onClick={() => handleNavigation("/audio")}>
+          <StyledImage src={AudioImage} alt="Audio" />
+          <CardContent>
+            <StyledHeading>Audio</StyledHeading>
+            <StyledText>
+              Convey your feelings or thoughts by uploading or recording
+              audio.
+            </StyledText>
+            <StarRating>{renderStars("audio")}</StarRating>
+          </CardContent>
+        </StyledCard>
 
-          <StyledCard onClick={() => handleNavigation("/text")}>
-            <StyledImage src={TextImage} alt="Text" />
-            <CardContent>
-              <StyledHeading>Text</StyledHeading>
-              <StyledText>
-                Convey your feelings or thoughts by writing text.
-              </StyledText>
-              <StarRating>{renderStars("text")}</StarRating>
-            </CardContent>
-          </StyledCard>
+        <StyledCard onClick={() => handleNavigation("/text")}>
+          <StyledImage src={TextImage} alt="Text" />
+          <CardContent>
+            <StyledHeading>Text</StyledHeading>
+            <StyledText>
+              Convey your feelings or thoughts by writing text.
+            </StyledText>
+            <StarRating>{renderStars("text")}</StarRating>
+          </CardContent>
+        </StyledCard>
 
-          <StyledCard onClick={() => handleNavigation("/quiz")}>
-            <StyledImage src={QuizeImage} alt="Quiz" />
-            <CardContent>
-              <StyledHeading>Quiz</StyledHeading>
-              <StyledText>
-                Convey your feelings or thoughts by taking a quiz.
-              </StyledText>
-              <StarRating>{renderStars("quiz")}</StarRating>
-            </CardContent>
-          </StyledCard>
-        </StyledStack>
-      </div>
+        <StyledCard onClick={() => handleNavigation("/quiz")}>
+          <StyledImage src={QuizeImage} alt="Quiz" />
+          <CardContent>
+            <StyledHeading>Quiz</StyledHeading>
+            <StyledText>
+              Convey your feelings or thoughts by taking a quiz.
+            </StyledText>
+            <StarRating>{renderStars("quiz")}</StarRating>
+          </CardContent>
+        </StyledCard>
+      </StyledStack>
 
       {/* Mindfulness Section */}
-      <div style={{ textAlign: "center", marginTop: "90px" }}>
+      <div style={{ textAlign: "center", marginTop: "50px" }}>
         <Mindful />
       </div>
-      <div style={{ textAlign: "center", marginTop: "120px" }}>
+      <div style={{ textAlign: "center", marginTop: "50px" }}>
         <ConsultDr />
       </div>
     </div>
@@ -193,7 +187,8 @@ export default InputsPage;
 
 // Styled Components
 const StyledCard = styled.div`
-  width: 360px;
+  width: 100%;
+  max-width: 360px;
   height: 510px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border-radius: 10px;
@@ -207,6 +202,12 @@ const StyledCard = styled.div`
   &:hover {
     transform: translateY(-10px);
   }
+
+  @media (max-width: 768px) {
+    max-width: 48%;
+    height: auto;
+    margin-bottom: 20px;
+  }
 `;
 
 const StyledImage = styled.img`
@@ -215,10 +216,15 @@ const StyledImage = styled.img`
   object-fit: cover;
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
+
+  @media (max-width: 768px) {
+    height: 200px;
+  }
 `;
 
 const CardContent = styled.div`
   padding: 20px;
+  text-align: center;
 `;
 
 const StyledHeading = styled.h3`
@@ -233,9 +239,16 @@ const StyledText = styled.p`
 
 const StyledStack = styled.div`
   display: flex;
+  flex-wrap: wrap;
   gap: 20px;
   justify-content: center;
   margin-top: 50px;
+  padding: 0 20px;
+
+  @media (max-width: 768px) {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
 `;
 
 const StyledNav = styled.nav`
@@ -246,6 +259,10 @@ const StyledNav = styled.nav`
   font-family: Arial, sans-serif;
   font-size: 24px;
   font-weight: bold;
+
+  @media (max-width: 768px) {
+    justify-content: space-between;
+  }
 `;
 
 const Logo = styled.div`
@@ -257,6 +274,17 @@ const LogoImg = styled.img`
   height: 40px;
   margin-right: 20px;
   cursor: pointer;
+`;
+
+const AlertContainer = styled.div`
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+
+  @media (max-width: 768px) {
+    margin-left: 0;
+    order: 2;
+  }
 `;
 
 const StarRating = styled.div`
@@ -279,8 +307,16 @@ const Star = styled.span`
 const StaticAlert = styled.img`
   height: 30px;
   width: 30px;
-  margin-left: 1350px;
+  cursor: pointer;
 `;
 
-
 const MotionAlert = motion(StaticAlert); // Convert Alert to a motion component
+
+const GreetingContainer = styled.div`
+  padding: 30px 20px;
+  text-align: left;
+
+  @media (max-width: 768px) {
+    text-align: center;
+  }
+`;
