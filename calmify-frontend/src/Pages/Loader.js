@@ -11,7 +11,6 @@ const slideImageLeft = keyframes`
   }
 `;
 
-
 const slideFromBehind = keyframes`
   0% {
     transform: translateX(-100%);
