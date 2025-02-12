@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import styled, { keyframes } from "styled-components";
+import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import NavBar from "../Nav.js";
 import image1 from "../../assets/slider1.png";
@@ -11,13 +11,12 @@ import Yoga from "../HomePage/Yoga/Yoga.js";
 import Exercise from "../HomePage/Exercise/Exercise.js";
 import Contactus from "./Contactus.js";
 import Footer from "../Footer.js";
-// import logo from "../../assets/logo.png";
-
+// import Loader from "./Loader.js"; // Import the Loader component
 
 function HomePage() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [disappearing, setDisappearing] = useState(false);
-  // const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const slides = [image1, image2, image3];
   const navigate = useNavigate();
 
@@ -25,169 +24,88 @@ function HomePage() {
     navigate("/input");
   };
 
-  useEffect(
-    () => {
-      // if (loading) {
-      //   const loadTimeout = setTimeout(() => setLoading(false), 500); // 6 seconds for loading screen
-      //   return () => clearTimeout(loadTimeout); // Clean up timeout on unmount
-      // }
+  useEffect(() => {
+    if (loading) {
+      const loadTimeout = setTimeout(() => setLoading(false), 3000); // 3 seconds for loading screen
+      return () => clearTimeout(loadTimeout); // Clean up timeout on unmount
+    }
 
-      const interval = setInterval(() => {
-        setDisappearing(true);
-        setTimeout(() => {
-          setCurrentSlide((prev) => (prev + 1) % slides.length);
-          setDisappearing(false);
-        }, 1000); // Duration of the disappearing animation
-      }, 6000); // 5 seconds visible + 2 seconds for disappearing animation~
-      return () => clearInterval(interval);
-    },
-    // [loading,
-    [slides.length]
-  );
+    const interval = setInterval(() => {
+      setDisappearing(true);
+      setTimeout(() => {
+        setCurrentSlide((prev) => (prev + 1) % slides.length);
+        setDisappearing(false);
+      }, 1000); // Duration of the disappearing animation
+    }, 20000); // 15 seconds visible + 1 second for disappearing animation
+    return () => clearInterval(interval);
+  }, [loading, slides.length]);
 
   return (
     <>
       {/* {loading ? (
-        <LoaderContainer>
-          <TextContainer>
-            {/* <MainImage src={logo} alt="Calmify Demo" />{" "} */}
-      {/* <SubTextContainer>
-              <SubText>Calmify</SubText> 
-            </SubTextContainer>
-          </TextContainer>
-        </LoaderContainer>
+        < >
       ) : ( */}
-      <>
-        <link
-          href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&display=swap"
-          rel="stylesheet"
-        />
-        <NavBar />
-        <HomeContainer id="home">
-          <HomeText>
-            <Heading>Welcome To Calmify!</Heading>
-            <Text>Your space to find solutions to emotions.</Text>
-            <StartButton onClick={handleStart}>
-              <span>GET STARTED</span>
-              <ArrowIcon
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 28 24"
-                stroke="currentColor"
-                strokeWidth="3"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M5 12h26M20 5l7 7-7 7"
+        <>
+          <link
+            href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&display=swap"
+            rel="stylesheet"
+          />
+          <NavBar />
+          <HomeContainer id="home">
+            <Slider>
+              <SliderImage className={disappearing ? "disappearing" : "active"}>
+                <SliderImageImg
+                  src={slides[currentSlide]}
+                  alt={`Slide ${currentSlide + 1}`}
                 />
-              </ArrowIcon>
-            </StartButton>
-          </HomeText>
-          <Slider>
-            <SliderImage className={disappearing ? "disappearing" : "active"}>
-              <SliderImageImg
-                src={slides[currentSlide]}
-                alt={`Slide ${currentSlide + 1}`}
-              />
-            </SliderImage>
-          </Slider>
-        </HomeContainer>
-        <Main id="yoga-practices">
-          <Yoga />
-        </Main>
-        <Main id="fun-activities">
-          <FunActivities />
-        </Main>
-        <Main id="exercises">
-          <Exercise />
-        </Main>
-        <Main id="contact">
-          <Contactus />
-        </Main>
-        <Footer />
-      </>
-      {/* // )
-    // } */}
+              </SliderImage>
+            </Slider>
+            <HomeText>
+              <Heading>Welcome To Calmify!</Heading>
+              <Text>Your space to find solutions to emotions.</Text>
+              <StartButton onClick={handleStart}>
+                <span>GET STARTED</span>
+                <ArrowIcon
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 28 24"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M5 12h26M20 5l7 7-7 7"
+                  />
+                </ArrowIcon>
+              </StartButton>
+            </HomeText>
+          </HomeContainer>
+          <Main id="yoga-practices">
+            <Yoga />
+          </Main>
+          <Main id="fun-activities">
+            <FunActivities />
+          </Main>
+          <Main id="exercises">
+            <Exercise />
+          </Main>
+          <Main id="contact">
+            <Contactus />
+          </Main>
+          <Footer />
+        </>
+      {/* )} */}
     </>
   );
 }
 
 export default HomePage;
 
-// const showup = keyframes`
-//   0% {opacity:0;}
-//   20% {opacity:1;}
-//   80% {opacity:1;}
-//   100% {opacity:0;}
-// `;
-
-// const revealLogo = keyframes`
-//   0% {opacity:0; width:0px;}
-//   20% {opacity:1; width:0px;}
-//   30% {width:355px;} /* Adjust width as needed */
-//   80% {opacity:1;}
-//   100% {opacity:0; width: 355px;} /* Adjust width as needed */
-// `;
-
-// const slideinLogo = keyframes`
-//   0% { margin-left:-600px; } /* Adjust as needed */
-//   20% { margin-left:-600px; }
-//   35% { margin-left:0px; }
-//   100% { margin-left:0px; }
-// `;
-
-// const LoaderContainer = styled.div`
-//   display: flex;
-//   flex-direction: column;
-//   justify-content: center;
-//   align-items: center;
-//   height: 100vh;
-//   background: linear-gradient(141deg, #ccc 25%, #eee 40%, #ddd 55%);
-//   color: #555;
-//   font-family: "Roboto", sans-serif;
-//   font-weight: 300;
-//   font-size: 32px;
-//   text-align: center;
-//   overflow: hidden;
-//   -webkit-backface-visibility: hidden;
-//   -webkit-perspective: 1000;
-//   -webkit-transform: translate3d(0, 0, 0);
-// `;
-
-// const TextContainer = styled.div`
-//   display: flex;
-//   align-items: center;
-//   justify-content: center;
-//   overflow: hidden;
-//   white-space: nowrap;
-// `;
-
-// const MainImage = styled.img`
-//   animation: ${showup} 5s forwards; /* Runs animation once */
-//   width: 290px; /* Adjust width as needed */
-//   height: auto; /* Maintain aspect ratio */
-// `;
-
-// const SubTextContainer = styled.div`
-//   margin-top: 65px;
-//   margin-left: 0; /* Adjust this margin-left as needed to space the text */
-//   animation: ${revealLogo} 5s forwards; /* Runs animation once */
-//   width: 0px;
-//   display: flex;
-//   align-items: center;
-// `;
-
-// const SubText = styled.span`
-//   font-size: 40px;
-//   margin-left: -355px;
-//   font-family: "Dancing Script", regular;
-//   animation: ${slideinLogo} 5s forwards; /* Runs animation once */
-// `;
-
 const HomeContainer = styled.div`
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  justify-content: center;
   align-items: center;
   background-image: url(${backgroundImage});
   background-size: cover;
@@ -195,39 +113,59 @@ const HomeContainer = styled.div`
   background-attachment: fixed;
   height: 750px;
   width: 100vw;
-  padding: 0 220px;
+  padding: 0 20px;
   margin-top: 110px; /* Adjusted for the navbar height */
+
+  @media (min-width: 768px) {
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 0 220px;
+  }
 `;
 
 const HomeText = styled.div`
-  max-width: calc(100% - 220px);
-  text-align: left;
+  max-width: 100%;
+  text-align: center;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
+
+  @media (min-width: 768px) {
+    text-align: left;
+    align-items: flex-start;
+  }
 `;
 
 const Heading = styled.div`
   color: #fff;
-  font-size: 65px;
+  font-size: 40px;
   font-weight: bold;
   font-family: Helvetica;
   text-shadow: 0 1px 0 #ccc, 0 2px 0 #c9c9c9, 0 3px 0 #bbb, 0 4px 0 #b9b9b9,
     0 5px 0 #aaa, 0 0 5px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.2),
     0 20px 20px rgba(0, 0, 0, 0.15);
+
+  @media (min-width: 768px) {
+    font-size: 65px;
+  }
 `;
 
 const Text = styled.div`
   color: black;
-  font-size: 20px;
+  font-size: 16px;
+
+  @media (min-width: 768px) {
+    font-size: 20px;
+  }
 `;
 
 const StartButton = styled.button`
   background-color: rgb(131, 172, 131);
   color: white;
-  padding: 15px 25px;
-  font-size: 16px;
-  font-family: "Roboto", sans-serif;
+  padding: 10px 15px;
+  font-size: 14px;
+  font-family: 'Roboto', sans-serif;
   border: none;
   cursor: pointer;
   display: inline-flex;
@@ -235,11 +173,18 @@ const StartButton = styled.button`
   border-radius: 6px;
   margin-top: 20px;
   gap: 10px;
-  width: 200px;
+  width: 165px;
+  height: 50px;
   transition: background-color 0.3s ease;
 
   &:hover {
     background-color: #a8cc9c;
+  }
+
+  @media (min-width: 768px) {
+    padding: 15px 25px;
+    font-size: 16px;
+    width: 200px;
   }
 `;
 
@@ -254,11 +199,17 @@ const ArrowIcon = styled.svg`
 `;
 
 const Slider = styled.div`
-  position: absolute;
-  right: 50px;
-  width: 700px;
-  height: 620px;
+  width: 100%;
+  height: 300px;
   overflow: hidden;
+  margin-bottom: 20px;
+
+  @media (min-width: 768px) {
+    position: absolute;
+    right: 50px;
+    width: 700px;
+    height: 620px;
+  }
 `;
 
 const SliderImage = styled.div`
@@ -286,5 +237,10 @@ const SliderImageImg = styled.img`
 `;
 
 const Main = styled.div`
-  font-size: 25px;
+  font-size: 20px;
+  padding: 20px;
+
+  @media (min-width: 768px) {
+    font-size: 25px;
+  }
 `;

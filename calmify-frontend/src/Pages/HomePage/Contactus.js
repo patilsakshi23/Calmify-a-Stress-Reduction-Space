@@ -1,123 +1,125 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Text } from '@chakra-ui/react';
+import { Text, Button } from '@chakra-ui/react';
 
-const ContactFormContainer = styled.div`
-  padding: 10px 0;
+const FeedbackContainer = styled.div`
+  padding: 20px;
+  max-width: 600px;
+  margin: auto;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 `;
 
-const Form = styled.form`
+const FeedbackItem = styled.div`
+  background: #f8f8f8;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  font-size: 14px;
+  border-left: 4px solid #a8cc9c;
+`;
+
+const FeedbackForm = styled.form`
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 20px;
 `;
 
 const Input = styled.input`
   width: 100%;
-  padding: 15px;
-  background: #f8f8f8;
-  border: 1px solid rgba(0, 0, 0, 0.075);
-  margin-bottom: 25px;
-  color: #727272;
-  font-size: 13px;
-  transition: all 0.4s;
-
-  &:hover {
-    border: 1px solid #8bc3a3;
-  }
-
-  &:focus {
-    color: white;
-    outline: none;
-    border: 1px solid #8bc3a3;
-  }
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
 `;
 
 const Textarea = styled.textarea`
   width: 100%;
-  padding: 15px;
-  height: 200px;
-  max-height: 200px;
-  max-width: 100%;
-  background: #f8f8f8;
-  border: 1px solid rgba(0, 0, 0, 0.075);
-  color: #727272;
-  font-size: 13px;
-  transition: all 0.4s;
-
-  &:hover {
-    border: 1px solid #8bc3a3;
-  }
-
-  &:focus {
-    color: white;
-    outline: none;
-    border: 1px solid #8bc3a3;
-  }
+  padding: 10px;
+  height: 100px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  resize: vertical;
 `;
 
 const SubmitButton = styled.button`
-  background-color: #a8cc9c;
+  background: #a8cc9c;
   color: white;
-  padding: 15px 25px;
-  font-size: 16px;
-  font-family: "Roboto", sans-serif;
+  padding: 10px 20px;
   border: none;
+  border-radius: 4px;
   cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  border-radius: 6px;
-  margin-top: 20px;
-  gap: 10px;
-  width: 200px;
-  transition: background-color 0.3s ease;
+  font-size: 14px;
+  transition: background 0.3s;
 
   &:hover {
-    background-color: rgb(131, 172, 131);
+    background: #8bc3a3;
   }
 `;
 
-const MessageBox = styled.div`
-  width: 100%;
-  background: rgba(255, 255, 255, 0.8);
-  transition: all 0.7s;
-  margin: 25px auto 0;
-  opacity: ${props => (props.visible ? 1 : 0)};
-  height: ${props => (props.visible ? 'auto' : '0px')};
-`;
-
-
 const Contactus = () => {
-  const [messageVisible, setMessageVisible] = useState(false);
+  const [feedbacks, setFeedbacks] = useState([
+    { id: 1, name: 'John Doe', feedback: 'Great service! Very helpful.' },
+    { id: 2, name: 'Jane Smith', feedback: 'Could improve response time.' },
+    { id: 3, name: 'Alice Johnson', feedback: 'Loved the new features!' },
+  ]);
+
+  const [showForm, setShowForm] = useState(false);
+  const [newFeedback, setNewFeedback] = useState({ name: '', feedback: '' });
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setNewFeedback({ ...newFeedback, [name]: value });
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setMessageVisible(true);
+    if (newFeedback.name && newFeedback.feedback) {
+      setFeedbacks([...feedbacks, { id: Date.now(), ...newFeedback }]);
+      setNewFeedback({ name: '', feedback: '' });
+      setShowForm(false);
+    }
   };
 
   return (
-    <>
-    <ContactFormContainer style={{ padding: '20px' }}>
-    <Text style={{ paddingTop: '40px' , fontWeight: '600' , textAlign: 'center' , paddingBottom:'20px' }}> Contact us </Text>
-      <Form id="contact-us" onSubmit={handleSubmit}>
-        <div style={{ flex: '1', paddingRight: '10px' }}>
-          <Input type="text" name="name" required placeholder="Name" />
-          <Input type="email" name="mail" required placeholder="Email" />
-          <Input type="text" name="subject" required placeholder="Subject" />
-        </div>
-        <div style={{ flex: '1', paddingLeft: '10px' }}>
-          <Textarea name="message" placeholder="Message" />
-        </div>
-        <div style={{ width: '100%', textAlign: 'center' }}>
-          <SubmitButton type="submit">Send Message</SubmitButton>
-        </div>
-      </Form>
-
-      <MessageBox visible={messageVisible}>
-        <strong>Thank You!</strong> Your email has been delivered.
-      </MessageBox>
-
-    </ContactFormContainer>
-    </> 
+    <FeedbackContainer>
+      <Text style={{ textAlign: 'center', marginBottom: '20px', fontWeight: '600' }}>
+        User Feedbacks
+      </Text>
+      {feedbacks.map((feedback) => (
+        <FeedbackItem key={feedback.id}>
+          <strong>{feedback.name}:</strong> {feedback.feedback}
+        </FeedbackItem>
+      ))}
+      <Button
+        onClick={() => setShowForm(true)}
+        style={{ width: '100%', marginTop: '20px', background: '#a8cc9c', color: 'white' }}
+      >
+        Give Your Feedback
+      </Button>
+      {showForm && (
+        <FeedbackForm onSubmit={handleSubmit}>
+          <Input
+            type="text"
+            name="name"
+            placeholder="Your Name"
+            value={newFeedback.name}
+            onChange={handleInputChange}
+            required
+          />
+          <Textarea
+            name="feedback"
+            placeholder="Your Feedback"
+            value={newFeedback.feedback}
+            onChange={handleInputChange}
+            required
+          />
+          <SubmitButton type="submit">Submit Feedback</SubmitButton>
+        </FeedbackForm>
+      )}
+    </FeedbackContainer>
   );
 };
 

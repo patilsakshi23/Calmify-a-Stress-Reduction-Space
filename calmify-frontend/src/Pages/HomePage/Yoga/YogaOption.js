@@ -19,7 +19,7 @@ import React, { useEffect, useState } from "react";
 import { getDatabase, ref, onValue } from "firebase/database";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import YouTube from 'react-youtube'; // Import YouTube component
+import YouTube from 'react-youtube';
 import CalmifyLogo from "../../../assets/logocalmify.png";
 import yoga1 from "../../../assets/Yoga/child_pose.png";
 import yoga2 from "../../../assets/Yoga/downward_facing_dog.png";
@@ -27,14 +27,13 @@ import yoga3 from "../../../assets/Yoga/Savasana.jpg";
 import yoga4 from "../../../assets/Yoga/viparita_karani.png";
 import yoga5 from "../../../assets/Yoga/utthita_trikonasana.png";
 
-
 const YogaOption = () => {
   const navigate = useNavigate();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedCard, setSelectedCard] = useState(null);
   const [cards, setCards] = useState([]);
   const images = [yoga1, yoga2, yoga3, yoga4, yoga5];
-  
+
   // Array of YouTube video links
   const videos = [
     "https://youtu.be/2MJGg-dUKh0?si=egSyDDcwh-spJlZ8&t=15",
@@ -69,7 +68,7 @@ const YogaOption = () => {
       cardsRef,
       (snapshot) => {
         const data = snapshot.val();
-        console.log("Fetched data:", data); // Log data
+        console.log("Fetched data:", data);
         if (data) {
           setCards(Object.values(data));
         }
@@ -78,7 +77,7 @@ const YogaOption = () => {
         console.error("Error fetching data:", error);
       }
     );
-    return () => unsubscribe(); // Clean up subscription
+    return () => unsubscribe();
   }, []);
 
   // Handle card click and open modal with video and details
@@ -88,37 +87,36 @@ const YogaOption = () => {
   };
 
   const handleLogoClick = () => {
-    navigate("/"); 
+    navigate("/");
   };
 
   // YouTube video options, dynamically set start time
   const videoOptions = {
     height: '315',
-    width: '530',
+    width: '100%',
     playerVars: {
       autoplay: 0,
-      start: selectedCard?.startTime || 0, // Set start time if available
+      start: selectedCard?.startTime || 0,
     },
   };
 
   return (
     <div>
-       <StyledNav>
-          <Logo onClick={handleLogoClick} >
-              <LogoImg src={CalmifyLogo} alt="Calmify" />
-          </Logo>
-        </StyledNav>
-        <Heading justify="center" m={15} textAlign={"center"} >Yoga Poses</Heading>
-     
+      <StyledNav>
+        <Logo onClick={handleLogoClick}>
+          <LogoImg src={CalmifyLogo} alt="Calmify" />
+        </Logo>
+      </StyledNav>
+      <Heading justify="center" m={15} textAlign={"center"}>Yoga Poses</Heading>
 
       <div style={{ textAlign: "center" }}>
-        <SimpleGrid columns={{ base: 1, md: 2, lg: 4  }} spacing={10} m={10}>
+        <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={10} m={10}>
           {cards.map((card, index) => {
-            const { videoId, startTime } = getVideoIdAndStartTime(videos[index]); // Get videoId and startTime
+            const { videoId, startTime } = getVideoIdAndStartTime(videos[index]);
             return (
               <Card maxW="sm" key={index} onClick={() => handleCardClick(card, videoId, startTime)} style={StyledCard}>
                 <CardBody>
-                <Image src={images[index]} alt={card.title} borderRadius="lg" style={ImageStyle}/>
+                  <Image src={images[index]} alt={card.title} borderRadius="lg" style={ImageStyle} />
                   <Stack mt="6" spacing="3">
                     <Heading size="md">{card.title}</Heading>
                     <Text>{card.shortInfo}</Text>
@@ -137,11 +135,7 @@ const YogaOption = () => {
               <ModalHeader>{selectedCard.title}</ModalHeader>
               <ModalCloseButton />
               <ModalBody>
-                {/* YouTube Video Player */}
-                <YouTube 
-                  videoId={selectedCard.videoId} // Use extracted videoId
-                  opts={videoOptions}
-                />
+                <YouTube videoId={selectedCard.videoId} opts={videoOptions} />
                 <InfoCard>{selectedCard.longInfo}</InfoCard>
               </ModalBody>
             </ModalContent>
@@ -159,7 +153,7 @@ const ImageStyle = {
   height: "300px",
   objectFit: "cover",
   borderTopLeftRadius: "10px",
-  borderTopRightRadius: "10px"
+  borderTopRightRadius: "10px",
 };
 
 const InfoCard = styled.div`
@@ -170,26 +164,27 @@ const InfoCard = styled.div`
 `;
 
 const StyledCard = {
-  width: "360px",
-  height: "510px",
-  boxShadow: "0 4px 10px  rgba(0, 0, 0, 0.23)",
+  width: "100%",
+  boxShadow: "0 4px 10px rgba(0, 0, 0, 0.23)",
   borderRadius: "10px",
   overflow: "hidden",
-  transition: "transform 0.3s ease-in-out", // Smooth transition for hover effect
+  transition: "transform 0.3s ease-in-out",
   display: "flex",
   flexDirection: "column",
   cursor: "pointer",
+  margin: "auto",
 
- 
+  "@media (min-width: 768px)": {
+    width: "360px",
+    height: "510px",
+  },
 };
-
-
 
 const StyledNav = styled.nav`
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
-  background-color:rgb(239, 241, 244);
+  background-color: rgb(239, 241, 244);
   padding: 15px 20px;
   font-family: Arial, sans-serif;
   font-size: 24px;
@@ -206,3 +201,4 @@ const LogoImg = styled.img`
   margin-right: 20px;
   cursor: pointer;
 `;
+
