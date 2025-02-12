@@ -1,9 +1,9 @@
 from django.http import JsonResponse, HttpResponse
 from tensorflow import keras
-from tensorflow.keras.models import load_model
-from tensorflow.keras.preprocessing.sequence import pad_sequences
+from tensorflow.keras.models import load_model # type: ignore
+from tensorflow.keras.preprocessing.sequence import pad_sequences # type: ignore
 from rest_framework.decorators import api_view
-
+import subprocess
 import os
 import pickle
 import numpy as np
@@ -13,14 +13,14 @@ from .retrain_model import retrain_model  # Import the retraining logic
 import speech_recognition as sr
 from PIL import Image
 import cv2
-import base64
+from moviepy import VideoFileClip
 from io import BytesIO
 
 # Paths to files
 MODEL_PATH = 'text_model/Text_Prediction_Model.keras'
 TOKENIZER_PATH = 'text_model/tokenizer_stress.pkl'
 TEXT_DATASET = 'text_model/text_dataset.csv'
-EMOTION_MODEL_PATH = 'video_model/emotion.h5'  # Path to your emotion detection model
+EMOTION_MODEL_PATH = 'video_model/facial_emotion_video_model.h5'  # Path to your emotion detection model
 MAX_LEN = 100  # Max length used during training
 
 # Load the trained text model and tokenizer
@@ -34,25 +34,7 @@ emotion_model = load_model(EMOTION_MODEL_PATH)
 def home(request):
     return HttpResponse("Welcome to the Stress Detection API!")
 
-def extract_audio(video_path):
-    from moviepy.editor import VideoFileClip
-    video = VideoFileClip(video_path)
-    audio_path = video_path.replace('.mp4', '.wav')
-    video.audio.write_audiofile(audio_path)
-    return audio_path
 
-# def convert_audio_to_text(audio_path):
-    import speech_recognition as sr
-    recognizer = sr.Recognizer()
-    with sr.AudioFile(audio_path) as source:
-        recognizer.adjust_for_ambient_noise(source)
-        audio = recognizer.record(source)
-        try:
-            return recognizer.recognize_google(audio)
-        except sr.UnknownValueError:
-            return "Could not understand the audio."
-        except sr.RequestError:
-            return "Error with the Google API."
 
 @api_view(['POST'])
 def predict_stress_from_text(request):
@@ -106,10 +88,12 @@ def save_feedback(request):
 
     return JsonResponse({"status": "Feedback saved"})
 
-
 def extract_frames(video_path, frame_interval=30):
     video = cv2.VideoCapture(video_path)
+    fps = video.get(cv2.CAP_PROP_FPS)  # Get the frames per second
+    frame_interval = int(fps * 2)
     frames = []
+
     frame_count = 0
     while True:
         ret, frame = video.read()
@@ -119,7 +103,9 @@ def extract_frames(video_path, frame_interval=30):
             frames.append(frame)
         frame_count += 1
     video.release()
+    print(f"Extracted {len(frames)} frames.")  # Debugging print
     return frames
+
 
 def get_emotion_from_predictions(predictions):
     emotion_labels = ['Anger', 'Disgust', 'Fear', 'Happy', 'Sad', 'Surprise', 'Neutral']
@@ -129,44 +115,119 @@ def get_emotion_from_predictions(predictions):
 
 def process_video(video_path):
     frames = extract_frames(video_path, frame_interval=30)
-    frames_info = []
+    emotion_counts = {}
 
     for frame in frames:
-        # Convert frame (numpy array) to base64
-        img = Image.fromarray(frame)
-        buffered = BytesIO()
-        img.save(buffered, format="JPEG")
-        frame_base64 = base64.b64encode(buffered.getvalue()).decode("utf-8")
+        # Convert frame to grayscale
+        gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        resized_frame = cv2.resize(gray_frame, (48, 48))  # Resize to match model input
+        img_array = np.array(resized_frame) / 255.0  # Normalize pixel values
+        img_array = np.expand_dims(img_array, axis=-1)  # Add channel dimension
+        img_array = np.expand_dims(img_array, axis=0)  # Add batch dimension
 
         # Predict emotion
-        img = img.resize((224, 224))
-        img_array = np.array(img) / 255.0
-        img_array = np.expand_dims(img_array, axis=0)
         predictions = emotion_model.predict(img_array)
         detected_emotion = get_emotion_from_predictions(predictions)
 
-        # Append frame information with emotion
-        frames_info.append({"emotion": detected_emotion, "frame": frame_base64})
+         # Count occurrences of each detected emotion
+        if detected_emotion in emotion_counts:
+            emotion_counts[detected_emotion] += 1
+        else:
+            emotion_counts[detected_emotion] = 1
 
-    return frames_info
+    # Determine the most frequently detected emotion
+    final_emotion = max(emotion_counts, key=emotion_counts.get) if emotion_counts else "Unknown"
+
+    return final_emotion
+
+
+# @api_view(['POST'])
+# def upload_video(request):
+#     file = request.FILES.get('file')
+#     if not file:
+#         return JsonResponse({"error": "No file provided"}, status=400)
+
+#     video_path = os.path.join('uploads', file.name)
+#     with open(video_path, 'wb+') as destination:
+#         for chunk in file.chunks():
+#             destination.write(chunk)
+
+#     final_emotion = process_video(video_path)
+#     os.remove(video_path)  # Clean up uploaded video
+
+#     return JsonResponse({"Final emotion": final_emotion})
 
 
 
+
+
+# Function to extract text from video using SpeechRecognition
+def extract_text_from_video(video_path):
+    try:
+        # Convert video to WAV format
+        audio_path = video_path.replace('.mp4', '.wav')  # Change extension
+        temp_audio_path = "temp_audio.wav"  # Temporary file to avoid issues
+
+        # Use FFmpeg to extract audio
+        ffmpeg_cmd = f"ffmpeg -i \"{video_path}\" -ac 1 -ar 16000 \"{temp_audio_path}\" -y"
+        process = subprocess.run(ffmpeg_cmd, shell=True, capture_output=True, text=True)
+
+        # Check for errors in FFmpeg output
+        if process.returncode != 0:
+            return f"FFmpeg error: {process.stderr}"
+
+        # Convert audio to text using SpeechRecognition
+        recognizer = sr.Recognizer()
+        with sr.AudioFile(temp_audio_path) as source:
+            audio = recognizer.record(source)
+            extracted_text = recognizer.recognize_google(audio)  # Using Google Speech API
+
+        # Clean up temporary files
+        os.remove(temp_audio_path)
+
+        return extracted_text
+
+    except Exception as e:
+        return str(e)  # Return error message if an issue occurs
+
+# Process video for emotion detection and speech-to-text conversion
 @api_view(['POST'])
 def upload_video(request):
     file = request.FILES.get('file')
     if not file:
         return JsonResponse({"error": "No file provided"}, status=400)
 
+    # Save the uploaded video temporarily
     video_path = os.path.join('uploads', file.name)
     with open(video_path, 'wb+') as destination:
         for chunk in file.chunks():
             destination.write(chunk)
 
-    frames_info = process_video(video_path)
-    os.remove(video_path)  # Clean up uploaded video
+    try:
+        # 1️⃣ Extract emotions from video (Using your existing method)
+        final_emotion = process_video(video_path)
 
-    # Print out frames_info to debug
-    print("Frames info:", frames_info) 
+        # 2️⃣ Extract text from video (speech-to-text)
+        extracted_text = extract_text_from_video(video_path)
 
-    return JsonResponse({"frames": frames_info})
+        # 3️⃣ Predict stress from extracted text (Using your existing text model)
+        if extracted_text:
+            text_sequence = text_tokenizer.texts_to_sequences([extracted_text])
+            padded_sequence = pad_sequences(text_sequence, maxlen=MAX_LEN)
+            prediction = text_model.predict(padded_sequence)
+            stress = int(prediction > 0.5)  # 1 = Stress, 0 = No Stress
+        else:
+            stress = None  # No text detected
+
+        # Remove uploaded video
+        os.remove(video_path)
+
+        # 4️⃣ Return both video emotion & extracted text results
+        return JsonResponse({
+            "Final Emotion from Video": final_emotion,
+            "Extracted Text": extracted_text,
+            "Stress Prediction": stress
+        })
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
