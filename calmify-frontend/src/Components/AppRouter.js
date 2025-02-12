@@ -12,7 +12,7 @@ import FunActivitiesOption from "../Pages/HomePage/FunActivity/FunActivitiesOpti
 import GamePage from "../Pages/HomePage/FunActivity/Games/GamePage";
 import MusicPage from "../Pages/HomePage/FunActivity/Music/MusicPage";
 import MindfulActivity from "../Pages/Inputs/Activities/Mindful"
-
+import AlertDr from "../Pages/Inputs/Activities/AlertDr";
 
 import LoginPage from "../Pages/Authentication/LoginPage";
 import SignupPage from "../Pages/Authentication/SigupPage";
@@ -48,6 +48,7 @@ export default function AppRouter() {
         <Route path="/music" element={<MusicPage />} />
 
         <Route path="/mindful" element={<MindfulActivity />} />
+        <Route path="/alertDr" element={<AlertDr />} />
 
 
       </Routes>

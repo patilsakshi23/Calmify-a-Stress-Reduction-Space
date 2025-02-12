@@ -97,7 +97,7 @@ const Contactus = () => {
   return (
     <>
     <ContactFormContainer style={{ padding: '20px' }}>
-    <Text style={{ paddingTop: '40px' , fontWeight: '600' , textAlign: 'center' , paddingBottom:'20px' }}> Contact Doctor </Text>
+    <Text style={{ paddingTop: '40px' , fontWeight: '600' , textAlign: 'center' , paddingBottom:'20px' }}> Contact us </Text>
       <Form id="contact-us" onSubmit={handleSubmit}>
         <div style={{ flex: '1', paddingRight: '10px' }}>
           <Input type="text" name="name" required placeholder="Name" />

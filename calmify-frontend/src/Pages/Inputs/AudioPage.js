@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import microphoneImage from "../../assets/microphone.png";
+import saveStressData from "../../FirebaseUtils"; // Import utility function
 
 const YOUTUBE_API_KEY = 'AIzaSyDJmuL33cv6GiuksMNlVb6hXPp6XHItgCA'; // Replace with your YouTube API key
 const YOUTUBE_API_URL = 'https://www.googleapis.com/youtube/v3/search';
@@ -97,6 +98,7 @@ const AudioPage = () => {
 
       // If stressed, fetch YouTube videos
       if (data.stress === 1) {
+        await saveStressData("audio", transcript, "stressed");
         fetchYouTubeVideos();
       }
     } catch (error) {

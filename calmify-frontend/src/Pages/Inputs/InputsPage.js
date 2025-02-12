@@ -1,10 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import {
-  Button,
-  Heading,
-  Text,
-} from "@chakra-ui/react";
+import { Button, Heading, Text } from "@chakra-ui/react";
+import { motion } from "framer-motion";
 
 import { useNavigate } from "react-router-dom";
 import TextImage from "../../assets/textoption.jpeg";
@@ -12,6 +9,8 @@ import AudioImage from "../../assets/audiooption.jpeg";
 import VideoImage from "../../assets/videooption.jpeg";
 import QuizeImage from "../../assets/quizeoption.jpeg";
 import CalmifyLogo from "../../assets/logocalmify.png";
+import ActiveAlert from "../../assets/activealert.png";
+import Alert1 from "../../assets/alert.png";
 
 import Mindful from "./Activities/Mindful.js";
 import ConsultDr from "./Activities/ConsultDr.js";
@@ -19,6 +18,8 @@ import ConsultDr from "./Activities/ConsultDr.js";
 import { signOut } from "firebase/auth";
 import { auth } from "../../firebaseConfig";
 import { useAuth } from "../Authentication/AuthContext.js";
+
+import { getDatabase, ref, onValue } from "firebase/database";
 
 function InputsPage() {
   const { user } = useAuth();
@@ -30,6 +31,26 @@ function InputsPage() {
     quiz: 0,
   });
 
+  const [stressOverloaded, setStressOverloaded] = useState(false);
+
+  useEffect(() => {
+    const db = getDatabase();
+    const userId = auth.currentUser?.uid;
+    if (!userId) return;
+
+    const stressCountRef = ref(db, `users/${userId}/input/stress_count`);
+
+    onValue(stressCountRef, (snapshot) => {
+      const stressCount = snapshot.val()?.count || 0;
+      if (stressCount >= 4) {
+        setStressOverloaded(true);
+        console.log("STRESSED OVERLOADED!");
+      } else {
+        setStressOverloaded(false);
+      }
+    });
+  }, []);
+
   // Handle user logout
   const handleLogout = async () => {
     try {
@@ -38,6 +59,11 @@ function InputsPage() {
     } catch (error) {
       console.error("Error logging out: ", error.message);
     }
+  };
+
+
+  const handleAlertDR = () => {
+    navigate("/alertDr");
   };
 
   // Handle navigation
@@ -63,7 +89,6 @@ function InputsPage() {
     ));
   };
 
-  
   return (
     <div>
       {/* Navbar with Logo and Logout */}
@@ -71,6 +96,24 @@ function InputsPage() {
         <Logo>
           <LogoImg src={CalmifyLogo} alt="Calmify" />
         </Logo>
+        {stressOverloaded ? (
+          <MotionAlert
+          onClick={handleAlertDR}
+            src={ActiveAlert}
+            alt="Active alert"
+            animate={{
+              scale: [1, 1.2, 1],
+              rotate: [0, 10, -10, 0],
+            }}
+            transition={{
+              duration: 0.5,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+          />
+        ) : (
+          <StaticAlert onClick={handleAlertDR} src={Alert1} alt="Alert" />
+        )}
         <Button onClick={handleLogout}>Logout</Button>
       </StyledNav>
 
@@ -92,7 +135,8 @@ function InputsPage() {
             <CardContent>
               <StyledHeading>Video</StyledHeading>
               <StyledText>
-                Convey your feelings or thoughts by uploading or recording a video.
+                Convey your feelings or thoughts by uploading or recording a
+                video.
               </StyledText>
               <StarRating>{renderStars("video")}</StarRating>
             </CardContent>
@@ -103,7 +147,8 @@ function InputsPage() {
             <CardContent>
               <StyledHeading>Audio</StyledHeading>
               <StyledText>
-                Convey your feelings or thoughts by uploading or recording audio.
+                Convey your feelings or thoughts by uploading or recording
+                audio.
               </StyledText>
               <StarRating>{renderStars("audio")}</StarRating>
             </CardContent>
@@ -114,7 +159,7 @@ function InputsPage() {
             <CardContent>
               <StyledHeading>Text</StyledHeading>
               <StyledText>
-                Convey your feelings or thoughts by uploading or recording text.
+                Convey your feelings or thoughts by writing text.
               </StyledText>
               <StarRating>{renderStars("text")}</StarRating>
             </CardContent>
@@ -230,3 +275,12 @@ const Star = styled.span`
     color: #ffcc00;
   }
 `;
+
+const StaticAlert = styled.img`
+  height: 30px;
+  width: 30px;
+  margin-left: 1350px;
+`;
+
+
+const MotionAlert = motion(StaticAlert); // Convert Alert to a motion component
