@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import FlipCard from "./FlipCard.js";
-import BlockPuzzle from "./WaterSortPuzzle.js";
+// import BlockPuzzle from "./WaterSortPuzzle.js";
 import { useDisclosure } from "@chakra-ui/react";
 import FlipCardImage from "../../../../assets/Flipcardgame.jpg";
 import CalmifyLogo from "../../../../assets/logocalmify.png";
@@ -137,7 +137,8 @@ const GamePage = () => {
           </CardContent>
         </StyledCard>
 
-        <StyledCard onClick={() => handleCardOpen("BlockPuzzle")}>
+        {/* <StyledCard onClick={() => handleCardOpen("BlockPuzzle")}> */}
+        <StyledCard>
           <StyledImage src={GameImage} alt="Game 2" />
           <CardContent>
             <StyledHeading>Zen Garden</StyledHeading>
@@ -146,7 +147,7 @@ const GamePage = () => {
       </StyledStack>
 
       {selectedGame === "FlipCard" && <FlipCard isOpen={isOpen} onClose={onClose} />}
-      {selectedGame === "BlockPuzzle" && <BlockPuzzle isOpen={isOpen} onClose={onClose} />}
+      {/* {selectedGame === "BlockPuzzle" && <BlockPuzzle isOpen={isOpen} onClose={onClose} />} */}
     </div>
   );
 };
