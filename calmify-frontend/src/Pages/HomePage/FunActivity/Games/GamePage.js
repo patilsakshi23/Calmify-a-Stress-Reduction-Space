@@ -106,15 +106,6 @@ const StyledHeading = styled.h3`
   }
 `;
 
-const StyledText = styled.p`
-  font-size: 1em;
-  color: #555;
-  text-align: center;
-
-  @media (max-width: 768px) {
-    font-size: 0.9em;
-  }
-`;
 
 const GamePage = () => {
   const navigate = useNavigate();

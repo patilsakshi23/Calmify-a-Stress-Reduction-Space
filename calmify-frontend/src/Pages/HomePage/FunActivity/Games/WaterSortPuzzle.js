@@ -8,11 +8,14 @@ import {
   ModalCloseButton,
   ModalBody,
   useToast,
+  useBreakpointValue,
 } from "@chakra-ui/react";
 
 const TubeWrapper = styled.div`
   display: flex;
   justify-content: space-around;
+  flex-wrap: wrap;
+  gap: 10px;
   margin-top: 20px;
 `;
 
@@ -23,6 +26,11 @@ const Tube = styled.div`
   border-radius: 10px;
   display: flex;
   flex-direction: column-reverse;
+  transition: transform 0.3s;
+
+  &:hover {
+    transform: scale(1.05);
+  }
 `;
 
 const Water = styled.div`
@@ -38,14 +46,18 @@ const WaterSortPuzzle = ({ isOpen, onClose }) => {
   const [tubes, setTubes] = useState([]);
   const [selectedTube, setSelectedTube] = useState(null);
   const toast = useToast();
+  const numberOfTubes = useBreakpointValue({ base: 5, md: 8 });
 
   const generateTubes = () => {
-    const newTubes = Array.from({ length: 5 }, () => []);
+    const newTubes = Array.from({ length: numberOfTubes - 1 }, () => []);
     const waterColors = [...colors, ...colors, ...colors].sort(() => Math.random() - 0.5);
 
     waterColors.forEach((color, index) => {
-      newTubes[index % 5].push(color);
+      newTubes[index % (numberOfTubes - 1)].push(color);
     });
+
+    newTubes.push([]); // Add an empty tube
+    newTubes.sort(() => Math.random() - 0.5); // Shuffle tubes
 
     setTubes(newTubes);
   };
@@ -54,7 +66,7 @@ const WaterSortPuzzle = ({ isOpen, onClose }) => {
     if (isOpen) {
       generateTubes();
     }
-  }, [isOpen]);
+  }, [isOpen, numberOfTubes]);
 
   const handleTubeClick = (index) => {
     if (selectedTube === null) {
@@ -77,7 +89,7 @@ const WaterSortPuzzle = ({ isOpen, onClose }) => {
   const checkWinCondition = () => {
     return tubes.every((tube) => {
       const color = tube[0];
-      return tube.every((waterColor) => waterColor === color);
+      return tube.every((waterColor) => waterColor === color) || tube.length === 0;
     });
   };
 
@@ -96,12 +108,13 @@ const WaterSortPuzzle = ({ isOpen, onClose }) => {
         onClose();
       }, 2000);
     }
-  }, [tubes, toast, onClose]);
+
+  }, [tubes, toast, onClose, checkWinCondition]);
 
   return (
     <Modal isOpen={isOpen} onClose={() => { generateTubes(); onClose(); }}>
       <ModalOverlay backdropFilter="blur(10px)" />
-      <ModalContent maxWidth="60%" height="700px">
+      <ModalContent maxWidth="90%" height="auto">
         <ModalHeader>Water Sort Puzzle</ModalHeader>
         <ModalCloseButton />
         <ModalBody>

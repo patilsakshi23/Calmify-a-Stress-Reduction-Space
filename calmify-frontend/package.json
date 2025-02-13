@@ -3,10 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.14.5",
     "@chakra-ui/react": "^2.8.2",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
+    "caniuse-lite": "^1.0.30001699",
     "chakra-ui-steps": "^2.1.0",
     "firebase": "^10.13.1",
     "lucide-react": "^0.474.0",
@@ -19,8 +21,7 @@
     "react-scroll": "^1.9.0",
     "react-youtube": "^10.1.0",
     "styled-components": "^6.1.12",
-    "web-vitals": "^2.1.4",
-    "@babel/plugin-proposal-private-property-in-object": "^7.14.5"
+    "web-vitals": "^2.1.4"
   },
   "scripts": {
     "start": "react-scripts start",
