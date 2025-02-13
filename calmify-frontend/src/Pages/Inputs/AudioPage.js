@@ -155,7 +155,7 @@ const AudioPage = () => {
 
       {videos.length > 0 && (
         <VideoSection>
-          <h3>Suggested Videos to Reduce Stress: </h3>
+          <h3>Suggest Videos to Reduce Stress: </h3>
           <VideoGrid>
             {videos.map((video) => (
               <VideoCard key={video.id.videoId}>
