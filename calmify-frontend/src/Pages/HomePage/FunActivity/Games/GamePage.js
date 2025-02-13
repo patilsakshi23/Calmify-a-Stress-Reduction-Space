@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import FlipCard from "./FlipCard.js";
+import BlockPuzzle from "./WaterSortPuzzle.js";
 import { useDisclosure } from "@chakra-ui/react";
 import FlipCardImage from "../../../../assets/Flipcardgame.jpg";
 import CalmifyLogo from "../../../../assets/logocalmify.png";
@@ -28,8 +29,6 @@ const LogoImg = styled.img`
   margin-right: 20px;
   cursor: pointer;
 `;
-
-
 
 const StyledStack = styled.div`
   display: flex;
@@ -119,15 +118,15 @@ const StyledText = styled.p`
 
 const GamePage = () => {
   const navigate = useNavigate();
-  // const [selectedCard, setSelectedCard] = useState(null);
+  const [selectedGame, setSelectedGame] = useState(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const handleLogoClick = () => {
     navigate("/");
   };
 
-  const handleCardOpen = () => {
-    // setSelectedCard({});
+  const handleCardOpen = (game) => {
+    setSelectedGame(game);
     onOpen();
   };
 
@@ -140,23 +139,23 @@ const GamePage = () => {
       </StyledNav>
 
       <StyledStack>
-        <StyledCard onClick={handleCardOpen}>
+        <StyledCard onClick={() => handleCardOpen("FlipCard")}>
           <StyledImage src={FlipCardImage} alt="Game 1" />
           <CardContent>
             <StyledHeading>Flip Card Memory Game</StyledHeading>
           </CardContent>
         </StyledCard>
 
-        <StyledCard>
+        <StyledCard onClick={() => handleCardOpen("BlockPuzzle")}>
           <StyledImage src={GameImage} alt="Game 2" />
           <CardContent>
-            <StyledHeading>Game 2</StyledHeading>
-            <StyledText>A therapeutic escape that calms the mind and uplifts the soul.</StyledText>
+            <StyledHeading>Zen Garden</StyledHeading>
           </CardContent>
         </StyledCard>
       </StyledStack>
 
-      <FlipCard isOpen={isOpen} onClose={onClose} />
+      {selectedGame === "FlipCard" && <FlipCard isOpen={isOpen} onClose={onClose} />}
+      {selectedGame === "BlockPuzzle" && <BlockPuzzle isOpen={isOpen} onClose={onClose} />}
     </div>
   );
 };

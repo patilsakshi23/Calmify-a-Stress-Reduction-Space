@@ -59,7 +59,7 @@ const SubmitButton = styled.button`
   }
 `;
 
-const Contactus = () => {
+const Feedback = () => {
   const [feedbacks, setFeedbacks] = useState([
     { id: 1, name: 'John Doe', feedback: 'Great service! Very helpful.' },
     { id: 2, name: 'Jane Smith', feedback: 'Could improve response time.' },
@@ -123,4 +123,4 @@ const Contactus = () => {
   );
 };
 
-export default Contactus;
+export default Feedback;

@@ -9,7 +9,7 @@ import backgroundImage from "../../assets/Homebg.png";
 import FunActivities from "../HomePage/FunActivity/FunActivities.js";
 import Yoga from "../HomePage/Yoga/Yoga.js";
 import Exercise from "../HomePage/Exercise/Exercise.js";
-import Contactus from "./Contactus.js";
+import Feedback from "./Feedback.js";
 import Footer from "../Footer.js";
 // import Loader from "./Loader.js"; // Import the Loader component
 
@@ -90,8 +90,8 @@ function HomePage() {
           <Main id="exercises">
             <Exercise />
           </Main>
-          <Main id="contact">
-            <Contactus />
+          <Main id="feedback">
+            <Feedback />
           </Main>
           <Footer />
         </>

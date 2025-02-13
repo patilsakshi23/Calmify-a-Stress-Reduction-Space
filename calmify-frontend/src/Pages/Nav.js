@@ -55,7 +55,7 @@ const Nav = () => {
             <StyledLink to="exercises" smooth={true} duration={500} onClick={() => setIsNavOpen(false)}>EXERCISES</StyledLink>
           </NavLi>
           <NavLi>
-            <StyledLink to="contact" smooth={true} duration={500} onClick={() => setIsNavOpen(false)}>CONTACT US</StyledLink>
+            <StyledLink to="feedback" smooth={true} duration={500} onClick={() => setIsNavOpen(false)}>FEEDBACK</StyledLink>
           </NavLi>
         </NavLinks>
       </NavBar>
