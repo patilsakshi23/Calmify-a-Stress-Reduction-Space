@@ -94,7 +94,6 @@ const AudioPage = () => {
 
       const data = await response.json();
       setPrediction(data.stress);
-      // setFeedbackGiven(false);
 
       // If stressed, fetch YouTube videos
       if (data.stress === 1) {
