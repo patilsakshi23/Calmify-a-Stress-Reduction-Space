@@ -1,7 +1,7 @@
 import { getDatabase, ref, set, get, update } from "firebase/database";
 import { auth } from "./firebaseConfig"; // Import your Firebase config
 
-const saveStressData = async (inputType, inputData, prediction) => {
+const saveStressData = async (inputType, inputData, prediction, suggestedVideos) => {
   const db = getDatabase();
   const userId = auth.currentUser?.uid;
 
@@ -12,7 +12,7 @@ const saveStressData = async (inputType, inputData, prediction) => {
 
   //  Check stress condition before saving
   const isStressDetected = 
-    (inputType !== "quiz" && prediction === "stressed") || 
+    (inputType !== "quiz" && (prediction === "stressed" || prediction ==="Moderate Stress" || prediction === "Stressed")) || 
     (inputType === "quiz" && (prediction === "Severely Stressed" || prediction === "Highly Stressed"));
 
   if (!isStressDetected) {
@@ -38,7 +38,7 @@ const saveStressData = async (inputType, inputData, prediction) => {
     await set(inputRef, {
       input: inputData,
       prediction: prediction,
-      suggestions: "Relaxation exercises, breathing techniques",
+      suggestions: suggestedVideos,
       timestamp: timestamp,
     });
 
