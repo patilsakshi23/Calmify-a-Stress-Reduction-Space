@@ -7,12 +7,12 @@ import consult from "../../../assets/consultdr.jpeg";
 const AlertDr = () => {
   return (
     <>
-      <Section>
+      {/* <Section>
         <LeftSection>
           <Img src={consult} alt="img" />
-        </LeftSection>
+        </LeftSection> */}
 
-        <RightSection>
+        {/* <RightSection> */}
           <Stack>
             <Heading mb={109} as="h2" size="xl">
               Consult a Doctor
@@ -22,8 +22,8 @@ const AlertDr = () => {
               <Text align="center" >Send</Text>
             </SubmitButton>
           </Stack>
-        </RightSection>
-      </Section>
+        {/* </RightSection>
+      </Section> */}
     </>
   );
 };
@@ -44,33 +44,33 @@ const TextArea = styled.textarea`
   resize: none;
 `;
 
-const Img = styled.img`
-  width: 80%;
-  height: 80%;
-  object-fit: cover;
-`;
+// const Img = styled.img`
+//   width: 80%;
+//   height: 80%;
+//   object-fit: cover;
+// `;
 
-const Section = styled.div`
-  display: flex;
-  height: 100vh;
-  padding: 20px;
-  box-sizing: border-box;
-`;
+// const Section = styled.div`
+//   display: flex;
+//   height: 100vh;
+//   padding: 20px;
+//   box-sizing: border-box;
+// `;
 
-const LeftSection = styled.div`
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
+// const LeftSection = styled.div`
+//   flex: 1;
+//   display: flex;
+//   justify-content: center;
+//   align-items: center;
+// `;
 
-const RightSection = styled.div`
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-`;
+// const RightSection = styled.div`
+//   flex: 1;
+//   display: flex;
+//   justify-content: center;
+//   align-items: center;
+//   flex-direction: column;
+// `;
 
 const SubmitButton = styled.button`
   background-color: rgb(168, 213, 255);

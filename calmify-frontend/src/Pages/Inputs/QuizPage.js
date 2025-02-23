@@ -181,7 +181,7 @@ const QuizPage = () => {
   // }, [isFinished, score]);
 
   return (
-    
+    <div>
     <Section>
       <LeftSection>
         <Card h="600px" w="700px" alignItems="center" p="10" pt="100px">
@@ -255,7 +255,7 @@ const QuizPage = () => {
           <Img src={quiz} alt="Quiz illustration" />
         </RightSection>
       </Section>
-      
+      </div>
         // {videos.length > 0 && (
         //         <VideoSection>
         //           <Text fontSize="lg" fontWeight="bold">Recommended Videos:</Text>

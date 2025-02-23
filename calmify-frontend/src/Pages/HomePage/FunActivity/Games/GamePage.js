@@ -88,7 +88,7 @@ const StyledImage = styled.img`
 
 const CardContent = styled.div`
   padding: 20px;
-
+  
   @media (max-width: 768px) {
     padding: 15px;
   }
@@ -137,13 +137,12 @@ const GamePage = () => {
           </CardContent>
         </StyledCard>
 
-        {/* <StyledCard onClick={() => handleCardOpen("JigsawPuzzle")}> */}
-      <StyledCard>
+        {/* <StyledCard onClick={() => handleCardOpen("JigsawPuzzle")}>
           <StyledImage src={GameImage} alt="Game 2" />
           <CardContent>
             <StyledHeading>Zen Garden</StyledHeading>
           </CardContent>
-        </StyledCard>
+        </StyledCard> */}
       </StyledStack>
 
       {selectedGame === "FlipCard" && <FlipCard isOpen={isOpen} onClose={onClose} />}

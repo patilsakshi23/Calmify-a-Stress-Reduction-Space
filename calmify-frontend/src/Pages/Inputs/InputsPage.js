@@ -12,13 +12,13 @@ import ActiveAlert from "../../assets/activealert.png";
 import Alert1 from "../../assets/alert.png";
 import Mindful from "./Activities/Mindful.js";
 // import ConsultDr from "./Activities/ConsultDr.js";
-import { signOut } from "firebase/auth";
+import { signOut, onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../firebaseConfig";
 import { useAuth } from "../Authentication/AuthContext.js";
 import { getDatabase, ref, onValue } from "firebase/database";
 
 function InputsPage() {
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
   const navigate = useNavigate();
   const [ratings, setRatings] = useState({
     video: 0,
@@ -46,10 +46,48 @@ function InputsPage() {
     });
   }, []);
 
+  // Check for a logged-in user on component mount
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+
+    // Firebase listener to handle authentication state changes
+    onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        const db = getDatabase();
+        const firstNameRef = ref(db, `users/${currentUser.uid}/firstName`);
+        const lastNameRef = ref(db, `users/${currentUser.uid}/lastName`);
+
+        onValue(firstNameRef, (snapshot) => {
+          const firstName = snapshot.val() || "";
+          onValue(lastNameRef, (snapshot) => {
+            const lastName = snapshot.val() || "";
+            const updatedUser = {
+              uid: currentUser.uid,
+              email: currentUser.email,
+              firstName,
+              lastName,
+            };
+            setUser(updatedUser);
+            localStorage.setItem("user", JSON.stringify(updatedUser));
+          });
+        });
+      } else {
+        setUser(null);
+        localStorage.removeItem("user");
+        navigate("/");
+      }
+    });
+  }, [navigate, setUser]);
+
   // Handle user logout
   const handleLogout = async () => {
     try {
-      await signOut(auth);
+      auth.signOut();
+      localStorage.removeItem("user");
       navigate("/");
     } catch (error) {
       console.error("Error logging out: ", error.message);
@@ -109,21 +147,20 @@ function InputsPage() {
           ) : (
             <StaticAlert onClick={handleAlertDR} src={Alert1} alt="Alert" />
           )}
-        
-        
         </AlertContainer>
         <Button onClick={handleLogout}>Logout</Button>
       </StyledNav>
 
       {/* Greeting Message */}
       <GreetingContainer>
-        <Heading as="h2" size="2xl">
-          Hello, {user?.firstName} {user?.lastName}
-        </Heading>
-        <Text fontSize="2xl" color="grey" pt="5">
-          Select any option to convey your thoughts or feelings to us!!
-        </Text>
-      </GreetingContainer>
+  <Heading as="h2" size="2xl" mt={{ base: 4, md: 0 }} ml={{ base: "20px", md: "70px" }}>
+    Hello, {user?.firstName} {user?.lastName}
+  </Heading>
+  <Text fontSize="2xl" color="grey" pt="5" ml={{ base: "20px", md: "70px" }}>
+    Select any option to convey your thoughts or feelings to us!!
+  </Text>
+</GreetingContainer>
+
 
       {/* Options for Input */}
       <StyledStack>
@@ -144,8 +181,7 @@ function InputsPage() {
           <CardContent>
             <StyledHeading>Audio</StyledHeading>
             <StyledText>
-              Convey your feelings or thoughts by uploading or recording
-              audio.
+              Convey your feelings or thoughts by uploading or recording audio.
             </StyledText>
             <StarRating>{renderStars("audio")}</StarRating>
           </CardContent>
@@ -294,7 +330,7 @@ const LogoImg = styled.img`
 const AlertContainer = styled.div`
   display: flex;
   align-items: center;
-  margin-left: 10px;
+  margin-right: 40px;
 
   @media (max-width: 768px) {
     margin-left: 10px;

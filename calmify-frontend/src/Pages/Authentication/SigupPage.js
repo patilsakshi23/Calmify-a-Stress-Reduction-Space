@@ -15,10 +15,10 @@ import {
   // Checkbox,
 } from "@chakra-ui/react";
 import backgroundImage from "../../assets/loginsignup.png";
-
+import CalmifyLogo from "../../assets/logocalmify.png";
 import styled from "styled-components";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth} from "../../firebaseConfig";
+import { auth } from "../../firebaseConfig";
 
 import { getDatabase, ref, set } from "firebase/database";
 // import { auth } from "../../firebaseConfig";
@@ -39,9 +39,13 @@ function SignupPage({ setUser }) {
   const handleSignup = async (e) => {
     e.preventDefault();
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
       const user = userCredential.user;
-  
+
       // Save user details to Firebase
       const database = getDatabase();
       const userRef = ref(database, `users/${user.uid}`);
@@ -51,14 +55,25 @@ function SignupPage({ setUser }) {
         email: user.email,
         sessions: {},
       });
-  
+
       // Update user context
       setUser({
         ...user,
         firstName: name,
         lastName: lname,
       });
-  
+
+      // Save to localStorage
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          uid: user.uid,
+          firstName: name,
+          lastName: lname,
+          email: user.email,
+        })
+      );
+
       navigate("/input"); // Redirect after signup
     } catch (error) {
       toast({
@@ -70,7 +85,6 @@ function SignupPage({ setUser }) {
       });
     }
   };
-  
 
   return (
     <Section>
@@ -106,10 +120,9 @@ function SignupPage({ setUser }) {
               Sign Up
             </Heading>
             <Text pl="30px" fontSize="xl" mb={5}>
-                Signup for creating new account
-              </Text>
-              <FormControl pl="30px" id="name">
-              
+              Signup for creating new account
+            </Text>
+            <FormControl pl="30px" id="name">
               <Input
                 mb={5}
                 h="50px"
@@ -120,9 +133,8 @@ function SignupPage({ setUser }) {
                 onChange={(e) => setName(e.target.value)}
                 isRequired
               />
-            </FormControl>  
+            </FormControl>
             <FormControl pl="30px" id="lname">
-              
               <Input
                 mb={5}
                 h="50px"
@@ -133,9 +145,8 @@ function SignupPage({ setUser }) {
                 onChange={(e) => setLname(e.target.value)}
                 isRequired
               />
-            </FormControl> 
+            </FormControl>
             <FormControl pl="30px" id="email">
-              
               <Input
                 mb={5}
                 h="50px"
@@ -161,7 +172,7 @@ function SignupPage({ setUser }) {
                 />
                 <InputRightElement pt="10px" width="4.5rem">
                   <Image
-                    src={show ? showeye :  hideeye }
+                    src={show ? showeye : hideeye}
                     h="23px"
                     cursor="pointer"
                     onClick={handleClick}
@@ -189,6 +200,9 @@ function SignupPage({ setUser }) {
                 Login
               </Button>
             </Text>
+            <Logo>
+              <LogoImg src={CalmifyLogo} alt="Calmify" />
+            </Logo>
           </Stack>
         </Box>
       </Container>
@@ -208,3 +222,17 @@ const Section = styled.div`
   background-repeat: no-repeat;
 `;
 
+const Logo = styled.div`
+  display: flex;
+  align-items: center;
+  margin-left: 150px;
+  margin-top: 20px;
+
+  @media (max-width: 768px) {
+    margin-right: 0;
+  }
+`;
+const LogoImg = styled.img`
+  height: 40px;
+  cursor: pointer;
+`;
