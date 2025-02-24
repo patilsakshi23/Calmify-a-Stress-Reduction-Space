@@ -243,8 +243,8 @@ const QuizPage = () => {
     };
   
     updateStressData();
-  }, [isFinished, score, user]);  // Dependencies to trigger the effect
-  
+  // }, [isFinished, score, user]);  // Dependencies to trigger the effect
+  });
 
 //   useEffect(() => {
 //     const updateStressData = async () => {
