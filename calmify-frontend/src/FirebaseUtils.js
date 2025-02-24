@@ -1,7 +1,7 @@
 import { getDatabase, ref, set, get, update } from "firebase/database";
 import { auth } from "./firebaseConfig"; // Import your Firebase config
 
-const saveStressData = async (inputType, inputData, prediction, suggestedVideos) => {
+const saveStressData = async (inputType, inputData, prediction, result, suggestedVideos) => {
   const db = getDatabase();
   const userId = auth.currentUser?.uid;
 
@@ -13,7 +13,7 @@ const saveStressData = async (inputType, inputData, prediction, suggestedVideos)
   //  Check stress condition before saving
   const isStressDetected = 
     (inputType !== "quiz" && (prediction === "stressed" || prediction ==="Moderate Stress" || prediction === "Stressed")) || 
-    (inputType === "quiz" && (prediction === "Severely Stressed" || prediction === "Highly Stressed"));
+    (inputType === "quiz" && (result.mood === "Severely Stressed" || result.mood === "Highly Stressed"));
 
   if (!isStressDetected) {
     console.log(" Not stressed, skipping Firebase save.");

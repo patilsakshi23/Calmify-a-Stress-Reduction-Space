@@ -16,25 +16,80 @@ import quiz from "../../assets/quiz.jpg";
 import { db } from "../../firebaseConfig";
 import { ref, push, update, get } from "firebase/database";
 import { useAuth } from "../Authentication/AuthContext";
+import saveStressData from "../../FirebaseUtils"; 
 
+const youtubeVideos = [
+  {
+    id: 1,
+    title: "3-Minute Stress Management: Reduce Stress With This Short Activity",
+    url: "https://youtu.be/grfXR6FAsI8?si=Npm8XkqaYLTKe0Tz",
+    thumbnail: "https://img.youtube.com/vi/grfXR6FAsI8/0.jpg",
+  },
+  {
+    id: 2,
+    title: "How to protect your brain from stress | Niki Korteweg | TEDxAmsterdamWomen",
+    url: "https://youtu.be/Nz9eAaXRzGg?si=B8RAdhiWiRo9CeAL",
+    thumbnail: "https://img.youtube.com/vi/Nz9eAaXRzGg/0.jpg",
+  },
+  {
+    id: 3,
+    title: "How stress is killing us (and how you can stop it). | Thijs Launspach | TEDxUniversiteitVanAmsterdam",
+    url: "https://youtu.be/NyyPZJrDfkM?si=U0eZ_3Yl13hRd8fa",
+    thumbnail: "https://img.youtube.com/vi/NyyPZJrDfkM/0.jpg",
+  },
+  {
+    id: 4,
+    title: "Stress relief tips",
+    url: "https://youtu.be/Q0m6MB7Dr30?si=DFjyiUFOp2imZULm",
+    thumbnail: "https://img.youtube.com/vi/Q0m6MB7Dr30/0.jpg",
+  },
+  {
+    id: 5,
+    title: "Hack for Headaches & Stress",
+    url: "https://youtube.com/shorts/_IfbUjoFdkk?si=Lb0-3tPn2vyCSwsn",
+    thumbnail: "https://img.youtube.com/vi/_IfbUjoFdkk/0.jpg",
+  },
+  {
+    id: 6,
+    title: "Instant Anxiety Relief Point on Your Body | Dr. Meghana Dikshit",
+    url: "https://youtube.com/shorts/QPyNeGHlMao?si=y_IPkrmy9lKGARRi",
+    thumbnail: "https://img.youtube.com/vi/QPyNeGHlMao/0.jpg",
+  },
+  {
+    id: 7,
+    title: "The Science of Stress & How to Reduce It 5 Minute Stress Relief",
+    url: "https://youtube.com/shorts/f8BqU9wUbP0?si=PsZU0MSumvWHCGok",
+    thumbnail: "https://img.youtube.com/vi/f8BqU9wUbP0/0.jpg",
+  },
+  {
+    id: 8,
+    title: "Reduce stress and anxiety with these mind-quieting tips | How to stop overthinking | Anxiety relief",
+    url: "https://youtu.be/bsaOBWUqdCU?si=SaOP1WGjJLkZPdHP",
+    thumbnail: "https://img.youtube.com/vi/bsaOBWUqdCU/0.jpg",
+  },
+  {
+    id: 9,
+    title: "10 Minute Guided Imagery for Reducing Stress and Anxiety",
+    url: "https://youtu.be/AbckuluEdM0?si=hc6dgs42rwCxgrpM",
+    thumbnail: "https://img.youtube.com/vi/AbckuluEdM0/0.jpg",
+  },
+  {
+    id: 10,
+    title: "10 Minute Guided Imagery Meditation | City of Hope",
+    url: "https://youtu.be/t1rRo6cgM_E?si=5GRImKLS5JB--3VA",
+    thumbnail: "https://img.youtube.com/vi/t1rRo6cgM_E/0.jpg",
+  },
+];
 
-// const videoSuggestions = {
-//   "Severely Stressed": [
-//     "https://youtu.be/RKECKQWVlO4?si=n7uYJETMtjcQmxz7",
-//     "https://youtu.be/4Tm6Z1y3h94?si=XCZn-wPAlAPKbODP",
-//     "https://youtu.be/o18I23HCQtE?si=Oxog_coeMFyTVrHo",
-//   ],
-//   "Highly Stressed": [
-//     "https://youtu.be/nX4dpGQ5wF4?si=sQSzu5fOvPOzKZWk",
-//     "https://youtu.be/4YVOD6XId04?si=4DvOC-DrwA0kaa9n",
-//     "https://youtu.be/grfXR6FAsI8?si=-WOH2YLy7DoS03vY",
-//   ],
-//   "Moderately Stressed": [
-//     "https://youtu.be/sitAHu6uxtA?si=p7i_BTjuQkLNhgs5",
-//     "https://youtu.be/7VfSCQnGfk4?si=QqAYQsXQohVP-5AC",
-//     "https://youtu.be/o18I23HCQtE?si=I4i1H6H3iXLSsLvw",
-//   ],
-// };
+// Shuffle function to randomize the order of videos
+const shuffleArray = (array) => {
+  let shuffledArray = array.slice();
+  for (let i = shuffledArray.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
+  }
+  return shuffledArray;
+};
 
 const questions = [
   {
@@ -125,7 +180,7 @@ const QuizPage = () => {
   const [selectedOption, setSelectedOption] = useState(null);
   const [isFinished, setIsFinished] = useState(false);
   const { user } = useAuth();
-  // const [videos, setVideos] = useState([]);
+  const [videos, setVideos] = useState([]);
 
   const handleNext = () => {
     if (selectedOption === null) return;
@@ -148,37 +203,96 @@ const QuizPage = () => {
 
   const result = calculateMood(score);
 
+
   useEffect(() => {
     const updateStressData = async () => {
       if (!isFinished || !user) return;
-
+  
       const userRef = ref(db, `users/${user.uid}/input/quiz`);
       const stressRef = ref(db, `users/${user.uid}/input/stress_count`);
-
+  
       const newResponse = {
         ...responses,
         prediction: result.mood,
         score,
         timestamp: new Date().toLocaleString(),
       };
-
+  
+      // Save quiz response to Firebase
       await push(userRef, newResponse);
-
+  
+      // Update stress count
       const snapshot = await get(stressRef);
       const currentCount = snapshot.exists() ? snapshot.val().count : 0;
-
       await update(stressRef, { count: currentCount + 1 });
+  
+      // Check if stress is at a level that requires video suggestions
+      if (["Moderately Stressed", "Highly Stressed", "Severely Stressed"].includes(result.mood)) {
+        const shuffledVideos = shuffleArray(youtubeVideos).slice(0, 3);
+        setVideos(shuffledVideos);
+  
+        // Extract video details for saving
+        const videoSuggestions = shuffledVideos.map(video => ({
+          title: video.title,
+          url: video.url,
+        }));
+  
+        // Save stress data along with video suggestions
+        await saveStressData(videoSuggestions);
+      }
     };
-
+  
     updateStressData();
-  });
+  }, [isFinished, score, user]);  // Dependencies to trigger the effect
+  
 
-  // useEffect(() => {
-  //   if (isFinished) {
-  //     const result = calculateMood(score);
-  //     // setVideos(videoSuggestions[result.mood] || []);
-  //   }
-  // }, [isFinished, score]);
+//   useEffect(() => {
+//     const updateStressData = async () => {
+//       if (!isFinished || !user) return;
+
+//       const userRef = ref(db, `users/${user.uid}/input/quiz`);
+//       const stressRef = ref(db, `users/${user.uid}/input/stress_count`);
+
+//       const newResponse = {
+//         ...responses,
+//         prediction: result.mood,
+//         score,
+//         timestamp: new Date().toLocaleString(),
+//       };
+
+//       await push(userRef, newResponse);
+
+//       const snapshot = await get(stressRef);
+//       const currentCount = snapshot.exists() ? snapshot.val().count : 0;
+
+//       await update(stressRef, { count: currentCount + 1 });
+//     };
+
+//     updateStressData();
+//   });
+
+//   useEffect(() => {
+//   //   if (isFinished) {
+//   //     const result = calculateMood(score);
+//   //     // setVideos(videoSuggestions[result.mood] || []);
+//   //   }
+
+
+//   const fetchData = async () => {
+//     const shuffledVideos = shuffleArray(youtubeVideos).slice(0, 3);
+//     setVideos(shuffledVideos);
+
+//     // Extract necessary video details to store in Firebase
+//     const videoSuggestions = shuffledVideos.map(video => ({
+//       title: video.title,
+//       url: video.url,
+//     }));
+
+//     // Save stress data along with video suggestions
+//     await saveStressData(videoSuggestions);
+//   };
+// // }, [isFinished, score, videoSuggestions]);
+//   }, [isFinished, score]);
 
   return (
     <div>
@@ -235,18 +349,7 @@ const QuizPage = () => {
               <Button onClick={() => window.location.reload()}>
                 Retake Quiz
               </Button>
-              {/* {videos.length > 0 && (
-                <Box>
-                  <Text fontSize="lg" fontWeight="bold">Recommended Videos:</Text>
-                  {videos.map((video, index) => (
-                    <Text key={index}>
-                      <a href={video} target="_blank" rel="noopener noreferrer">
-                        {video}
-                      </a>
-                    </Text>
-                  ))}
-                </Box>
-              )} */}
+           
             </VStack>
           )}
         </Card>
@@ -255,24 +358,30 @@ const QuizPage = () => {
           <Img src={quiz} alt="Quiz illustration" />
         </RightSection>
       </Section>
-      </div>
-        // {videos.length > 0 && (
-        //         <VideoSection>
-        //           <Text fontSize="lg" fontWeight="bold">Recommended Videos:</Text>
-        //           <VideoGrid>
-        //             {videos.map((video, index) => (
-        //               <VideoCard key={index}>
-        //                 <Thumbnail src={`https://img.youtube.com/vi/${video.url.split("v=")[1]}/mqdefault.jpg`} alt={video.title} />
-        //                 <VideoTitle>{video.title}</VideoTitle>
-        //                 <VideoLink href={video.url} target="_blank" rel="noopener noreferrer">
-        //                   Watch Video
-        //                 </VideoLink>
-        //               </VideoCard>
-        //             ))}
-        //           </VideoGrid>
-        //         </VideoSection>
+      {videos.length > 0 && (
+          <VideoSection>
+            <VideoGrid>
+              {videos.map((video) => (
+                <VideoCard key={video.id}>
+                  <Thumbnail
+                    src={video.thumbnail}
+                    alt={video.title}
+                  />
+                  <VideoTitle>{video.title}</VideoTitle>
+                  <VideoLink
+                    href={video.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Watch Video
+                  </VideoLink>
+                </VideoCard>
+              ))}
+            </VideoGrid>
+          </VideoSection>
+        )}
       
-    // </div>
+    </div>
   );
 };
 
@@ -306,42 +415,42 @@ const RightSection = styled.div`
   flex-direction: column;
 `;
 
-// const VideoSection = styled.div`
-//   margin-top: 20px;
-//   width: 80%;
-// `;
+const VideoSection = styled.div`
+  margin-top: 20px;
+  width: 80%;
+`;
 
-// const VideoGrid = styled.div`
-//   display: grid;
-//   grid-template-columns: repeat(3, 1fr);
-//   gap: 20px;
-// `;
+const VideoGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+`;
 
-// const VideoCard = styled.div`
-//   display: flex;
-//   flex-direction: column;
-//   align-items: center;
-//   background-color: white;
-//   padding: 15px;
-//   border-radius: 8px;
-//   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-// `;
+const VideoCard = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: white;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+`;
 
-// const Thumbnail = styled.img`
-//   width: 100%;
-//   border-radius: 8px;
-//   margin-bottom: 10px;
-// `;
+const Thumbnail = styled.img`
+  width: 100%;
+  border-radius: 8px;
+  margin-bottom: 10px;
+`;
 
-// const VideoTitle = styled.h4`
-//   text-align: center;
-//   margin: 10px 0;
-//   font-size: 16px;
-//   color: #333;
-// `;
+const VideoTitle = styled.h4`
+  text-align: center;
+  margin: 10px 0;
+  font-size: 16px;
+  color: #333;
+`;
 
-// const VideoLink = styled.a`
-//   text-decoration: none;
-//   color: #4b9cdf;
-//   font-weight: bold;
-// `;
+const VideoLink = styled.a`
+  text-decoration: none;
+  color: #4b9cdf;
+  font-weight: bold;
+`;
