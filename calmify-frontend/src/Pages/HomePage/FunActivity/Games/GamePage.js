@@ -6,7 +6,7 @@ import FlipCard from "./FlipCard.js";
 import { useDisclosure } from "@chakra-ui/react";
 import FlipCardImage from "../../../../assets/Flipcardgame.jpg";
 import CalmifyLogo from "../../../../assets/logocalmify.png";
-import GameImage from "../../../../assets/games.jpg";
+// import GameImage from "../../../../assets/games.jpg";
 
 const StyledNav = styled.nav`
   display: flex;
