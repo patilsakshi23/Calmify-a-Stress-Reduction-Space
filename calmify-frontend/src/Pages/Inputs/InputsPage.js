@@ -12,7 +12,7 @@ import ActiveAlert from "../../assets/activealert.png";
 import Alert1 from "../../assets/alert.png";
 import Mindful from "./Activities/Mindful.js";
 // import ConsultDr from "./Activities/ConsultDr.js";
-import { signOut, onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../firebaseConfig";
 import { useAuth } from "../Authentication/AuthContext.js";
 import { getDatabase, ref, onValue } from "firebase/database";

@@ -2,7 +2,7 @@ import React from "react";
 import { Heading, Text, Stack } from "@chakra-ui/react";
 import styled from "styled-components";
 
-import consult from "../../../assets/consultdr.jpeg";
+// import consult from "../../../assets/consultdr.jpeg";
 
 const AlertDr = () => {
   return (
