@@ -13,6 +13,9 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 import os
 
+
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -21,12 +24,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
+
+SECRET_KEY = "django-insecure-8)c!-n^t80n%2n0$=hllr)4cscqf*)lnrtvri)kj6inu1x674="
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ["https://calmify-a-stress-reduction-space.onrender.com"]
+ALLOWED_HOSTS = []
 
 
 
@@ -59,8 +63,8 @@ MIDDLEWARE = [
 CORS_ALLOW_ALL_ORIGINS = True
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  # React default port
-    "https://calmify-stress-reduction-space.netlify.app"
+    "http://localhost:3000",  
+    "http://127.0.0.1:8000",
 ]
 
 ROOT_URLCONF = 'backend.urls'
