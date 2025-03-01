@@ -27,13 +27,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-8)c!-n^t80n%2n0$=hllr)4cscqf*)lnrtvri)kj6inu1x674="
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = [
     "calmify-a-stress-reduction-space.onrender.com",
     "calmify-stress-reduction-space.netlify.app",
     "localhost",
-    "127.0.0.1:8000",
+    "127.0.0.1",
     ]
 
 
@@ -66,10 +66,10 @@ MIDDLEWARE = [
 
 # CORS_ALLOW_ALL_ORIGINS = True
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  
-    "http://calmify-stress-reduction-space.netlify.app"
-]
+# CORS_ALLOWED_ORIGINS = [
+#     "http://calmify-stress-reduction-space.netlify.app",
+#     "http://localhost:3000", 
+# ]
 CSRF_TRUSTED_ORIGINS = [
     "http://calmify-stress-reduction-space.netlify.app",    
 ]
@@ -152,6 +152,35 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CORS_ALLOW_ALL_ORIGINS = False
+
+CORS_ALLOWED_ORIGINS = [
+    "https://calmify-stress-reduction-space.netlify.app",
+    "http://localhost:3000",
+]
+
+# Allow all methods and headers if needed
+CORS_ALLOW_METHODS = [
+    "GET",
+    "POST",
+    "PUT",
+    "PATCH",
+    "DELETE",
+    "OPTIONS"
+]
+
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "dnt",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
+]
 
 
 
