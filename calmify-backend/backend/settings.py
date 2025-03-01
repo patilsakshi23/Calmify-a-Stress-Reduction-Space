@@ -14,8 +14,7 @@ from pathlib import Path
 import os
 
 
-
-
+PORT = os.getenv("PORT", "8000") 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -28,7 +27,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-8)c!-n^t80n%2n0$=hllr)4cscqf*)lnrtvri)kj6inu1x674="
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = [
     "calmify-a-stress-reduction-space.onrender.com",
