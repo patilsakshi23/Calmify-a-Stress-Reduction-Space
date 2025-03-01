@@ -450,7 +450,7 @@ const VideoPage = () => {
     formData.append("file", videoBlob);
 
     try {
-      const response = await fetch("https://calmify-a-stress-reduction-space.onrender.com/", {
+      const response = await fetch("https://calmify-a-stress-reduction-space.onrender.com", {
         method: "POST",
         body: formData,
       });
