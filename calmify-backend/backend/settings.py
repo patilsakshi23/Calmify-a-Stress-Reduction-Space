@@ -30,7 +30,12 @@ SECRET_KEY = "django-insecure-8)c!-n^t80n%2n0$=hllr)4cscqf*)lnrtvri)kj6inu1x674=
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost","127.0.0.1:8000","calmify-a-stress-reduction-space.onrender.com"]
+ALLOWED_HOSTS = [
+    "calmify-a-stress-reduction-space.onrender.com",
+    "calmify-stress-reduction-space.netlify.app",
+    "localhost",
+    "127.0.0.1:8000",
+    ]
 
 
 
@@ -64,8 +69,10 @@ CORS_ALLOW_ALL_ORIGINS = True
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",  
-    "http://127.0.0.1:8000",
     "http://calmify-stress-reduction-space.netlify.app"
+]
+CSRF_TRUSTED_ORIGINS = [
+    "http://calmify-stress-reduction-space.netlify.app",    
 ]
 
 ROOT_URLCONF = 'backend.urls'
