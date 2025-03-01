@@ -41,13 +41,14 @@ ALLOWED_HOSTS = [
 # Application definition
 
 INSTALLED_APPS = [
+    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'django.middleware.common',
     'django.contrib.staticfiles',
-    'corsheaders',
     'rest_framework',
 ]
 
@@ -153,13 +154,13 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CORS_ALLOW_ALL_ORIGINS = False
 
 CORS_ALLOWED_ORIGINS = [
     "https://calmify-stress-reduction-space.netlify.app",
-    "http://localhost:3000",
+    "http://localhost:3002",
 ]
 
+CORS_ALLOW_ALL_ORIGINS = True  
 # Allow all methods and headers if needed
 CORS_ALLOW_METHODS = [
     "GET",
