@@ -1,6 +1,27 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
-import { Button, Heading, Text } from "@chakra-ui/react";
+import {
+  Button,
+  Heading,
+  Text,
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  PopoverHeader,
+  PopoverBody,
+  // PopoverFooter,
+  PopoverArrow,
+  PopoverCloseButton,
+  // PopoverAnchor,
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogCloseButton,
+  AlertDialogHeader,
+  useDisclosure,
+  AlertDialogBody,
+  AlertDialogOverlay,
+  AlertDialogFooter
+} from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import TextImage from "../../assets/textoption.jpeg";
@@ -17,9 +38,14 @@ import { auth } from "../../firebaseConfig";
 import { useAuth } from "../Authentication/AuthContext.js";
 import { getDatabase, ref, onValue } from "firebase/database";
 
+
 function InputsPage() {
+  const [isOpen, setIsOpen] = useState(false);
+  const popoverRef = useRef(null);
   const { user, setUser } = useAuth();
   const navigate = useNavigate();
+  const { isOpen: isOpen1, onOpen: onOpen1, onClose: onClose1 } = useDisclosure();
+  const cancelRef = React.useRef();
   const [ratings, setRatings] = useState({
     video: 0,
     audio: 0,
@@ -28,23 +54,47 @@ function InputsPage() {
   });
 
   const [stressOverloaded, setStressOverloaded] = useState(false);
+  const [stressCount, setStressCount] = useState(0);
 
+  useEffect(() => {
+    if (stressOverloaded) {
+      setIsOpen(true);
+    }
+  }, [stressOverloaded]);
+
+  const handleAlertClick = () => {
+    handleAlertDR();
+    setIsOpen(!isOpen);
+  };
+
+  // Check stress count whenever component mounts or when user changes
   useEffect(() => {
     const db = getDatabase();
     const userId = auth.currentUser?.uid;
     if (!userId) return;
 
+    // Create reference to the stress count in Firebase
     const stressCountRef = ref(db, `users/${userId}/input/stress_count`);
 
-    onValue(stressCountRef, (snapshot) => {
-      const stressCount = snapshot.val()?.count || 0;
-      if (stressCount >= 4) {
+    // Set up a listener to monitor changes to the stress count
+    const unsubscribe = onValue(stressCountRef, (snapshot) => {
+      const data = snapshot.val();
+      const currentStressCount = data?.count || 0;
+      setStressCount(currentStressCount);
+
+      // Update stressOverloaded state based on count
+      if (currentStressCount >= 4) {
         setStressOverloaded(true);
       } else {
         setStressOverloaded(false);
+        // Also close the popover if it's open and stress count is reset
+        setIsOpen(false);
       }
     });
-  }, []);
+
+    // Clean up listener on component unmount
+    return () => unsubscribe();
+  });
 
   // Check for a logged-in user on component mount
   useEffect(() => {
@@ -86,7 +136,7 @@ function InputsPage() {
   // Handle user logout
   const handleLogout = async () => {
     try {
-      auth.signOut();
+      await auth.signOut();
       localStorage.removeItem("user");
       navigate("/");
     } catch (error) {
@@ -128,40 +178,102 @@ function InputsPage() {
         <Logo>
           <LogoImg src={CalmifyLogo} alt="Calmify" />
         </Logo>
+
         <AlertContainer>
-          {stressOverloaded ? (
-            <MotionAlert
-              onClick={handleAlertDR}
-              src={ActiveAlert}
-              alt="Active alert"
-              animate={{
-                scale: [1, 1.2, 1],
-                rotate: [0, 10, -10, 0],
-              }}
-              transition={{
-                duration: 0.5,
-                repeat: Infinity,
-                ease: "easeInOut",
-              }}
-            />
-          ) : (
-            <StaticAlert onClick={handleAlertDR} src={Alert1} alt="Alert" />
-          )}
+          <Popover
+            isOpen={isOpen && stressOverloaded}
+            onClose={() => setIsOpen(false)}
+          >
+            <PopoverTrigger>
+              {stressOverloaded ? (
+                <MotionAlert
+                  onClick={handleAlertClick}
+                  src={ActiveAlert}
+                  alt="Active alert"
+                  animate={{
+                    scale: [1, 1.2, 1],
+                    rotate: [0, 10, -10, 0],
+                  }}
+                  transition={{
+                    duration: 0.5,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                />
+              ) : (
+                <StaticAlert
+                  onClick={handleAlertClick}
+                  src={Alert1}
+                  alt="Alert"
+                />
+              )}
+            </PopoverTrigger>
+            <PopoverContent ref={popoverRef} className="p-4">
+              <PopoverArrow />
+              <PopoverCloseButton />
+              <PopoverHeader className=" text-red-600">Alert!!!</PopoverHeader>
+              <PopoverBody>
+                You have been detected stress for {stressCount} times in lately
+                so we recommend you to book your appointment and contact the
+                doctor immediately!!
+                <div className="mt-4">
+                  <Button onClick={handleAlertDR} className="w-full">
+                    Contact Doctor
+                  </Button>
+                </div>
+              </PopoverBody>
+            </PopoverContent>
+          </Popover>
         </AlertContainer>
-        <Button onClick={handleLogout}>Logout</Button>
+
+        <Button onClick={() => { onOpen1(); }}>Logout</Button> 
+
+      <AlertDialog
+        motionPreset='slideInBottom'
+        leastDestructiveRef={cancelRef}
+        onClose={onClose1}
+        isOpen={isOpen1}
+        isCentered
+      >
+   
+        <AlertDialogOverlay />
+        <AlertDialogContent>
+          <AlertDialogHeader>Confirm Logout</AlertDialogHeader>
+          <AlertDialogCloseButton />
+          <AlertDialogBody>
+            Are you sure you want to Logout?
+          </AlertDialogBody>
+          <AlertDialogFooter>
+            <Button ref={cancelRef} onClick={onClose1}>
+              No
+            </Button>
+            <Button colorScheme='red' ml={3} onClick={handleLogout}>
+              Yes
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+        </AlertDialog>
       </StyledNav>
 
       {/* Greeting Message */}
       <GreetingContainer>
-  <Heading as="h2" size="2xl" mt={{ base: 4, md: 0 }} ml={{ base: "20px", md: "70px" }}>
-    Hello, {user?.firstName} {user?.lastName}
-  </Heading>
-  <Text fontSize="2xl" color="grey" pt="5" ml={{ base: "20px", md: "70px" }}>
-    Select any option to convey your thoughts or feelings to us!!
-  </Text>
-</GreetingContainer>
-
-
+        <Heading
+          as="h2"
+          size="2xl"
+          mt={{ base: 4, md: 0 }}
+          ml={{ base: "20px", md: "70px" }}
+        >
+          Hello, {user?.firstName} {user?.lastName}
+        </Heading>
+        <Text
+          fontSize="2xl"
+          color="grey"
+          pt="5"
+          ml={{ base: "20px", md: "70px" }}
+        >
+          Select any option to convey your thoughts or feelings to us!!
+        </Text>
+      </GreetingContainer>
       {/* Options for Input */}
       <StyledStack>
         <StyledCard onClick={() => handleNavigation("/video")}>
@@ -209,7 +321,6 @@ function InputsPage() {
           </CardContent>
         </StyledCard>
       </StyledStack>
-
       {/* Mindfulness Section */}
       <div style={{ textAlign: "center", marginTop: "50px" }}>
         <Mindful />

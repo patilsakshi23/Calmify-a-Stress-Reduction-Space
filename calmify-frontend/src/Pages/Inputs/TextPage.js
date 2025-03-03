@@ -1,30 +1,38 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import backgroundImage from './../../assets/textpagebg.avif'; // Import your image here
+import backgroundImage from "./../../assets/textpagebg.avif"; // Import your image here
 import saveStressData from "../../FirebaseUtils";
+import { useAuth } from "../Authentication/AuthContext";
+import { db } from "../../firebaseConfig";
+import { ref, push, get, update } from "firebase/database";
+
 
 const TextPage = () => {
   const [inputText, setInputText] = useState("");
   const [prediction, setPrediction] = useState("");
   const [videos, setVideos] = useState([]);
+  const { user } = useAuth();
 
   // Array of 10 YouTube videos
   const youtubeVideos = [
     {
       id: 1,
-      title: "3-Minute Stress Management: Reduce Stress With This Short Activity",
+      title:
+        "3-Minute Stress Management: Reduce Stress With This Short Activity",
       url: "https://youtu.be/grfXR6FAsI8?si=Npm8XkqaYLTKe0Tz",
       thumbnail: "https://img.youtube.com/vi/grfXR6FAsI8/0.jpg",
     },
     {
       id: 2,
-      title: "How to protect your brain from stress | Niki Korteweg | TEDxAmsterdamWomen",
+      title:
+        "How to protect your brain from stress | Niki Korteweg | TEDxAmsterdamWomen",
       url: "https://youtu.be/Nz9eAaXRzGg?si=B8RAdhiWiRo9CeAL",
       thumbnail: "https://img.youtube.com/vi/Nz9eAaXRzGg/0.jpg",
     },
     {
       id: 3,
-      title: "How stress is killing us (and how you can stop it). | Thijs Launspach | TEDxUniversiteitVanAmsterdam",
+      title:
+        "How stress is killing us (and how you can stop it). | Thijs Launspach | TEDxUniversiteitVanAmsterdam",
       url: "https://youtu.be/NyyPZJrDfkM?si=U0eZ_3Yl13hRd8fa",
       thumbnail: "https://img.youtube.com/vi/NyyPZJrDfkM/0.jpg",
     },
@@ -54,7 +62,8 @@ const TextPage = () => {
     },
     {
       id: 8,
-      title: "Reduce stress and anxiety with these mind-quieting tips | How to stop overthinking | Anxiety relief",
+      title:
+        "Reduce stress and anxiety with these mind-quieting tips | How to stop overthinking | Anxiety relief",
       url: "https://youtu.be/bsaOBWUqdCU?si=SaOP1WGjJLkZPdHP",
       thumbnail: "https://img.youtube.com/vi/bsaOBWUqdCU/0.jpg",
     },
@@ -77,7 +86,10 @@ const TextPage = () => {
     let shuffledArray = array.slice();
     for (let i = shuffledArray.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
-      [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
+      [shuffledArray[i], shuffledArray[j]] = [
+        shuffledArray[j],
+        shuffledArray[i],
+      ];
     }
     return shuffledArray;
   };
@@ -87,7 +99,7 @@ const TextPage = () => {
       alert("Please enter some text");
       return;
     }
-
+  
     try {
       const response = await fetch("http://127.0.0.1:8000/api/predict/text/", {
         method: "POST",
@@ -96,32 +108,56 @@ const TextPage = () => {
         },
         body: JSON.stringify({ text: inputText }),
       });
-
+  
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-
+  
       const data = await response.json();
       setPrediction(data.stress);
-
+  
       // If prediction is 'stressed', display 3 random videos
       if (data.stress === 1) {
         const shuffledVideos = shuffleArray(youtubeVideos).slice(0, 3);
         setVideos(shuffledVideos);
-
-        // Extract necessary video details to store in Firebase
-        const videoSuggestions = shuffledVideos.map(video => ({
-          title: video.title,
-          url: video.url,
-        }));
-        // Save stress data along with video suggestions
-        await saveStressData("text", inputText, "stressed", videoSuggestions);
+  
+        if (user) {
+          const saveTextData = async () => {
+            const userRef = ref(db, `users/${user.uid}/input/text`);
+            const stressRef = ref(db, `users/${user.uid}/input/stress_count`);
+  
+            // Extract video details for saving
+            const videoSuggestions = shuffledVideos.map((video) => ({
+              title: video.title,
+              url: video.url,
+            }));
+  
+            const newResponse = {
+              prediction: "stressed",
+              timestamp: new Date().toLocaleString(),
+              suggestedVideos: videoSuggestions,
+            };
+  
+            // Save quiz response to Firebase
+            await push(userRef, newResponse);
+  
+            // Update stress count
+            const snapshot = await get(stressRef);
+            const currentCount = snapshot.exists() ? snapshot.val().count : 0;
+            await update(stressRef, { count: currentCount + 1 });
+  
+            // Save stress data along with video suggestions
+            await saveStressData(videoSuggestions);
+          };
+  
+          saveTextData();
+        }
       }
-
     } catch (error) {
       console.error("Error while submitting text:", error);
     }
   };
+  
 
   return (
     <Container>
@@ -135,18 +171,20 @@ const TextPage = () => {
       <SubmitButton onClick={handleSubmit}>Submit</SubmitButton>
 
       {prediction !== "" && ( // Check if prediction is not an empty string
-      <PredictionFrame>
-        {prediction === 1 ? (
-          <PredictionText>
-            It seems you're feeling stressed. No worries, we're here to help you relax and feel better! Here are some videos to calm your mind.
-          </PredictionText>
-        ) : (
-          <PredictionText>
-            You're doing great! Keep it up, and remember to take breaks when needed. Stay positive!
-          </PredictionText>
-        )}
-      </PredictionFrame>
-    )}
+        <PredictionFrame>
+          {prediction === 1 ? (
+            <PredictionText>
+              It seems you're feeling stressed. No worries, we're here to help
+              you relax and feel better! Here are some videos to calm your mind.
+            </PredictionText>
+          ) : (
+            <PredictionText>
+              You're doing great! Keep it up, and remember to take breaks when
+              needed. Stay positive!
+            </PredictionText>
+          )}
+        </PredictionFrame>
+      )}
 
       {videos.length > 0 && (
         <VideoSection>
@@ -154,10 +192,7 @@ const TextPage = () => {
           <VideoGrid>
             {videos.map((video) => (
               <VideoCard key={video.id}>
-                <Thumbnail
-                  src={video.thumbnail}
-                  alt={video.title}
-                />
+                <Thumbnail src={video.thumbnail} alt={video.title} />
                 <VideoTitle>{video.title}</VideoTitle>
                 <VideoLink
                   href={video.url}
@@ -305,7 +340,6 @@ const PredictionText = styled.p`
     font-size: 1.5rem;
   }
 `;
-
 
 const PredictionFrame = styled.div`
   margin-top: 20px;

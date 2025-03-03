@@ -20,7 +20,10 @@ import {
   ModalCloseButton,
   useDisclosure,
   AspectRatio,
-  useBreakpointValue
+  useBreakpointValue,
+  Center,
+  // Container,
+  // Flex,
 } from "@chakra-ui/react";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
@@ -31,6 +34,7 @@ import { useAuth } from "../Authentication/AuthContext";
 import saveStressData from "../../FirebaseUtils";
 import backgroundImage from "../../assets/quiz.jpg";
 import { useNavigate } from "react-router-dom";
+import CalmifyLogo from "../../assets/logocalmify.png";
 
 const youtubeVideos = [
   {
@@ -42,14 +46,16 @@ const youtubeVideos = [
   },
   {
     id: 2,
-    title: "How to protect your brain from stress | Niki Korteweg | TEDxAmsterdamWomen",
+    title:
+      "How to protect your brain from stress | Niki Korteweg | TEDxAmsterdamWomen",
     url: "https://youtu.be/Nz9eAaXRzGg?si=B8RAdhiWiRo9CeAL",
     embedUrl: "https://www.youtube.com/embed/Nz9eAaXRzGg",
     thumbnail: "https://img.youtube.com/vi/Nz9eAaXRzGg/0.jpg",
   },
   {
     id: 3,
-    title: "How stress is killing us (and how you can stop it). | Thijs Launspach | TEDxUniversiteitVanAmsterdam",
+    title:
+      "How stress is killing us (and how you can stop it). | Thijs Launspach | TEDxUniversiteitVanAmsterdam",
     url: "https://youtu.be/NyyPZJrDfkM?si=U0eZ_3Yl13hRd8fa",
     embedUrl: "https://www.youtube.com/embed/NyyPZJrDfkM",
     thumbnail: "https://img.youtube.com/vi/NyyPZJrDfkM/0.jpg",
@@ -84,7 +90,8 @@ const youtubeVideos = [
   },
   {
     id: 8,
-    title: "Reduce stress and anxiety with these mind-quieting tips | How to stop overthinking | Anxiety relief",
+    title:
+      "Reduce stress and anxiety with these mind-quieting tips | How to stop overthinking | Anxiety relief",
     url: "https://youtu.be/bsaOBWUqdCU?si=SaOP1WGjJLkZPdHP",
     embedUrl: "https://www.youtube.com/embed/bsaOBWUqdCU",
     thumbnail: "https://img.youtube.com/vi/bsaOBWUqdCU/0.jpg",
@@ -105,7 +112,6 @@ const youtubeVideos = [
   },
 ];
 
-// Shuffle function to randomize the order of videos
 const shuffleArray = (array) => {
   let shuffledArray = array.slice();
   for (let i = shuffledArray.length - 1; i > 0; i--) {
@@ -188,7 +194,6 @@ const questions = [
   },
 ];
 
-// Updated to only have 3 mood categories
 const calculateMood = (score) => {
   if (score <= 14) return { mood: "Relaxed", color: "#4caf50" };
   if (score <= 21) return { mood: "Moderately Stressed", color: "#ffeb3b" };
@@ -219,6 +224,8 @@ const QuizPage = () => {
   const handleNext = () => {
     if (selectedOption === null) return;
 
+    window.speechSynthesis.cancel();
+
     const question = questions[currentQuestion];
     const selectedScore = question.options.find(
       (option) => option.text === selectedOption
@@ -248,12 +255,15 @@ const QuizPage = () => {
       // Always generate videos for the 2x2 grid
       const shuffledVideos = shuffleArray(youtubeVideos).slice(0, 2);
       setVideos(shuffledVideos);
-      
+
       // Fade out background
       setShowBackground(false);
 
       // Only save to Firebase if user is stressed
-      if (result.mood === "Moderately Stressed" || result.mood === "Highly Stressed") {
+      if (
+        result.mood === "Moderately Stressed" ||
+        result.mood === "Highly Stressed"
+      ) {
         if (user) {
           const saveQuizData = async () => {
             const userRef = ref(db, `users/${user.uid}/input/quiz`);
@@ -270,7 +280,7 @@ const QuizPage = () => {
               prediction: result.mood,
               score,
               timestamp: new Date().toLocaleString(),
-              suggestedVideos: videoSuggestions
+              suggestedVideos: videoSuggestions,
             };
 
             // Save quiz response to Firebase
@@ -299,6 +309,7 @@ const QuizPage = () => {
 
   // Function to convert text to speech
   const speakText = (text) => {
+    window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
     window.speechSynthesis.speak(utterance);
   };
@@ -306,8 +317,16 @@ const QuizPage = () => {
   // Speak the question when the component updates with a new question
   useEffect(() => {
     if (isStarted && !isFinished) {
-      speakText(questions[currentQuestion].question);
+      // Small timeout to ensure any previous speech is fully cancelled
+      setTimeout(() => {
+        speakText(questions[currentQuestion].question);
+      }, 100);
     }
+
+    // Cleanup function to cancel speech when component unmounts or changes
+    return () => {
+      window.speechSynthesis.cancel();
+    };
   }, [currentQuestion, isStarted, isFinished]);
 
   const navigateToGames = () => {
@@ -323,42 +342,88 @@ const QuizPage = () => {
       <ContentWrapper flexDirection={flexDirection}>
         {/* Left side - Quiz */}
         <QuizContainer width={containerWidth}>
-          <Card 
-            height="full" 
-            width="full" 
-            p={{ base: 4, md: 6 }} 
-            borderRadius="xl" 
-            boxShadow="md"
+          <Card
+            height="full"
+            width="full"
+            mt="1px"
+            p={{ base: 4, md: 6 }}
+            borderRadius="xl"
+            boxShadow="lg"
           >
+            <Center mb={6}>
+              <LogoContainer>
+                <LogoImg src={CalmifyLogo} alt="Calmify" />
+              </LogoContainer>
+            </Center>
+
+            <Center>
+              <Heading size="lg" color="#8869e1" textAlign="center" mb={6}>
+                Stress Assessment Quiz
+              </Heading>
+            </Center>
+
             {!isStarted ? (
-              <VStack spacing={5} justify="center" height="full">
-                <Heading size="lg" color="#4B9CDF">Stress Assessment Quiz</Heading>
-                <Text textAlign="center">This quiz will help assess your current stress levels and provide personalized suggestions.</Text>
-                <Button 
+              <VStack spacing={8} justify="center" height="full" mt={10}>
+                <Text textAlign="center" fontSize="lg" maxW="md" mx="auto">
+                  This quiz will help assess your current stress levels and
+                  provide personalized suggestions.
+                </Text>
+                <Button
                   onClick={() => setIsStarted(true)}
-                  colorScheme="blue"
+                  color="#ffffff"
+                  bgColor="#8869e1"
                   size="lg"
+                  px={10}
+                  py={6}
+                  fontSize="md"
+                  fontWeight="bold"
+                  borderRadius="full"
+                  _hover={{ bgColor: "#7559d1", transform: "translateY(-2px)" }}
+                  transition="all 0.3s ease"
+                  boxShadow="md"
                 >
                   Start Quiz
                 </Button>
               </VStack>
             ) : !isFinished ? (
-              <VStack spacing={5} justify="center" height="full">
-                <Text fontSize={{ base: "xl", md: "2xl" }} fontWeight="bold">
+              <VStack spacing={8} justify="center" height="full" mt={4}>
+                <Text
+                  fontSize={{ base: "xl", md: "2xl" }}
+                  fontWeight="bold"
+                  color="#8869e1"
+                >
                   Question {currentQuestion + 1} of {questions.length}
                 </Text>
-                <Text fontSize={{ base: "lg", md: "xl" }} textAlign="center">
+                <Text
+                  fontSize={{ base: "lg", md: "xl" }}
+                  textAlign="center"
+                  fontWeight="medium"
+                >
                   {questions[currentQuestion].question}
                 </Text>
                 <RadioGroup
                   onChange={setSelectedOption}
                   value={selectedOption || ""}
                   width="full"
+                  maxW="md"
+                  mx="auto"
                 >
-                  <Stack spacing={6} direction="column" alignItems="start" width="full">
+                  <Stack
+                    spacing={6}
+                    direction="column"
+                    alignItems="flex-start"
+                    justifyContent="center"
+                    width="full"
+                  >
                     {questions[currentQuestion].options.map((option, index) => (
-                      <Radio key={index} value={option.text} width="full">
-                        {option.text}
+                      <Radio
+                        key={index}
+                        value={option.text}
+                        width="full"
+                        colorScheme="purple"
+                        size="lg"
+                      >
+                        <Text fontSize="md">{option.text}</Text>
                       </Radio>
                     ))}
                   </Stack>
@@ -366,41 +431,68 @@ const QuizPage = () => {
                 <Button
                   onClick={handleNext}
                   isDisabled={selectedOption === null}
-                  colorScheme="blue"
+                  color="white"
+                  bgColor="#8869e1"
                   width={{ base: "full", md: "60%" }}
+                  maxW="md"
+                  py={6}
+                  borderRadius="full"
+                  _hover={{ bgColor: "#7559d1", transform: "translateY(-2px)" }}
+                  transition="all 0.3s ease"
+                  boxShadow="md"
                 >
                   {currentQuestion === questions.length - 1 ? "Finish" : "Next"}
                 </Button>
               </VStack>
             ) : (
-              <VStack spacing={5} justify="center" height="full">
-                <Text fontSize={{ base: "xl", md: "2xl" }} fontWeight="bold">
+              <VStack spacing={8} justify="center" height="full" mt={4}>
+                <Text
+                  fontSize={{ base: "xl", md: "2xl" }}
+                  fontWeight="bold"
+                  color="#8869e1"
+                >
                   Quiz Complete!
                 </Text>
                 {mood && (
                   <>
-                    <Box width={{ base: "120px", md: "150px" }} height={{ base: "120px", md: "150px" }}>
+                    <Box
+                      width={{ base: "150px", md: "180px" }}
+                      height={{ base: "150px", md: "180px" }}
+                    >
                       <CircularProgressbar
                         value={(score / (questions.length * 4)) * 100}
                         text={`${score}`}
                         styles={buildStyles({
-                          textSize: "16px",
+                          textSize: "20px",
+                          fontWeight: "bold",
                           pathColor: getDefaultColor(),
                           textColor: getDefaultColor(),
-                          trailColor: "#d6d6d6",
+                          trailColor: "#e6e6e6",
+                          pathTransition: "stroke-dashoffset 0.5s ease 0s",
                         })}
                       />
                     </Box>
-                    <Text fontSize="lg" textAlign="center">
+                    <Text fontSize="xl" textAlign="center" fontWeight="medium">
                       Your stress level is:{" "}
-                      <strong style={{ color: mood.color }}>{mood.mood}</strong>
+                      <Box as="span" fontWeight="bold" color={mood.color}>
+                        {mood.mood}
+                      </Box>
                     </Text>
                   </>
                 )}
-                <Text fontSize="sm" textAlign="center" color="gray.600">
+                <Text fontSize="md" textAlign="center" color="gray.600">
                   Total Score: {score}/{questions.length * 4}
                 </Text>
-                <Button onClick={() => window.location.reload()} colorScheme="blue">
+                <Button
+                  onClick={() => window.location.reload()}
+                  colorScheme="purple"
+                  variant="outline"
+                  size="lg"
+                  borderRadius="full"
+                  _hover={{ transform: "translateY(-2px)" }}
+                  transition="all 0.3s ease"
+                  boxShadow="sm"
+                >
                   Retake Quiz
                 </Button>
               </VStack>
@@ -411,20 +503,23 @@ const QuizPage = () => {
         {/* Right side - Background/Results */}
         <SuggestionsContainer width={containerWidth}>
           {showBackground ? (
-            <BackgroundImageContainer 
-              style={{ 
+            <BackgroundImageContainer
+              style={{
                 backgroundImage: `url(${backgroundImage})`,
                 opacity: isFinished ? 0 : 1,
-                transition: "opacity 0.5s ease-in-out"
+                transition: "opacity 0.5s ease-in-out",
               }}
             />
           ) : (
             <ResultsContainer>
               {mood && (
                 <EmotionFrame>
-                  <Heading size="md" mb={4} color="#4B9CDF">Recommendation Based on Your Results</Heading>
+                  <Heading size="md" mb={4} color="#4B9CDF">
+                    Recommendation Based on Your Results
+                  </Heading>
                   <EmotionText>
-                    {mood.mood === "Moderately Stressed" || mood.mood === "Highly Stressed" 
+                    {mood.mood === "Moderately Stressed" ||
+                    mood.mood === "Highly Stressed"
                       ? `It seems you're feeling ${mood.mood}. No worries, we're here to help you relax and feel better! Here are some recommendations.`
                       : "You're doing great! Keep it up, and remember to take breaks when needed. Stay positive!"}
                   </EmotionText>
@@ -432,22 +527,20 @@ const QuizPage = () => {
               )}
 
               {isFinished && (
-                <Grid templateColumns={gridColumns} gap={4} mt={4}>
+                <Grid templateColumns={gridColumns} gap={6} mt={6}>
                   {/* Top row: 2 YouTube videos */}
                   {videos.map((video) => (
                     <GridItem key={video.id}>
                       <VideoCard>
                         <Thumbnail src={video.thumbnail} alt={video.title} />
                         <VideoTitle>{video.title}</VideoTitle>
-                        <VideoLink
-                          onClick={() => openVideoModal(video)}
-                        >
+                        <VideoLink onClick={() => openVideoModal(video)}>
                           Watch Video
                         </VideoLink>
                       </VideoCard>
                     </GridItem>
                   ))}
-                  
+
                   {/* Bottom row: Games and Music buttons */}
                   <GridItem>
                     <NavButton onClick={navigateToGames}>
@@ -481,7 +574,6 @@ const QuizPage = () => {
                   title={selectedVideo.title}
                   src={selectedVideo.embedUrl}
                   allowFullScreen
-                  frameBorder="0"
                 />
               </AspectRatio>
             )}
@@ -500,6 +592,18 @@ const QuizPage = () => {
 export default QuizPage;
 
 // Styled components
+const LogoImg = styled.img`
+  height: 50px;
+  cursor: pointer;
+`;
+
+const LogoContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+`;
+
 const MainContainer = styled.div`
   width: 100%;
   min-height: 100vh;
@@ -508,6 +612,7 @@ const MainContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  background-color: #f8f9fa;
 `;
 
 const ContentWrapper = styled.div`
@@ -515,8 +620,8 @@ const ContentWrapper = styled.div`
   width: 100%;
   max-width: 1400px;
   min-height: 600px;
-  gap: 20px;
-  flex-direction: ${props => props.flexDirection || 'row'};
+  gap: 30px;
+  flex-direction: ${(props) => props.flexDirection || "row"};
 
   @media (max-width: 768px) {
     flex-direction: column;
@@ -525,7 +630,7 @@ const ContentWrapper = styled.div`
 
 const QuizContainer = styled.div`
   flex: 1;
-  width: ${props => props.width || '50%'};
+  width: ${(props) => props.width || "50%"};
   min-height: 600px;
   display: flex;
 
@@ -538,7 +643,7 @@ const QuizContainer = styled.div`
 
 const SuggestionsContainer = styled.div`
   flex: 1;
-  width: ${props => props.width || '50%'};
+  width: ${(props) => props.width || "50%"};
   min-height: 600px;
   display: flex;
 
@@ -555,7 +660,8 @@ const BackgroundImageContainer = styled.div`
   background-position: center;
   background-repeat: no-repeat;
   border-radius: 20px;
-  
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+
   @media (max-width: 768px) {
     min-height: 300px;
   }
@@ -564,10 +670,10 @@ const BackgroundImageContainer = styled.div`
 const ResultsContainer = styled.div`
   width: 100%;
   height: 100%;
-  padding: 20px;
+  padding: 25px;
   background-color: white;
   border-radius: 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
 `;
@@ -575,7 +681,7 @@ const ResultsContainer = styled.div`
 const EmotionText = styled.p`
   font-size: 16px;
   color: #333;
-  line-height: 1.6;
+  line-height: 1.8;
 `;
 
 const EmotionFrame = styled.div`
@@ -583,6 +689,10 @@ const EmotionFrame = styled.div`
   display: flex;
   flex-direction: column;
   text-align: left;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 12px;
+  border-left: 4px solid #4b9cdf;
 `;
 
 const VideoCard = styled.div`
@@ -591,9 +701,15 @@ const VideoCard = styled.div`
   align-items: center;
   background-color: white;
   padding: 15px;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
   height: 100%;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  }
 `;
 
 const Thumbnail = styled.img`
@@ -605,7 +721,7 @@ const Thumbnail = styled.img`
 
 const VideoTitle = styled.h4`
   text-align: center;
-  margin: 10px 0;
+  margin: 12px 0;
   font-size: 16px;
   color: #333;
   display: -webkit-box;
@@ -620,13 +736,13 @@ const VideoLink = styled.button`
   color: #4b9cdf;
   font-weight: bold;
   margin-top: auto;
-  padding: 8px 16px;
+  padding: 8px 20px;
   border: 1px solid #4b9cdf;
   border-radius: 20px;
   transition: all 0.3s ease;
   background: none;
   cursor: pointer;
-  
+
   &:hover {
     background-color: #4b9cdf;
     color: white;
@@ -639,14 +755,14 @@ const NavButton = styled.div`
   align-items: center;
   justify-content: center;
   background-color: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
   cursor: pointer;
   transition: all 0.3s ease;
   height: 100%;
   border: 2px solid #e8e8e8;
-  
+
   &:hover {
     transform: translateY(-5px);
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
