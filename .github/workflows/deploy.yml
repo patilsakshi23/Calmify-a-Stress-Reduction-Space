@@ -19,7 +19,9 @@ jobs:
           node-version: '>=20'  # Update to your project's Node.js version
 
       - name: Install dependencies
-        run: npm install  # Update if using a different package manager
+        run: |
+              cd calmify-frontend
+              npm install  # Update if using a different package manager
 
       - name: Build project
         run: npm run build  # Update if your build command is different
