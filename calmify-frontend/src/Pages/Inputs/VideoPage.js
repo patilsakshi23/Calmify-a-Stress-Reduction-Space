@@ -1,7 +1,9 @@
 import React, { useRef, useState, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
 import videobg from "../../assets/videobg.jpg";
-import saveStressData from "../../FirebaseUtils"; 
+import saveStressData from "../../FirebaseUtils";
+import { useNavigate } from "react-router-dom";
+import { GridItem, Text, Heading, useDisclosure, Modal, useBreakpointValue, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, AspectRatio } from "@chakra-ui/react";
 
 const spin = keyframes`
   0% { transform: rotate(0deg); }
@@ -28,7 +30,7 @@ const MainContainer = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background-color: rgb(255, 255, 255); /* Light warm color */
+  background-color: rgb(255, 255, 255);
   min-height: 100vh;
   padding: 20px;
   font-family: 'Poppins', sans-serif;
@@ -93,7 +95,7 @@ const TopContainer = styled.div`
   }
 `;
 
-const Heading = styled.h1`
+const VHeading = styled.h1`
   font-size: 2em;
   color: #2c3e50;
   margin-bottom: 20px;
@@ -189,13 +191,11 @@ const Button = styled.button`
   transition: background-color 0.3s ease;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   width: 100%;
-
-  @media (min-width: 768px) {
-    width: auto;
-  }
-
   &:hover {
     background-color: rgb(96, 53, 197);
+  }
+  @media (min-width: 768px) {
+    width: auto;
   }
 `;
 
@@ -215,6 +215,11 @@ const EmotionFrame = styled.div`
   align-items: center;
   justify-content: center;
   text-align: center;
+  padding: 23px;
+  background-color: #f8f9fa;
+  border-radius: 12px;
+  border-left: 6px solid rgb(158, 124, 238);
+  border-right: 6px solid rgb(158, 124, 238);
 `;
 
 const Image = styled.img`
@@ -226,8 +231,9 @@ const Image = styled.img`
 `;
 
 const EmotionText = styled.p`
-  font-size: 20px;
+  font-size: 18px;
   color: #333;
+  line-height: 1.8;
 `;
 
 const HiddenInput = styled.input`
@@ -236,7 +242,8 @@ const HiddenInput = styled.input`
 
 const VideoSection = styled.div`
   margin-top: 20px;
-  width: 100%;
+  width: 90%;
+  max-width: 1300px;
 `;
 
 const VideoGrid = styled.div`
@@ -255,8 +262,13 @@ const VideoCard = styled.div`
   align-items: center;
   background-color: white;
   padding: 15px;
+  height: 100%;
   border-radius: 8px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  &:hover {
+    transform: translateY(-5px);
+  }
 `;
 
 const Thumbnail = styled.img`
@@ -274,16 +286,64 @@ const VideoTitle = styled.h4`
   color: #333;
 `;
 
-const VideoLink = styled.a`
-  text-decoration: none;
-  color: #4b9cdf;
-  font-weight: bold;
+const GamesMusicContainer = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  margin-top: 20px;
+  gap: 15px;
+  justify-content: center;
+  align-items: center;
+
+  @media (min-width: 768px) {
+    flex-direction: row;
+  }
+`;
+
+const NavButton = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+  padding: 25px;
+  width: 110%;
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  height: 50%;
+  border: 2px solid #e8e8e8;
+
   &:hover {
-    text-decoration: underline;
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  }
+
+  @media (min-width: 768px) {
+    width: 580px;
+  }
+`;
+
+const VideoLink = styled.button`
+  text-decoration: none;
+  color: rgb(0, 0, 0);
+  font-weight: bold;
+  padding: 8px 20px;
+  border: 1.5px solid rgb(158, 124, 238);
+  border-radius: 20px;
+  transition: all 0.3s ease;
+  background: none;
+  cursor: pointer;
+
+  &:hover {
+    background-color: rgb(158, 124, 238);
+    color: white;
   }
 `;
 
 const VideoPage = () => {
+  const navigate = useNavigate();
   const videoRef = useRef(null);
   const [videoBlob, setVideoBlob] = useState(null);
   const [recording, setRecording] = useState(false);
@@ -297,6 +357,9 @@ const VideoPage = () => {
   const mediaRecorderRef = useRef(null);
   const recordedChunks = useRef([]);
   const fileInputRef = useRef(null);
+  const [selectedVideo, setSelectedVideo] = useState(null);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const modalSize = useBreakpointValue({ base: "full", md: "xl", lg: "2xl" });
 
   useEffect(() => {
     let interval;
@@ -310,71 +373,82 @@ const VideoPage = () => {
     return () => clearInterval(interval);
   }, [recording]);
 
-  // Array of 10 YouTube videos
   const youtubeVideos = [
     {
       id: 1,
       title: "3-Minute Stress Management: Reduce Stress With This Short Activity",
       url: "https://youtu.be/grfXR6FAsI8?si=Npm8XkqaYLTKe0Tz",
+      embedUrl: "https://www.youtube.com/embed/grfXR6FAsI8",
       thumbnail: "https://img.youtube.com/vi/grfXR6FAsI8/0.jpg",
     },
     {
       id: 2,
-      title: "How to protect your brain from stress | Niki Korteweg | TEDxAmsterdamWomen",
+      title:
+        "How to protect your brain from stress | Niki Korteweg | TEDxAmsterdamWomen",
       url: "https://youtu.be/Nz9eAaXRzGg?si=B8RAdhiWiRo9CeAL",
+      embedUrl: "https://www.youtube.com/embed/Nz9eAaXRzGg",
       thumbnail: "https://img.youtube.com/vi/Nz9eAaXRzGg/0.jpg",
     },
     {
       id: 3,
-      title: "How stress is killing us (and how you can stop it). | Thijs Launspach | TEDxUniversiteitVanAmsterdam",
+      title:
+        "How stress is killing us (and how you can stop it). | Thijs Launspach | TEDxUniversiteitVanAmsterdam",
       url: "https://youtu.be/NyyPZJrDfkM?si=U0eZ_3Yl13hRd8fa",
+      embedUrl: "https://www.youtube.com/embed/NyyPZJrDfkM",
       thumbnail: "https://img.youtube.com/vi/NyyPZJrDfkM/0.jpg",
     },
     {
       id: 4,
       title: "Stress relief tips",
       url: "https://youtu.be/Q0m6MB7Dr30?si=DFjyiUFOp2imZULm",
+      embedUrl: "https://www.youtube.com/embed/Q0m6MB7Dr30",
       thumbnail: "https://img.youtube.com/vi/Q0m6MB7Dr30/0.jpg",
     },
     {
       id: 5,
       title: "Hack for Headaches & Stress",
       url: "https://youtube.com/shorts/_IfbUjoFdkk?si=Lb0-3tPn2vyCSwsn",
+      embedUrl: "https://www.youtube.com/embed/_IfbUjoFdkk",
       thumbnail: "https://img.youtube.com/vi/_IfbUjoFdkk/0.jpg",
     },
     {
       id: 6,
       title: "Instant Anxiety Relief Point on Your Body | Dr. Meghana Dikshit",
       url: "https://youtube.com/shorts/QPyNeGHlMao?si=y_IPkrmy9lKGARRi",
+      embedUrl: "https://www.youtube.com/embed/QPyNeGHlMao",
       thumbnail: "https://img.youtube.com/vi/QPyNeGHlMao/0.jpg",
     },
     {
       id: 7,
       title: "The Science of Stress & How to Reduce It 5 Minute Stress Relief",
       url: "https://youtube.com/shorts/f8BqU9wUbP0?si=PsZU0MSumvWHCGok",
+      embedUrl: "https://www.youtube.com/embed/f8BqU9wUbP0",
       thumbnail: "https://img.youtube.com/vi/f8BqU9wUbP0/0.jpg",
     },
     {
       id: 8,
-      title: "Reduce stress and anxiety with these mind-quieting tips | How to stop overthinking | Anxiety relief",
+      title:
+        "Reduce stress and anxiety with these mind-quieting tips | How to stop overthinking | Anxiety relief",
       url: "https://youtu.be/bsaOBWUqdCU?si=SaOP1WGjJLkZPdHP",
+      embedUrl: "https://www.youtube.com/embed/bsaOBWUqdCU",
       thumbnail: "https://img.youtube.com/vi/bsaOBWUqdCU/0.jpg",
     },
     {
       id: 9,
       title: "10 Minute Guided Imagery for Reducing Stress and Anxiety",
       url: "https://youtu.be/AbckuluEdM0?si=hc6dgs42rwCxgrpM",
+      embedUrl: "https://www.youtube.com/embed/AbckuluEdM0",
       thumbnail: "https://img.youtube.com/vi/AbckuluEdM0/0.jpg",
     },
     {
       id: 10,
       title: "10 Minute Guided Imagery Meditation | City of Hope",
       url: "https://youtu.be/t1rRo6cgM_E?si=5GRImKLS5JB--3VA",
+      embedUrl: "https://www.youtube.com/embed/t1rRo6cgM_E",
       thumbnail: "https://img.youtube.com/vi/t1rRo6cgM_E/0.jpg",
     },
   ];
 
-  // Shuffle function to randomize the order of videos
   const shuffleArray = (array) => {
     let shuffledArray = array.slice();
     for (let i = shuffledArray.length - 1; i > 0; i--) {
@@ -450,7 +524,7 @@ const VideoPage = () => {
     formData.append("file", videoBlob);
 
     try {
-      const response = await fetch("https://calmify-a-stress-reduction-space.onrender.com/api/upload_video/", {
+      const response = await fetch("http://127.0.0.1:8000/api/upload_video/", {
         method: "POST",
         body: formData,
       });
@@ -458,19 +532,18 @@ const VideoPage = () => {
       const data = await response.json();
       console.log("Response Data:", data);
 
-      // Display final stress classification
       setEmotion(data["Final Stress Decision"]);
 
       if (data["Final Stress Decision"] === "Stressed" || data["Final Stress Decision"] === "Moderate Stress") {
         const shuffledVideos = shuffleArray(youtubeVideos).slice(0, 3);
         setVideos(shuffledVideos);
-        // Extract necessary video details to store in Firebase
-      const videoSuggestions = shuffledVideos.map(video => ({
-        title: video.title,
-        url: video.url,
-      }));
-      // Save stress data along with video suggestions
-      await saveStressData("video", data["Extracted Text"], data["Final Stress Decision"], videoSuggestions);
+
+        const videoSuggestions = shuffledVideos.map(video => ({
+          title: video.title,
+          url: video.url,
+        }));
+
+        await saveStressData("video", data["Extracted Text"], data["Final Stress Decision"], videoSuggestions);
       }
 
     } catch (error) {
@@ -518,6 +591,19 @@ const VideoPage = () => {
     return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
   };
 
+  const openVideoModal = (video) => {
+    setSelectedVideo(video);
+    onOpen();
+  };
+
+  const navigateToGames = () => {
+    navigate("/games");
+  };
+
+  const navigateToMusic = () => {
+    navigate("/music");
+  };
+
   return (
     <MainContainer>
       {showMainButtons && (
@@ -526,7 +612,7 @@ const VideoPage = () => {
             <Image src={videobg} alt="Video Emotion Detection Illustration" />
           </TopContainer>
           <LeftContainer>
-            <Heading>Video Emotion Detection</Heading>
+            <VHeading>Video Emotion Detection</VHeading>
             <Description>
               Use this feature to record or upload a video. It will analyze your emotions and help reduce stress through
               personalized recommendations.
@@ -567,9 +653,13 @@ const VideoPage = () => {
             <Button onClick={handleBack}>Back</Button>
           </ButtonGroup>
         )}
+
         {isProcessing && <ProcessingSpinner />}
         {emotion && (
           <EmotionFrame>
+            <Heading size="md" mb={4} color="rgb(108, 59, 222)">
+              Recommendation Based on Your Results
+            </Heading>
             {emotion === "Stressed" || emotion === "Moderate Stress" ? (
               <EmotionText>
                 It seems you're feeling {emotion}. No worries, we're here to help you relax and feel better! Here are some videos to calm your mind.
@@ -586,25 +676,59 @@ const VideoPage = () => {
           <VideoSection>
             <VideoGrid>
               {videos.map((video) => (
-                <VideoCard key={video.id}>
-                  <Thumbnail
-                    src={video.thumbnail}
-                    alt={video.title}
-                  />
-                  <VideoTitle>{video.title}</VideoTitle>
-                  <VideoLink
-                    href={video.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Watch Video
-                  </VideoLink>
-                </VideoCard>
+                <GridItem key={video.id}>
+                  <VideoCard>
+                    <Thumbnail src={video.thumbnail} alt={video.title} />
+                    <VideoTitle>{video.title}</VideoTitle>
+                    <VideoLink onClick={() => openVideoModal(video)}>
+                      Watch Video
+                    </VideoLink>
+                  </VideoCard>
+                </GridItem>
               ))}
             </VideoGrid>
+
+            <GamesMusicContainer>
+              <GridItem>
+                <NavButton onClick={navigateToGames}>
+                  <Heading size="lg">Games</Heading>
+                  <Text mt={2}>Play stress-relief games</Text>
+                </NavButton>
+              </GridItem>
+              <GridItem>
+                <NavButton onClick={navigateToMusic}>
+                  <Heading size="lg">Music</Heading>
+                  <Text mt={2}>Listen to calming music</Text>
+                </NavButton>
+              </GridItem>
+            </GamesMusicContainer>
           </VideoSection>
         )}
       </RecordingContainer>
+
+      <Modal isOpen={isOpen} onClose={onClose} size={modalSize} isCentered>
+        <ModalOverlay backdropFilter="blur(5px)" />
+        <ModalContent>
+          <ModalHeader>{selectedVideo?.title}</ModalHeader>
+
+          <ModalBody>
+            {selectedVideo && (
+              <AspectRatio ratio={16 / 9}>
+                <iframe
+                  title={selectedVideo.title}
+                  src={selectedVideo.embedUrl}
+                  allowFullScreen
+                />
+              </AspectRatio>
+            )}
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="blue" mr={3} onClick={onClose}>
+              Close
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </MainContainer>
   );
 };
