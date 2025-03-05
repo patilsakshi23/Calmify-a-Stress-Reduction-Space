@@ -113,7 +113,7 @@ const TextPage = () => {
     setIsProcessing(true);
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/predict/text/", {
+      const response = await fetch("https://calmify-a-stress-reduction-space.onrender.com/api/predict/text/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

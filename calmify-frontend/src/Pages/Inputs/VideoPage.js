@@ -524,7 +524,7 @@ const VideoPage = () => {
     formData.append("file", videoBlob);
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/upload_video/", {
+      const response = await fetch("https://calmify-a-stress-reduction-space.onrender.com/api/upload_video/", {
         method: "POST",
         body: formData,
       });
