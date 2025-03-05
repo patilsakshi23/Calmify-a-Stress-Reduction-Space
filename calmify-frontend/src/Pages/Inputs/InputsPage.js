@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect} from "react";
 import styled from "styled-components";
 import {
   Button,
@@ -7,11 +7,14 @@ import {
   Popover,
   PopoverTrigger,
   PopoverContent,
-  PopoverHeader,
-  PopoverBody,
+  // PopoverHeader,
+  // PopoverBody,
+  // Popover,
+  // PopoverTrigger,
+  // PopoverContent,
   // PopoverFooter,
-  PopoverArrow,
-  PopoverCloseButton,
+  // PopoverArrow,
+  // PopoverCloseButton,
   // PopoverAnchor,
   AlertDialog,
   AlertDialogContent,
@@ -20,7 +23,7 @@ import {
   useDisclosure,
   AlertDialogBody,
   AlertDialogOverlay,
-  AlertDialogFooter
+  AlertDialogFooter,
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -38,13 +41,16 @@ import { auth } from "../../firebaseConfig";
 import { useAuth } from "../Authentication/AuthContext.js";
 import { getDatabase, ref, onValue } from "firebase/database";
 
-
 function InputsPage() {
   const [isOpen, setIsOpen] = useState(false);
-  const popoverRef = useRef(null);
+  // const popoverRef = useRef(null);
   const { user, setUser } = useAuth();
   const navigate = useNavigate();
-  const { isOpen: isOpen1, onOpen: onOpen1, onClose: onClose1 } = useDisclosure();
+  const {
+    isOpen: isOpen1,
+    onOpen: onOpen1,
+    onClose: onClose1,
+  } = useDisclosure();
   const cancelRef = React.useRef();
   const [ratings, setRatings] = useState({
     video: 0,
@@ -202,56 +208,57 @@ function InputsPage() {
                 />
               ) : (
                 <StaticAlert
-                  onClick={handleAlertClick}
+                  // onClick={handleAlertClick}
                   src={Alert1}
                   alt="Alert"
                 />
               )}
             </PopoverTrigger>
-            <PopoverContent ref={popoverRef} className="p-4">
-              <PopoverArrow />
-              <PopoverCloseButton />
-              <PopoverHeader className=" text-red-600">Alert!!!</PopoverHeader>
-              <PopoverBody>
-                You have been detected stress for {stressCount} times in lately
-                so we recommend you to book your appointment and contact the
-                doctor immediately!!
-                <div className="mt-4">
-                  <Button onClick={handleAlertDR} className="w-full">
-                    Contact Doctor
-                  </Button>
-                </div>
-              </PopoverBody>
-            </PopoverContent>
+            <StyledPopoverContent>
+    <CloseButton onClick={() => setIsOpen(false)}>
+      &times;
+    </CloseButton>
+    <PopoverHeader>Stress Alert</PopoverHeader>
+    <PopoverBody>
+      You have been detected as stressed {stressCount} times recently. 
+      We recommend booking an appointment with a doctor to help manage your stress levels.
+    </PopoverBody>
+    <ContactButton onClick={handleAlertDR}>
+      Contact Doctor
+    </ContactButton>
+  </StyledPopoverContent>
           </Popover>
         </AlertContainer>
 
-        <Button onClick={() => { onOpen1(); }}>Logout</Button> 
+        <Button
+          onClick={() => {
+            onOpen1();
+          }}
+        >
+          Logout
+        </Button>
 
-      <AlertDialog
-        motionPreset='slideInBottom'
-        leastDestructiveRef={cancelRef}
-        onClose={onClose1}
-        isOpen={isOpen1}
-        isCentered
-      >
-   
-        <AlertDialogOverlay />
-        <AlertDialogContent>
-          <AlertDialogHeader>Confirm Logout</AlertDialogHeader>
-          <AlertDialogCloseButton />
-          <AlertDialogBody>
-            Are you sure you want to Logout?
-          </AlertDialogBody>
-          <AlertDialogFooter>
-            <Button ref={cancelRef} onClick={onClose1}>
-              No
-            </Button>
-            <Button colorScheme='red' ml={3} onClick={handleLogout}>
-              Yes
-            </Button>
-          </AlertDialogFooter>
-        </AlertDialogContent>
+        <AlertDialog
+          motionPreset="slideInBottom"
+          leastDestructiveRef={cancelRef}
+          onClose={onClose1}
+          isOpen={isOpen1}
+          isCentered
+        >
+          <AlertDialogOverlay />
+          <AlertDialogContent>
+            <AlertDialogHeader>Confirm Logout</AlertDialogHeader>
+            <AlertDialogCloseButton />
+            <AlertDialogBody>Are you sure you want to Logout?</AlertDialogBody>
+            <AlertDialogFooter>
+              <Button ref={cancelRef} onClick={onClose1}>
+                No
+              </Button>
+              <Button colorScheme="red" ml={3} onClick={handleLogout}>
+                Yes
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
         </AlertDialog>
       </StyledNav>
 
@@ -332,6 +339,73 @@ function InputsPage() {
 export default InputsPage;
 
 // Styled Components
+
+// Custom Styled Popover Content
+const StyledPopoverContent = styled(PopoverContent)`
+  background-color: #f8f9fa;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e9ecef;
+  padding: 16px;
+  max-width: 300px;
+  
+  @media (max-width: 768px) {
+    max-width: 280px;
+    margin: 0 10px;
+  }
+`;
+
+const PopoverHeader = styled.div`
+  font-size: 18px;
+  font-weight: 700;
+  color: #d32f2f;
+  margin-bottom: 12px;
+  text-align: center;
+`;
+
+const PopoverBody = styled.div`
+  font-size: 16px;
+  color: #495057;
+  text-align: center;
+  margin-bottom: 16px;
+  line-height: 1.5;
+`;
+
+const CloseButton = styled.button`
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: #868e96;
+  cursor: pointer;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: #212529;
+  }
+`;
+
+const ContactButton = styled(Button)`
+  width: 100%;
+  background-color: #4299E1;
+  color: white;
+  border-radius: 8px;
+  padding: 10px;
+  font-weight: 600;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: #3182CE;
+  }
+
+  &:active {
+    background-color: #2C5282;
+  }
+`;
+
+
 const StyledCard = styled.div`
   width: 100%;
   max-width: 360px;

@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
-import videobg from "../../assets/videobg.jpg";
+import videobg from "../../assets/videobg.png";
 import saveStressData from "../../FirebaseUtils";
 import { useNavigate } from "react-router-dom";
 import { GridItem, Text, Heading, useDisclosure, Modal, useBreakpointValue, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, AspectRatio } from "@chakra-ui/react";

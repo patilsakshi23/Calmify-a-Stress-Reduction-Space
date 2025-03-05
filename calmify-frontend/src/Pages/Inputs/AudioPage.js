@@ -2,9 +2,10 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import microphoneImage from "../../assets/microphone.png";
 import saveStressData from "../../FirebaseUtils"; // Import utility function
+import AudioImg from "../../assets/audioimg.jpg";
 
-const YOUTUBE_API_KEY = 'AIzaSyDJmuL33cv6GiuksMNlVb6hXPp6XHItgCA'; // Replace with your YouTube API key
-const YOUTUBE_API_URL = 'https://www.googleapis.com/youtube/v3/search';
+const YOUTUBE_API_KEY = "AIzaSyDJmuL33cv6GiuksMNlVb6hXPp6XHItgCA"; // Replace with your YouTube API key
+const YOUTUBE_API_URL = "https://www.googleapis.com/youtube/v3/search";
 
 const AudioPage = () => {
   const [isRecording, setIsRecording] = useState(false);
@@ -13,13 +14,14 @@ const AudioPage = () => {
   const [transcript, setTranscript] = useState("");
   const [recognition, setRecognition] = useState(null);
   const [prediction, setPrediction] = useState("");
-  // const [feedbackGiven, setFeedbackGiven] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState(null);
   const [videos, setVideos] = useState([]); // To store fetched YouTube videos
+  const [showRecordingInterface, setShowRecordingInterface] = useState(false);
 
   useEffect(() => {
     // Initialize the Speech Recognition API
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
       const recog = new SpeechRecognition();
       recog.continuous = false;
@@ -57,14 +59,16 @@ const AudioPage = () => {
 
       // Start recording audio
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const stream = await navigator.mediaDevices.getUserMedia({
+          audio: true,
+        });
         const recorder = new MediaRecorder(stream);
-        
+
         recorder.ondataavailable = (event) => {
           setAudioBlob(event.data);
           setAudioURL(URL.createObjectURL(event.data)); // Create a URL for the audio blob
         };
-        
+
         recorder.start();
         setMediaRecorder(recorder);
       } catch (error) {
@@ -117,6 +121,45 @@ const AudioPage = () => {
     }
   };
 
+  const handleRecordAudio = () => {
+    setShowRecordingInterface(true);
+  };
+
+  const handleUploadAudio = () => {
+    // Implement audio upload functionality
+    alert("Audio upload functionality to be implemented");
+  };
+
+  // If not showing recording interface, render the initial page
+  if (!showRecordingInterface) {
+    return (
+      <PageContainer>
+        <ContentContainer>
+          <TextSection>
+            <Title>Audio Emotion Detection</Title>
+            <Description>
+              Use this feature to record or upload an audio clip. It will
+              analyze your emotions and help reduce stress through personalized
+              recommendations.
+            </Description>
+            <ButtonContainer>
+              <PrimaryButton onClick={handleRecordAudio}>
+                Record Audio
+              </PrimaryButton>
+              <SecondaryButton onClick={handleUploadAudio}>
+                Upload Audio
+              </SecondaryButton>
+            </ButtonContainer>
+          </TextSection>
+          <IllustrationSection>
+            <Illustration src={AudioImg} alt="Audio Emotion Detection" />
+          </IllustrationSection>
+        </ContentContainer>
+      </PageContainer>
+    );
+  }
+
+  // Existing recording interface
   return (
     <AudioPageContainer>
       <AudioHeading>Start Recording</AudioHeading>
@@ -126,7 +169,11 @@ const AudioPage = () => {
           onClick={toggleRecording}
           image={microphoneImage}
         >
-          {isRecording ? <i className="fas fa-stop"></i> : <i className="fas fa-microphone"></i>}
+          {isRecording ? (
+            <i className="fas fa-stop"></i>
+          ) : (
+            <i className="fas fa-microphone"></i>
+          )}
         </MicrophoneButton>
       </MicrophoneButtonContainer>
 
@@ -179,13 +226,91 @@ const AudioPage = () => {
   );
 };
 
-export default AudioPage;
+// Styled Components
+const PageContainer = styled.div`
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #e6f2ff 0%, #ffffff 100%);
+  padding: 20px;
+`;
 
-// Styled Components (same as before)
+const ContentContainer = styled.div`
+  display: flex;
+  align-items: center;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  max-width: 1000px;
+  width: 100%;
+`;
 
-const AudioPreviewContainer = styled.div`
-  margin-top: 20px;
-  text-align: center;
+const TextSection = styled.div`
+  flex: 0.7;
+  padding: 40px;
+`;
+
+const Title = styled.h1`
+  font-size: 38px;
+  color: #333;
+  margin-bottom: 20px;
+`;
+
+const Description = styled.p`
+  font-size: 18px;
+  color: #666;
+  margin-bottom: 30px;
+  line-height: 1.6;
+`;
+
+const ButtonContainer = styled.div`
+  display: flex;
+  gap: 20px;
+`;
+
+const PrimaryButton = styled.button`
+  padding: 12px 24px;
+  background-color: #6c5ce7;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #5847e5;
+  }
+`;
+
+const SecondaryButton = styled.button`
+  padding: 12px 24px;
+  background-color: #e2e8f0;
+  color: #4a5568;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #cbd5e0;
+  }
+`;
+
+const IllustrationSection = styled.div`
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f7fafc;
+`;
+
+const Illustration = styled.img`
+  max-width: 100%;
+  height: auto;
 `;
 
 const AudioPageContainer = styled.div`
@@ -194,15 +319,15 @@ const AudioPageContainer = styled.div`
   align-items: center;
   justify-content: center;
   height: 100vh;
-  background-color: #f9f9f9;
+  background: linear-gradient(135deg, #e6f2ff 0%, #ffffff 100%);
   font-family: Arial, sans-serif;
 `;
 
 const AudioHeading = styled.label`
   margin-bottom: 20px;
   font-size: 30px;
-  font-weight: bold; 
-  text-align: center; 
+  font-weight: bold;
+  text-align: center;
 `;
 
 const MicrophoneButtonContainer = styled.div`
@@ -219,7 +344,7 @@ const MicrophoneButton = styled.button`
   background-color: transparent;
   border: 2px solid #a8cc9c;
   background-image: url(${(props) => props.image});
-  background-size: 60%; 
+  background-size: 60%;
   background-position: center;
   background-repeat: no-repeat;
   display: flex;
@@ -247,6 +372,30 @@ const MicrophoneButton = styled.button`
       box-shadow: 0 0 5px #ff1744;
     }
   }
+`;
+
+const AudioPreviewContainer = styled.div`
+  margin-top: 20px;
+  text-align: center;
+`;
+
+const StyledButton = styled.button`
+  padding: 10px 20px;
+  background-color: #6c5ce7;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 20px;
+
+  &:hover {
+    background-color: #5847e5;
+  }
+`;
+
+const TranscriptContainer = styled.div`
+  margin-top: 20px;
+  text-align: center;
 `;
 
 const PredictionContainer = styled.div`
@@ -291,25 +440,8 @@ const VideoTitle = styled.h4`
 
 const VideoLink = styled.a`
   text-decoration: none;
-  color: #4b9cdf;
+  color: #6c5ce7;
   font-weight: bold;
 `;
 
-const StyledButton = styled.button`
-  padding: 10px 20px;
-  background-color: #4b9cdf;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  margin-top: 20px;
-
-  &:hover {
-    background-color: #3a7dbe;
-  }
-`;
-
-const TranscriptContainer = styled.div`
-  margin-top: 20px;
-  text-align: center;
-`;
+export default AudioPage;

@@ -41,7 +41,7 @@ const doctorsData = [
     name: "Dr. Jane Smith",
     specialization: "Dermatologist",
     info: "Dr. Jane Smith is a skilled dermatologist with a focus on skin health and cosmetic procedures.",
-    email: "jane.smith@example.com",
+    email: "sakshipatil0803@gmail.com",
     contact: "987-654-3210",
     address: "456 Elm St, Anytown, USA",
     color: "green.400",
@@ -69,17 +69,83 @@ const doctorsData = [
     color: "purple.400",
     availability: "MON-THU: 8AM-7PM",
   },
-  // {
-  //   id: 5,
-  //   name: "Dr. Michael Chen",
-  //   specialization: "Psychiatrist",
-  //   info: "Dr. Michael Chen specializes in mental health counseling with expertise in anxiety, depression, and stress management.",
-  //   email: "michael.chen@example.com",
-  //   contact: "555-123-4567",
-  //   address: "789 Oak St, Anytown, USA",
-  //   color: "purple.400",
-  //   availability: "MON-THU: 8AM-7PM",
-  // },
+  {
+    id: 5,
+    name: "Dr. Michael Chen",
+    specialization: "Psychiatrist",
+    info: "Dr. Michael Chen specializes in mental health counseling with expertise in anxiety, depression, and stress management.",
+    email: "michael.chen@example.com",
+    contact: "555-123-4567",
+    address: "789 Oak St, Anytown, USA",
+    color: "purple.400",
+    availability: "MON-THU: 8AM-7PM",
+  },
+  {
+    id: 5,
+    name: "Dr. Michael Chen",
+    specialization: "Psychiatrist",
+    info: "Dr. Michael Chen specializes in mental health counseling with expertise in anxiety, depression, and stress management.",
+    email: "michael.chen@example.com",
+    contact: "555-123-4567",
+    address: "789 Oak St, Anytown, USA",
+    color: "purple.400",
+    availability: "MON-THU: 8AM-7PM",
+  },
+  {
+    id: 5,
+    name: "Dr. Michael Chen",
+    specialization: "Psychiatrist",
+    info: "Dr. Michael Chen specializes in mental health counseling with expertise in anxiety, depression, and stress management.",
+    email: "michael.chen@example.com",
+    contact: "555-123-4567",
+    address: "789 Oak St, Anytown, USA",
+    color: "purple.400",
+    availability: "MON-THU: 8AM-7PM",
+  },
+  {
+    id: 5,
+    name: "Dr. Michael Chen",
+    specialization: "Psychiatrist",
+    info: "Dr. Michael Chen specializes in mental health counseling with expertise in anxiety, depression, and stress management.",
+    email: "michael.chen@example.com",
+    contact: "555-123-4567",
+    address: "789 Oak St, Anytown, USA",
+    color: "purple.400",
+    availability: "MON-THU: 8AM-7PM",
+  },
+  {
+    id: 5,
+    name: "Dr. Michael Chen",
+    specialization: "Psychiatrist",
+    info: "Dr. Michael Chen specializes in mental health counseling with expertise in anxiety, depression, and stress management.",
+    email: "michael.chen@example.com",
+    contact: "555-123-4567",
+    address: "789 Oak St, Anytown, USA",
+    color: "purple.400",
+    availability: "MON-THU: 8AM-7PM",
+  },
+  {
+    id: 5,
+    name: "Dr. Michael Chen",
+    specialization: "Psychiatrist",
+    info: "Dr. Michael Chen specializes in mental health counseling with expertise in anxiety, depression, and stress management.",
+    email: "michael.chen@example.com",
+    contact: "555-123-4567",
+    address: "789 Oak St, Anytown, USA",
+    color: "purple.400",
+    availability: "MON-THU: 8AM-7PM",
+  },
+  {
+    id: 5,
+    name: "Dr. Michael Chen",
+    specialization: "Psychiatrist",
+    info: "Dr. Michael Chen specializes in mental health counseling with expertise in anxiety, depression, and stress management.",
+    email: "michael.chen@example.com",
+    contact: "555-123-4567",
+    address: "789 Oak St, Anytown, USA",
+    color: "purple.400",
+    availability: "MON-THU: 8AM-7PM",
+  },
 ];
 
 const getDoctorData = (doctorId) => {
@@ -93,25 +159,65 @@ const AlertDr = () => {
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
   const [stressCount, setStressCount] = useState(null);
-  const [ setLoading] = useState(true);
-  const [ setError] = useState(null);
-  const [user, setUser] = useState(null);
   const [mailSent, setMailSent] = useState(false);
   const navigate = useNavigate();
   const toast = useToast();
-
+  const [userName, setUserName] = useState({
+    firstName: "",
+    lastName: "",
+    fullName: "",
+  });
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((currentUser) => {
       if (currentUser) {
-        setUser(currentUser);
+        // Fetch user details from Realtime Database
+        const db = getDatabase();
+        const userRef = ref(db, `users/${currentUser.uid}`);
+
+        onValue(
+          userRef,
+          (snapshot) => {
+            const userData = snapshot.val();
+
+            if (userData) {
+              const firstName = userData.firstName || "";
+              const lastName = userData.lastName || "";
+
+              const fullName =
+                firstName && lastName
+                  ? `${firstName} ${lastName}`
+                  : currentUser.displayName ||
+                    currentUser.email?.split("@")[0] ||
+                    "Calmify User";
+
+              setUserName({
+                firstName,
+                lastName,
+                fullName,
+              });
+            }
+          },
+          (error) => {
+            console.error("Error fetching user profile:", error);
+            // Fallback to display name or email
+            const displayName =
+              currentUser.displayName ||
+              currentUser.email?.split("@")[0] ||
+              "Calmify User";
+            setUserName({
+              firstName: "",
+              lastName: "",
+              fullName: displayName,
+            });
+          }
+        );
+
         fetchStressCount(currentUser.uid);
-      } else {
-        setLoading(false);
       }
     });
 
     return () => unsubscribe();
-  });
+  }, []);
 
   const fetchStressCount = (userId) => {
     const db = getDatabase();
@@ -128,12 +234,9 @@ const AlertDr = () => {
         } else {
           setStressCount(0);
         }
-        setLoading(false);
       },
       (err) => {
         console.error("Firebase error:", err);
-        setError(`Error: ${err.message}`);
-        setLoading(false);
       }
     );
   };
@@ -152,8 +255,6 @@ const AlertDr = () => {
 
       toast({
         title: "Email sent successfully!",
-        description:
-          "Your stress level has been reset. Redirecting back to home...",
         status: "success",
         duration: 4000,
         isClosable: true,
@@ -165,7 +266,6 @@ const AlertDr = () => {
       }, 4000);
     } catch (err) {
       console.error("Error resetting stress count:", err);
-      setError(`Error: ${err.message}`);
 
       toast({
         title: "Error",
@@ -193,14 +293,10 @@ const AlertDr = () => {
     const doctor = getDoctorData(doctorId);
     setDoctorEmail(doctor.email);
     setSubject(
-      `Stress Management Consultation Request - Stress Level: ${stressCount}`
+      `Stress Management Consultation Request - Detected as stressed ${stressCount} times in recent days`
     );
     setMessage(
-      `Dear ${
-        doctor.name
-      },\n\nI would like to request a consultation regarding my mental health and stress management. My recent stress levels have been concerning, and I believe I could benefit from your professional guidance.\n\nPlease let me know your available dates and times for an appointment.\n\nThank you,\n${
-        user?.displayName || "A Calmify User"
-      }`
+      `Dear ${doctor.name},\n\nI would like to request a consultation regarding my mental health and stress management. My recent stress levels have been concerning, as I have been detected as stressed ${stressCount} times in the past few days. I believe I could benefit from your professional guidance.\n\nPlease let me know your available dates and times for an appointment.\n\nThank you,\n${userName.fullName}`
     );
     document
       .getElementById("email-form")
@@ -232,8 +328,8 @@ const AlertDr = () => {
         if (newWindow.closed) {
           clearInterval(checkWindowClosed);
           resetForm();
-          if (user) {
-            resetStressCount(user.uid);
+          if (auth.currentUser) {
+            resetStressCount(auth.currentUser.uid);
           }
         }
       }, 500);
@@ -265,15 +361,11 @@ const AlertDr = () => {
         <Logo>
           <LogoImg onClick={handleBack} src={CalmifyLogo} alt="Calmify" />
         </Logo>
-        {/* <Heading as="h2" size="lg" mb={4}>
-            Request Appointment
-          </Heading> */}
       </StyledNav>
       <MainContainer>
         <Mailtemp id="email-form">
           <Heading as="h2" size="lg" mb={4}>
-           Request Appointment
-            {/* You have been detected very stressed lately we would suggest you to book and appointment with the doctor. */}
+            Request Appointment
           </Heading>
           <EmailForm>
             <FormField>
@@ -300,7 +392,7 @@ const AlertDr = () => {
               <Label htmlFor="message">Message</Label>
               <TextArea
                 id="message"
-                placeholder="Explain your concerns and request appointment..."
+                placeholder="Explain your concerns and request appointment or any doubt related to your mental health..."
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
               />
@@ -315,30 +407,33 @@ const AlertDr = () => {
           </EmailForm>
         </Mailtemp>
         <DoctorListContainer>
-          {/* <Heading as="h2" size="lg" mb={4}>
-            Available Healthcare Professionals
-          </Heading> */}
-          <Stack spacing={4}>
+          <ResponsiveStack spacing={4}>
             {doctorsData.map((doctor) => (
               <DoctorCard key={doctor.id}>
                 <Flex p={4}>
                   <Box flex="1">
-                    <Flex justify="space-between" align="center">
+                    <ResponsiveFlex justify="space-between" align="center">
                       <Heading size="md">{doctor.name}</Heading>
-                      <Badge colorScheme="blue">
+                      <Badge colorScheme="blue" mt={{ base: 2, md: 0 }}>
                         <strong>Available - </strong> {doctor.availability}
                       </Badge>
-                    </Flex>
+                    </ResponsiveFlex>
                     <Text noOfLines={2} mt={1} mb={2} fontSize="sm">
                       {doctor.info}
                     </Text>
-                    <Flex mt={3} justify="space-between" align="center">
-                      <Box>
+                    <ResponsiveFlex
+                      mt={3}
+                      justify="space-between"
+                      align="center"
+                    >
+                      <ResponsiveButtonContainer>
                         <Button
                           size="sm"
                           colorScheme="blue"
                           variant="outline"
-                          mr={2}
+                          mr={{ base: 0, md: 2 }}
+                          mb={{ base: 2, md: 0 }}
+                          width={{ base: "100%", md: "auto" }}
                           onClick={() => handleViewInfo(doctor.id)}
                         >
                           View Profile
@@ -346,18 +441,19 @@ const AlertDr = () => {
                         <Button
                           size="sm"
                           colorScheme="green"
+                          width={{ base: "100%", md: "auto" }}
                           onClick={() => handleMailDr(doctor.id)}
                           disabled={mailSent}
                         >
                           Request Appointment
                         </Button>
-                      </Box>
-                    </Flex>
+                      </ResponsiveButtonContainer>
+                    </ResponsiveFlex>
                   </Box>
                 </Flex>
               </DoctorCard>
             ))}
-          </Stack>
+          </ResponsiveStack>
         </DoctorListContainer>
       </MainContainer>
 
@@ -380,9 +476,6 @@ const AlertDr = () => {
             <Stack spacing={3}>
               <Text>{selectedDoctor?.info}</Text>
               <Divider />
-              <Text>
-                <strong>Education:</strong> {selectedDoctor?.education}
-              </Text>
               <Text>
                 <strong>Email:</strong> {selectedDoctor?.email}
               </Text>
@@ -456,22 +549,117 @@ const MainContainer = styled.div`
   }
 `;
 
+const Mailtemp = styled.div`
+  width: 100%;
+  background: white;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+
+  @media (min-width: 1024px) {
+    position: sticky;
+    top: 20px;
+    width: 450px; /* Fixed width on larger screens */
+    align-self: flex-start;
+    margin-right: 40px;
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+  }
+
+  /*
+  @media (max-width: 1023px) {
+    position: static;
+    box-shadow: none;
+    padding: 10px;
+  }*/
+`;
+
+// const MainContainer = styled.div`
+//   display: flex;
+//   flex-direction: column;
+//   padding: 20px;
+//   gap: 40px;
+//   max-width: 1200px;
+//   margin: 0 auto;
+
+//   @media (min-width: 1024px) {
+//     flex-direction: row;
+//     align-items: flex-start;
+//   }
+// `;
+
+// const DoctorListContainer = styled.div`
+//   flex: 1;
+//   width: 100%;
+//   overflow-y: auto;
+//   max-height: calc(100vh - 120px);
+//   /* margin-top: 100px */
+
+//   @media (min-width: 1024px) {
+//     max-height: none;
+//     margin-left: 120px; /* Add space between Mailtemp and DoctorListContainer */
+//   }
+// `;
+
+// const DoctorCard = styled(Card)`
+//   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+//   border: 1px solid #e2e8f0;
+
+//   &:hover {
+//     transform: translateY(-5px);
+//     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+//       0 4px 6px -2px rgba(0, 0, 0, 0.05);
+//   }
+// `;
+
+// const Mailtemp = styled.div`
+//   position: sticky;
+//   top: 20px;
+//   width: 100%;
+//   background: white;
+//   padding: 20px;
+//   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+//   z-index: 10;
+
+//   @media (min-width: 1024px) {
+//     position: static;
+//     flex: 1;
+//     padding: 0;
+//     box-shadow: none;
+//   }
+// `;
+
+// const DoctorListContainer = styled.div`
+//   flex: 1;
+//   width: 100%;
+
+//   @media (max-width: 640px) {
+//     padding: 0 10px;
+//   }
+// `;
+
 const DoctorListContainer = styled.div`
   flex: 1;
   width: 100%;
   overflow-y: auto;
   max-height: calc(100vh - 120px);
-  /* margin-top: 100px */
 
-  @media (min-width: 1024px) {
-    max-height: none;
-    margin-left: 120px; /* Add space between Mailtemp and DoctorListContainer */
+  @media (min-width: 640px) {
+    max-height: calc(100vh - 200px);
+    margin-left: 40px;
+    padding-right: 20px;
   }
 `;
 
 const DoctorCard = styled(Card)`
-  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out;
   border: 1px solid #e2e8f0;
+  margin-bottom: 16px;
+
+  @media (max-width: 640px) {
+    /* More compact layout for small screens */
+    padding: 12px;
+  }
 
   &:hover {
     transform: translateY(-5px);
@@ -480,20 +668,27 @@ const DoctorCard = styled(Card)`
   }
 `;
 
-const Mailtemp = styled.div`
-  position: sticky;
-  top: 20px;
-  width: 100%;
-  background: white;
-  padding: 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  z-index: 10;
+const ResponsiveStack = styled(Stack)`
+  @media (max-width: 640px) {
+    /* Adjust spacing for smaller screens */
+    gap: 12px;
+  }
+`;
 
-  @media (min-width: 1024px) {
-    position: static;
-    flex: 1;
-    padding: 0;
-    box-shadow: none;
+const ResponsiveFlex = styled(Flex)`
+  @media (max-width: 640px) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+`;
+
+const ResponsiveButtonContainer = styled(Box)`
+  @media (max-width: 640px) {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 10px;
+    margin-top: 12px;
   }
 `;
 
@@ -580,7 +775,7 @@ const SubmitButton = styled.button`
   transition: background-color 0.2s, transform 0.1s;
 
   &:hover:not(:disabled) {
-    background-color: #9cd9eb;
+    background-color: rgb(148, 213, 233);
     transform: translateY(-1px);
   }
 

@@ -3,11 +3,19 @@ import {
   Box,
   Button,
   Text,
-  HStack,
+  VStack,
   Heading,
   useToast,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalCloseButton,
+  ModalFooter,
   Card,
   Stack,
+  Flex,
 } from "@chakra-ui/react";
 import styled from "styled-components";
 import yoga from "../../../assets/Mindful/image_processing20200602-24882-19tmhn3.gif";
@@ -125,6 +133,7 @@ const mindfulActivities = {
 
 const Mindful = () => {
   const [selectedActivity, setSelectedActivity] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [timer, setTimer] = useState(0);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
@@ -135,7 +144,17 @@ const Mindful = () => {
     setSelectedActivity(activity);
     setCurrentStepIndex(0);
     setTimer(mindfulActivities[activity][0].duration);
+    setIsModalOpen(true);
     speak(mindfulActivities[activity][0].step);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedActivity(null);
+    setCurrentStepIndex(0);
+    setTimer(0);
+    setIsTimerRunning(false);
+    speechSynthesis.cancel();
   };
 
   const handleNextStep = () => {
@@ -152,10 +171,7 @@ const Mindful = () => {
         duration: 5000,
         isClosable: true,
       });
-      setSelectedActivity(null);
-      setCurrentStepIndex(0);
-      setTimer(0);
-      speechSynthesis.cancel();
+      handleCloseModal();
     }
   };
 
@@ -175,14 +191,6 @@ const Mindful = () => {
       setIsPaused(false);
       speechSynthesis.resume();
     }
-  };
-
-  const handleBackButton = () => {
-    setSelectedActivity(null);
-    setIsTimerRunning(false);
-    setCurrentStepIndex(0);
-    setTimer(0);
-    speechSynthesis.cancel();
   };
 
   useEffect(() => {
@@ -205,89 +213,160 @@ const Mindful = () => {
 
   return (
     <>
-      <Heading as="h2" size="2xl" mt={10} color="#404060" textAlign="center" marginTop={"100px"}>
+      <Heading 
+        as="h2" 
+        size="2xl" 
+        color="#404060" 
+        textAlign="center" 
+        marginTop="100px"
+      >
         Mindful Activity
       </Heading>
+      
       <Section>
         <LeftSection>
-          {!selectedActivity ? (
-            <Box>
-              <Text fontSize="2xl" mb={7} color="grey" textAlign="center">
-                Choose an activity
-              </Text>
-              <Stack spacing={4} align="center" width="280px">
-                {Object.keys(mindfulActivities).map((activity) => (
-                  <Card
-                    key={activity}
-                    onClick={() => handleActivitySelection(activity)}
-                    transition="all 0.5s ease-in-out"
-                    _hover={{ transform: "scale(1.1)", boxShadow: "xl" }}
-                    boxShadow="lg"
-                    borderRadius="10px"
-                    p={4}
-                    width={{ base: "100%", md: "500px" }}
-                  >
-                    <Text fontSize="2xl" textAlign="center">
-                      {activity}
-                    </Text>
-                  </Card>
-                ))}
-              </Stack>
-            </Box>
-          ) : (
-            <Box>
-              <Heading mb={4} textAlign="center">
-                {mindfulActivities[selectedActivity][0].name}
-              </Heading>
-              <Text fontSize="lg" mb={2} textAlign="center">
-                {mindfulActivities[selectedActivity][currentStepIndex].step}
-              </Text>
-              <Text fontSize="md" mb={2} textAlign="center">
-                Timer: {timer} seconds
-              </Text>
-              <HStack justifyContent="space-between" mt={4}>
-                <Button onClick={handleBackButton} colorScheme="red">
-                  Back
-                </Button>
-                {!isTimerRunning && (
-                  <Button
-                    onClick={startTimer}
-                    colorScheme="green"
-                    isDisabled={isTimerRunning}
-                  >
-                    Start
-                  </Button>
-                )}
-                {isTimerRunning && (
-                  <Button onClick={handlePauseResume} colorScheme="yellow">
-                    {isPaused ? "Resume" : "Pause"}
-                  </Button>
-                )}
-                <Button
-                  onClick={handleNextStep}
-                  isDisabled={
-                    currentStepIndex ===
-                    mindfulActivities[selectedActivity].length - 1
-                  }
-                  colorScheme="blue"
+          <Box>
+            <Text 
+              fontSize="2xl" 
+              mb={7} 
+              color="grey" 
+              textAlign="center"
+            >
+              Choose an activity
+            </Text>
+            <Stack spacing={4} align="center" width="280px">
+              {Object.keys(mindfulActivities).map((activity) => (
+                <Card
+                  key={activity}
+                  onClick={() => handleActivitySelection(activity)}
+                  transition="all 0.5s ease-in-out"
+                  _hover={{ transform: "scale(1.1)", boxShadow: "xl" }}
+                  boxShadow="lg"
+                  borderRadius="10px"
+                  p={4}
+                  width={{ base: "100%", md: "500px" }}
                 >
-                  Next
-                </Button>
-              </HStack>
-            </Box>
-          )}
+                  <Text fontSize="2xl" textAlign="center">
+                    {activity}
+                  </Text>
+                </Card>
+              ))}
+            </Stack>
+          </Box>
         </LeftSection>
 
         <RightSection>
           <Img src={yoga} alt="yoga img" />
         </RightSection>
       </Section>
+
+      {/* Modal for Mindful Activities */}
+      <Modal 
+        isOpen={isModalOpen} 
+        onClose={handleCloseModal}
+        size="xl"
+        isCentered
+      >
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader 
+            textAlign="center" 
+            fontSize="2xl" 
+            fontWeight="bold"
+            color="#404060"
+          >
+            {selectedActivity}
+          </ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <VStack 
+              spacing={6} 
+              align="center" 
+              justify="center" 
+              width="full"
+            >
+              {selectedActivity && (
+                <>
+                  {/* <Box 
+                    textAlign="center" 
+                    p={4} 
+                    borderWidth={1} 
+                    borderRadius="lg" 
+                    width="full"
+                  > */}
+                    <Text 
+                      fontSize="lg" 
+                      mb={2} 
+                      fontWeight="semibold"
+                    >
+                      {mindfulActivities[selectedActivity][currentStepIndex].step}
+                    </Text>
+                  {/* </Box> */}
+                  <Flex 
+                    width="full" 
+                    justifyContent="center" 
+                    alignItems="center"
+                  >
+                    <Text 
+                      fontSize="md" 
+                      fontWeight="medium" 
+                      color="gray.600"
+                    >
+                      Timer: {timer} seconds
+                    </Text>
+                  </Flex>
+                </>
+              )}
+            </VStack>
+          </ModalBody>
+          <ModalFooter 
+            display="flex" 
+            justifyContent="space-between" 
+            width="full"
+          >
+            {!isTimerRunning && (
+              <Button
+                onClick={startTimer}
+                colorScheme="green"
+                isDisabled={isTimerRunning}
+                flex={1}
+                mr={2}
+              >
+                Start
+              </Button>
+            )}
+            {isTimerRunning && (
+              <Button 
+                onClick={handlePauseResume} 
+                colorScheme="yellow"
+                flex={1}
+                mr={2}
+              >
+                {isPaused ? "Resume" : "Pause"}
+              </Button>
+            )}
+            <Button
+              onClick={handleNextStep}
+              isDisabled={
+                selectedActivity && 
+                currentStepIndex === 
+                mindfulActivities[selectedActivity].length - 1
+              }
+              colorScheme="blue"
+              flex={1}
+            >
+              Next
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </>
   );
 };
 
 export default Mindful;
 
+// Styled components remain the same as in the original file
 const Img = styled.img`
   width: 100%;
   height: auto;
@@ -334,7 +413,6 @@ const RightSection = styled.div`
   align-items: center;
   flex-direction: column;
   width: 100%;
-  // padding: 20px;
 
   @media (min-width: 769px) {
     order: 2;
