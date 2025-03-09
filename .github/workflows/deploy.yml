@@ -24,6 +24,7 @@ jobs:
               npm install  # Update if using a different package manager
 
       - name: Build project
+        working-directory: ./calmify-frontend # updated this as there was an error for not finding package.json
         run: npm run build  # Update if your build command is different
         env:
           REACT_APP_FIREBASE_API_KEY: ${{ secrets.REACT_APP_FIREBASE_API_KEY }}
