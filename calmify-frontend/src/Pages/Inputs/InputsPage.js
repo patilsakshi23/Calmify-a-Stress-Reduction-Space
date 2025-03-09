@@ -1,4 +1,4 @@
-import React, { useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import {
   Button,
@@ -7,15 +7,6 @@ import {
   Popover,
   PopoverTrigger,
   PopoverContent,
-  // PopoverHeader,
-  // PopoverBody,
-  // Popover,
-  // PopoverTrigger,
-  // PopoverContent,
-  // PopoverFooter,
-  // PopoverArrow,
-  // PopoverCloseButton,
-  // PopoverAnchor,
   AlertDialog,
   AlertDialogContent,
   AlertDialogCloseButton,
@@ -187,6 +178,10 @@ function InputsPage() {
 
         <AlertContainer>
           <Popover
+          
+          // backgro: rgb(255, 201, 214);
+            mt={10}
+            placement="left"
             isOpen={isOpen && stressOverloaded}
             onClose={() => setIsOpen(false)}
           >
@@ -214,19 +209,18 @@ function InputsPage() {
                 />
               )}
             </PopoverTrigger>
-            <StyledPopoverContent>
-    <CloseButton onClick={() => setIsOpen(false)}>
-      &times;
-    </CloseButton>
-    <PopoverHeader>Stress Alert</PopoverHeader>
-    <PopoverBody>
-      You have been detected as stressed {stressCount} times recently. 
-      We recommend booking an appointment with a doctor to help manage your stress levels.
-    </PopoverBody>
-    <ContactButton onClick={handleAlertDR}>
-      Contact Doctor
-    </ContactButton>
-  </StyledPopoverContent>
+            <StyledPopoverContent mt={5}>
+              <CloseButton onClick={() => setIsOpen(false)}>
+                &times;
+              </CloseButton>
+              <PopoverHeader>Stress Alert</PopoverHeader>
+              <PopoverBody>
+                Stressed {stressCount} times! Time to check in with a doctor!
+              </PopoverBody>
+              <ContactButton onClick={handleAlertDR}>
+                Contact Doctor
+              </ContactButton>
+            </StyledPopoverContent>
           </Popover>
         </AlertContainer>
 
@@ -344,28 +338,27 @@ export default InputsPage;
 const StyledPopoverContent = styled(PopoverContent)`
   background-color: #f8f9fa;
   border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 20px rgba(32, 32, 34, 0.1);
   border: 1px solid #e9ecef;
   padding: 16px;
-  max-width: 300px;
-  
-  @media (max-width: 768px) {
-    max-width: 280px;
-    margin: 0 10px;
-  }
+  width: 500px;
+  // margintop: "40px" @media (max-width: 768px) {
+  //   max-width: 280px;
+  //   margin: 0 10px;
+  // }
 `;
 
 const PopoverHeader = styled.div`
-  font-size: 18px;
+  font-size: 23px;
   font-weight: 700;
-  color: #d32f2f;
+  color: rgb(47, 47, 211);
   margin-bottom: 12px;
   text-align: center;
 `;
 
 const PopoverBody = styled.div`
   font-size: 16px;
-  color: #495057;
+  color: rgb(83, 84, 84);
   text-align: center;
   margin-bottom: 16px;
   line-height: 1.5;
@@ -389,7 +382,7 @@ const CloseButton = styled.button`
 
 const ContactButton = styled(Button)`
   width: 100%;
-  background-color: #4299E1;
+  background-color: rgb(194, 227, 255);
   color: white;
   border-radius: 8px;
   padding: 10px;
@@ -397,14 +390,13 @@ const ContactButton = styled(Button)`
   transition: background-color 0.2s ease;
 
   &:hover {
-    background-color: #3182CE;
+    background-color: rgb(0, 90, 174);
   }
 
   &:active {
-    background-color: #2C5282;
+    background-color: rgb(214, 233, 255);
   }
 `;
-
 
 const StyledCard = styled.div`
   width: 100%;
@@ -516,7 +508,6 @@ const AlertContainer = styled.div`
   display: flex;
   align-items: center;
   margin-right: 40px;
-
   @media (max-width: 768px) {
     margin-left: 10px;
     // margin-right: 10px;

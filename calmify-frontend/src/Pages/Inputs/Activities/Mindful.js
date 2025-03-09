@@ -218,8 +218,7 @@ const Mindful = () => {
         size="2xl" 
         color="#404060" 
         textAlign="center" 
-        marginTop="100px"
-      >
+        marginTop="100px">
         Mindful Activity
       </Heading>
       
@@ -230,8 +229,7 @@ const Mindful = () => {
               fontSize="2xl" 
               mb={7} 
               color="grey" 
-              textAlign="center"
-            >
+              textAlign="center">
               Choose an activity
             </Text>
             <Stack spacing={4} align="center" width="280px">

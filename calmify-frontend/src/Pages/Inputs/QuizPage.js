@@ -22,8 +22,7 @@ import {
   AspectRatio,
   useBreakpointValue,
   Center,
-  // Container,
-  // Flex,
+  HStack,
 } from "@chakra-ui/react";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
@@ -214,6 +213,9 @@ const QuizPage = () => {
   const [selectedVideo, setSelectedVideo] = useState(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { user } = useAuth();
+  
+  // Track question answers to allow going back
+  const [questionAnswers, setQuestionAnswers] = useState({});
 
   // Responsive layout adjustments
   const gridColumns = useBreakpointValue({ base: "1fr", md: "repeat(2, 1fr)" });
@@ -231,15 +233,46 @@ const QuizPage = () => {
       (option) => option.text === selectedOption
     )?.score;
 
+    // Save the current question's answer
+    setQuestionAnswers((prev) => ({
+      ...prev,
+      [currentQuestion]: selectedOption,
+    }));
+    
     setResponses((prev) => ({ ...prev, [question.question]: selectedOption }));
     setScore((prevScore) => prevScore + selectedScore);
-    setSelectedOption(null);
-
+    
     if (currentQuestion < questions.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
+      // Set the selected option for the next question if it was previously answered
+      setSelectedOption(questionAnswers[currentQuestion + 1] || null);
     } else {
       setIsFinished(true);
     }
+  };
+  
+  const handleBack = () => {
+    if (currentQuestion === 0) return;
+    
+    window.speechSynthesis.cancel();
+    
+    // Subtract the score from the current question
+    const currentQuestionObj = questions[currentQuestion];
+    const currentAnswer = questionAnswers[currentQuestion];
+    
+    if (currentAnswer) {
+      const currentScore = currentQuestionObj.options.find(
+        (option) => option.text === currentAnswer
+      )?.score || 0;
+      
+      setScore((prevScore) => prevScore - currentScore);
+    }
+    
+    // Go back to the previous question
+    setCurrentQuestion(currentQuestion - 1);
+    
+    // Set the selected option to what was previously selected for this question
+    setSelectedOption(questionAnswers[currentQuestion - 1] || null);
   };
 
   const openVideoModal = (video) => {
@@ -252,9 +285,17 @@ const QuizPage = () => {
       const result = calculateMood(score);
       setMood(result);
 
-      // Always generate videos for the 2x2 grid
-      const shuffledVideos = shuffleArray(youtubeVideos).slice(0, 2);
-      setVideos(shuffledVideos);
+      // Generate videos for the 2x2 grid only if moderately or highly stressed
+      if (
+        result.mood === "Moderately Stressed" ||
+        result.mood === "Highly Stressed"
+      ) {
+        const shuffledVideos = shuffleArray(youtubeVideos).slice(0, 2);
+        setVideos(shuffledVideos);
+      } else {
+        // For relaxed users, set empty videos array
+        setVideos([]);
+      }
 
       // Fade out background
       setShowBackground(false);
@@ -269,11 +310,12 @@ const QuizPage = () => {
             const userRef = ref(db, `users/${user.uid}/input/quiz`);
             const stressRef = ref(db, `users/${user.uid}/input/stress_count`);
 
-            // Extract video details for saving
-            const videoSuggestions = shuffledVideos.map((video) => ({
-              title: video.title,
-              url: video.url,
-            }));
+            // Extract video details for saving if stressed
+            const videoSuggestions = result.mood !== "Relaxed" ? 
+              shuffleArray(youtubeVideos).slice(0, 2).map((video) => ({
+                title: video.title,
+                url: video.url,
+              })) : [];
 
             const newResponse = {
               ...responses,
@@ -294,7 +336,6 @@ const QuizPage = () => {
             // Save stress data along with video suggestions
             await saveStressData(videoSuggestions);
           };
-
           saveQuizData();
         }
       }
@@ -347,8 +388,8 @@ const QuizPage = () => {
             width="full"
             mt="1px"
             p={{ base: 4, md: 6 }}
-            borderRadius="xl"
-            boxShadow="lg"
+            borderRadius="20px"
+            boxShadow=" 0 5px 15px rgba(0, 0, 0, 0.1)"
           >
             <Center mb={6}>
               <LogoContainer>
@@ -363,8 +404,8 @@ const QuizPage = () => {
             </Center>
 
             {!isStarted ? (
-              <VStack spacing={8} justify="center" height="full" mt={10}>
-                <Text textAlign="center" fontSize="lg" maxW="md" mx="auto">
+              <VStack spacing={8} height="full" mt={20}>
+                <Text textAlign="center" fontSize="xl" maxW="md" mx="auto">
                   This quiz will help assess your current stress levels and
                   provide personalized suggestions.
                 </Text>
@@ -411,8 +452,8 @@ const QuizPage = () => {
                   <Stack
                     spacing={6}
                     direction="column"
-                    alignItems="flex-start"
-                    justifyContent="center"
+                    alignItems="center"
+                    justify="center"
                     width="full"
                   >
                     {questions[currentQuestion].options.map((option, index) => (
@@ -420,6 +461,7 @@ const QuizPage = () => {
                         key={index}
                         value={option.text}
                         width="full"
+                        justifyContent="center"
                         colorScheme="purple"
                         size="lg"
                       >
@@ -428,21 +470,46 @@ const QuizPage = () => {
                     ))}
                   </Stack>
                 </RadioGroup>
-                <Button
-                  onClick={handleNext}
-                  isDisabled={selectedOption === null}
-                  color="white"
-                  bgColor="#8869e1"
-                  width={{ base: "full", md: "60%" }}
-                  maxW="md"
-                  py={6}
-                  borderRadius="full"
-                  _hover={{ bgColor: "#7559d1", transform: "translateY(-2px)" }}
-                  transition="all 0.3s ease"
-                  boxShadow="md"
+                
+                {/* Navigation buttons in a flex container */}
+                <HStack 
+                  width={{ base: "full", md: "60%" }} 
+                  maxW="md" 
+                  spacing={4} 
+                  justify="center"
                 >
-                  {currentQuestion === questions.length - 1 ? "Finish" : "Next"}
-                </Button>
+                  {/* Back button */}
+                  <Button
+                    onClick={handleBack}
+                    isDisabled={currentQuestion === 0}
+                    color="white"
+                    bgColor="#9e7cee"
+                    flex="1"
+                    py={6}
+                    borderRadius="full"
+                    _hover={{ bgColor: "#8f6ddf", transform: "translateY(-2px)" }}
+                    transition="all 0.3s ease"
+                    boxShadow="md"
+                  >
+                    Back
+                  </Button>
+                  
+                  {/* Next/Finish button */}
+                  <Button
+                    onClick={handleNext}
+                    isDisabled={selectedOption === null}
+                    color="white"
+                    bgColor="#8869e1"
+                    flex="1"
+                    py={6}
+                    borderRadius="full"
+                    _hover={{ bgColor: "#7559d1", transform: "translateY(-2px)" }}
+                    transition="all 0.3s ease"
+                    boxShadow="md"
+                  >
+                    {currentQuestion === questions.length - 1 ? "Finish" : "Next"}
+                  </Button>
+                </HStack>
               </VStack>
             ) : (
               <VStack spacing={8} justify="center" height="full" mt={4}>
@@ -461,7 +528,9 @@ const QuizPage = () => {
                     >
                       <CircularProgressbar
                         value={(score / (questions.length * 4)) * 100}
-                        text={`${score}`}
+                        text={`${Math.round(
+                          (score / (questions.length * 4)) * 100
+                        )}%`}
                         styles={buildStyles({
                           textSize: "20px",
                           fontWeight: "bold",
@@ -480,9 +549,6 @@ const QuizPage = () => {
                     </Text>
                   </>
                 )}
-                <Text fontSize="md" textAlign="center" color="gray.600">
-                  Total Score: {score}/{questions.length * 4}
-                </Text>
                 <Button
                   onClick={() => window.location.reload()}
                   colorScheme="purple"
@@ -514,41 +580,48 @@ const QuizPage = () => {
             <ResultsContainer>
               {mood && (
                 <EmotionFrame>
-                  <Heading size="md" mb={4} color="#4B9CDF">
+                  <Heading size="md" mb={4} color="rgb(108, 59, 222)">
                     Recommendation Based on Your Results
                   </Heading>
                   <EmotionText>
                     {mood.mood === "Moderately Stressed" ||
-                    mood.mood === "Highly Stressed"
-                      ? `It seems you're feeling ${mood.mood}. No worries, we're here to help you relax and feel better! Here are some recommendations.`
-                      : "You're doing great! Keep it up, and remember to take breaks when needed. Stay positive!"}
+                    mood.mood === "Highly Stressed" ? (
+                      <>
+                        It seems you're feeling <b>{mood.mood}</b>. No worries,
+                        we're here to help you relax and feel better! Here are
+                        some recommendations.
+                      </>
+                    ) : (
+                      "You're doing great! You can still use the games and music to improve your mood! Keep it up, and remember to take breaks when needed. Stay positive!"
+                    )}
                   </EmotionText>
                 </EmotionFrame>
               )}
 
               {isFinished && (
                 <Grid templateColumns={gridColumns} gap={6} mt={6}>
-                  {/* Top row: 2 YouTube videos */}
-                  {videos.map((video) => (
-                    <GridItem key={video.id}>
-                      <VideoCard>
-                        <Thumbnail src={video.thumbnail} alt={video.title} />
-                        <VideoTitle>{video.title}</VideoTitle>
-                        <VideoLink onClick={() => openVideoModal(video)}>
-                          Watch Video
-                        </VideoLink>
-                      </VideoCard>
-                    </GridItem>
-                  ))}
+                  {/* YouTube videos only for moderately or highly stressed users */}
+                  {(mood?.mood === "Moderately Stressed" || mood?.mood === "Highly Stressed") && 
+                    videos.map((video) => (
+                      <GridItem key={video.id}>
+                        <VideoCard>
+                          <Thumbnail src={video.thumbnail} alt={video.title} />
+                          <VideoTitle>{video.title}</VideoTitle>
+                          <VideoLink onClick={() => openVideoModal(video)}>
+                            Watch Video
+                          </VideoLink>
+                        </VideoCard>
+                      </GridItem>
+                    ))}
 
-                  {/* Bottom row: Games and Music buttons */}
-                  <GridItem>
+                  {/* Games and Music buttons for all users */}
+                  <GridItem colSpan={mood?.mood === "Relaxed" ? 1 : undefined}>
                     <NavButton onClick={navigateToGames}>
                       <Heading size="md">Games</Heading>
                       <Text mt={2}>Play stress-relief games</Text>
                     </NavButton>
                   </GridItem>
-                  <GridItem>
+                  <GridItem colSpan={mood?.mood === "Relaxed" ? 1 : undefined}>
                     <NavButton onClick={navigateToMusic}>
                       <Heading size="md">Music</Heading>
                       <Text mt={2}>Listen to calming music</Text>
@@ -579,7 +652,12 @@ const QuizPage = () => {
             )}
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme="blue" mr={3} onClick={onClose}>
+            <Button
+              colorScheme="purple"
+              justifyContent="center"
+              mr={3}
+              onClick={onClose}
+            >
               Close
             </Button>
           </ModalFooter>
@@ -638,6 +716,7 @@ const QuizContainer = styled.div`
     width: 100%;
     min-height: unset;
     margin-bottom: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
   }
 `;
 
@@ -691,8 +770,8 @@ const EmotionFrame = styled.div`
   text-align: left;
   padding: 15px;
   background-color: #f8f9fa;
-  border-radius: 12px;
-  border-left: 4px solid #4b9cdf;
+  border-radius: 20px;
+  border-left: 6px solid rgb(158, 124, 238);
 `;
 
 const VideoCard = styled.div`
@@ -701,7 +780,7 @@ const VideoCard = styled.div`
   align-items: center;
   background-color: white;
   padding: 15px;
-  border-radius: 12px;
+  border-radius: 20px;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
   height: 100%;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -733,18 +812,18 @@ const VideoTitle = styled.h4`
 
 const VideoLink = styled.button`
   text-decoration: none;
-  color: #4b9cdf;
+  color: rgb(158, 124, 238);
   font-weight: bold;
   margin-top: auto;
   padding: 8px 20px;
-  border: 1px solid #4b9cdf;
+  border: 1.5px solid rgb(158, 124, 238);
   border-radius: 20px;
   transition: all 0.3s ease;
   background: none;
   cursor: pointer;
 
   &:hover {
-    background-color: #4b9cdf;
+    background-color: rgb(158, 124, 238);
     color: white;
   }
 `;
@@ -756,7 +835,7 @@ const NavButton = styled.div`
   justify-content: center;
   background-color: white;
   padding: 25px;
-  border-radius: 12px;
+  border-radius: 20px;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
   cursor: pointer;
   transition: all 0.3s ease;
@@ -766,6 +845,6 @@ const NavButton = styled.div`
   &:hover {
     transform: translateY(-5px);
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    border-color: #4b9cdf;
+    border-color: rgb(158, 124, 238);
   }
 `;

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import styled, { keyframes } from "styled-components";
 import backgroundImage from "./../../assets/textpage.jpg"; // Import your image here
 import saveStressData from "../../FirebaseUtils";
@@ -18,6 +18,21 @@ const TextPage = () => {
   const [selectedVideo, setSelectedVideo] = useState(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const modalSize = useBreakpointValue({ base: "full", md: "xl", lg: "2xl" });
+  
+  // Refs for scrolling
+  const videoSectionRef = useRef(null);
+
+  // Effect to auto-scroll when videos are loaded
+  useEffect(() => {
+    if (videos.length > 0 && videoSectionRef.current) {
+      setTimeout(() => {
+        videoSectionRef.current.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start' 
+        });
+      }, 500); // Small delay to ensure content is rendered
+    }
+  }, [videos]);
 
   // Array of 10 YouTube videos
   const youtubeVideos = [
@@ -217,7 +232,7 @@ const TextPage = () => {
       )}
 
       {videos.length > 0 && (
-        <VideoSection>
+        <VideoSection ref={videoSectionRef}>
           <VideoGrid>
             {videos.map((video) => (
               <GridItem key={video.id}>
@@ -336,6 +351,7 @@ const VideoSection = styled.div`
   margin-top: 20px;
   width: 90%;
   max-width: 1150px;
+  scroll-margin-top: 20px;
 `;
 
 const VideoGrid = styled.div`
