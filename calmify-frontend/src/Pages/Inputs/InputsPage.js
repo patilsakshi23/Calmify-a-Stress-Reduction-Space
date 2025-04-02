@@ -215,7 +215,7 @@ function InputsPage() {
               </CloseButton>
               <PopoverHeader>Stress Alert</PopoverHeader>
               <PopoverBody>
-                Stressed {stressCount} times! Time to check in with a doctor!
+                Stressed {stressCount} times! Time to chec k in with a doctor!
               </PopoverBody>
               <ContactButton onClick={handleAlertDR}>
                 Contact Doctor
@@ -227,8 +227,7 @@ function InputsPage() {
         <Button
           onClick={() => {
             onOpen1();
-          }}
-        >
+          }}>
           Logout
         </Button>
 

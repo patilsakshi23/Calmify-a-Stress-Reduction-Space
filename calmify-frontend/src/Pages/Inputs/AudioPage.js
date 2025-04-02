@@ -7,19 +7,19 @@ import { useAuth } from "../Authentication/AuthContext";
 import { db } from "../../firebaseConfig";
 import { ref, push, get, update } from "firebase/database";
 import { useNavigate } from "react-router-dom";
-import { 
-  useDisclosure, 
-  Modal, 
-  ModalOverlay, 
-  ModalContent, 
-  ModalHeader, 
-  ModalFooter, 
-  ModalBody, 
+import {
+  useDisclosure,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
   AspectRatio,
   GridItem,
   Text,
   Heading,
-  useBreakpointValue
+  useBreakpointValue,
 } from "@chakra-ui/react";
 
 const AudioPage = () => {
@@ -38,29 +38,32 @@ const AudioPage = () => {
   const [selectedVideo, setSelectedVideo] = useState(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const modalSize = useBreakpointValue({ base: "full", md: "xl", lg: "2xl" });
-  
+
   // Refs for scrolling
   const videoSectionRef = useRef(null);
 
-  // Array of stress relief videos 
+  // Array of stress relief videos
   const youtubeVideos = [
     {
       id: 1,
-      title: "3-Minute Stress Management: Reduce Stress With This Short Activity",
+      title:
+        "3-Minute Stress Management: Reduce Stress With This Short Activity",
       url: "https://youtu.be/grfXR6FAsI8?si=Npm8XkqaYLTKe0Tz",
       embedUrl: "https://www.youtube.com/embed/grfXR6FAsI8",
       thumbnail: "https://img.youtube.com/vi/grfXR6FAsI8/0.jpg",
     },
     {
       id: 2,
-      title: "How to protect your brain from stress | Niki Korteweg | TEDxAmsterdamWomen",
+      title:
+        "How to protect your brain from stress | Niki Korteweg | TEDxAmsterdamWomen",
       url: "https://youtu.be/Nz9eAaXRzGg?si=B8RAdhiWiRo9CeAL",
       embedUrl: "https://www.youtube.com/embed/Nz9eAaXRzGg",
       thumbnail: "https://img.youtube.com/vi/Nz9eAaXRzGg/0.jpg",
     },
     {
       id: 3,
-      title: "How stress is killing us (and how you can stop it). | Thijs Launspach | TEDxUniversiteitVanAmsterdam",
+      title:
+        "How stress is killing us (and how you can stop it). | Thijs Launspach | TEDxUniversiteitVanAmsterdam",
       url: "https://youtu.be/NyyPZJrDfkM?si=U0eZ_3Yl13hRd8fa",
       embedUrl: "https://www.youtube.com/embed/NyyPZJrDfkM",
       thumbnail: "https://img.youtube.com/vi/NyyPZJrDfkM/0.jpg",
@@ -95,7 +98,8 @@ const AudioPage = () => {
     },
     {
       id: 8,
-      title: "Reduce stress and anxiety with these mind-quieting tips | How to stop overthinking | Anxiety relief",
+      title:
+        "Reduce stress and anxiety with these mind-quieting tips | How to stop overthinking | Anxiety relief",
       url: "https://youtu.be/bsaOBWUqdCU?si=SaOP1WGjJLkZPdHP",
       embedUrl: "https://www.youtube.com/embed/bsaOBWUqdCU",
       thumbnail: "https://img.youtube.com/vi/bsaOBWUqdCU/0.jpg",
@@ -120,9 +124,9 @@ const AudioPage = () => {
   useEffect(() => {
     if (videos.length > 0 && videoSectionRef.current) {
       setTimeout(() => {
-        videoSectionRef.current.scrollIntoView({ 
-          behavior: 'smooth', 
-          block: 'start' 
+        videoSectionRef.current.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
         });
       }, 500);
     }
@@ -133,7 +137,10 @@ const AudioPage = () => {
     let shuffledArray = array.slice();
     for (let i = shuffledArray.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
-      [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
+      [shuffledArray[i], shuffledArray[j]] = [
+        shuffledArray[j],
+        shuffledArray[i],
+      ];
     }
     return shuffledArray;
   };
@@ -206,13 +213,16 @@ const AudioPage = () => {
     setIsProcessing(true);
 
     try {
-      const response = await fetch("https://calmify-a-stress-reduction-space.onrender.com/api/predict/text/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ text: transcript }),
-      });
+      const response = await fetch(
+        "https://calmify-a-stress-reduction-space.onrender.com/api/predict/text/",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ text: transcript }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -253,7 +263,12 @@ const AudioPage = () => {
           await update(stressRef, { count: currentCount + 1 });
 
           // Save stress data
-          await saveStressData("audio", transcript, "stressed", videoSuggestions);
+          await saveStressData(
+            "audio",
+            transcript,
+            "stressed",
+            videoSuggestions
+          );
         }
       }
     } catch (error) {
@@ -276,7 +291,7 @@ const AudioPage = () => {
     setSelectedVideo(video);
     onOpen();
   };
-  
+
   const navigateToGames = () => {
     navigate("/games");
   };
@@ -301,11 +316,16 @@ const AudioPage = () => {
       <PageContainer>
         <ContentContainer>
           <TextSection>
-            <Title><b>Audio</b></Title>
-            <TitleNext><b>Stress Detection</b></TitleNext>
+            <Title>
+              <b>Audio</b>
+            </Title>
+            <TitleNext>
+              <b>Stress Detection</b>
+            </TitleNext>
             <Description>
-              Share how you're feeling by speaking or uploading an audio clip. Our system will 
-              analyze your voice patterns and offer personalized stress-relief recommendations.
+              Share how you're feeling by speaking or uploading an audio clip.
+              Our system will analyze your voice patterns and offer personalized
+              stress-relief recommendations.
             </Description>
             <ButtonContainer>
               <PrimaryButton onClick={handleRecordAudio}>
@@ -327,85 +347,88 @@ const AudioPage = () => {
   // Recording interface
   return (
     <RecordingPageContainer>
-          <BackButton onClick={handleBack}>
-            <span>←</span> Back
-          </BackButton>
-          
-          <RecordingCard>
-            <CardHeader>
-              <CardTitle>Voice Stress Analysis</CardTitle>
-              <CardSubtitle>Speak naturally for 10-30 seconds for best results</CardSubtitle>
-            </CardHeader>
-    
-            <RecordingSection>
-              <RecordingStatus isRecording={isRecording}>
-                {isRecording ? "Recording..." : "Ready to record"}
-              </RecordingStatus>
-              
-              <MicrophoneButton
-                isRecording={isRecording}
-                onClick={toggleRecording}
-                image={microphoneImage}
-                title={isRecording ? "Stop recording" : "Start recording"}
-              >
-                {isRecording ? (
-                  <RecordingIcon>⬛</RecordingIcon>
-                ) : (
-                  <RecordingIcon>🎙️</RecordingIcon>
-                )}
-              </MicrophoneButton>
-              
-              <RecordingInstructions>
-                {isRecording ? "Tap to stop recording" : "Tap microphone to begin"}
-              </RecordingInstructions>
-            </RecordingSection>
-    
-            {audioBlob && (
-              <AudioPreview>
-                <PreviewLabel>Review your recording:</PreviewLabel>
-                <AudioPlayer controls>
-                  <source src={audioURL} type="audio/wav" />
-                  Your browser does not support the audio element.
-                </AudioPlayer>
-              </AudioPreview>
+      <BackButton onClick={handleBack}>
+        <span>←</span> Back
+      </BackButton>
+
+      <RecordingCard>
+        <CardHeader>
+          <CardTitle>Audio Stress Analysis</CardTitle>
+          <CardSubtitle>
+            Speak naturally for 10-30 seconds for best results
+          </CardSubtitle>
+        </CardHeader>
+
+        <RecordingSection>
+          <RecordingStatus isRecording={isRecording}>
+            {isRecording ? "Recording..." : "Ready to record"}
+          </RecordingStatus>
+
+          <MicrophoneButton
+            isRecording={isRecording}
+            onClick={toggleRecording}
+            image={microphoneImage}
+            title={isRecording ? "Stop recording" : "Start recording"}
+          >
+            {isRecording ? (
+              <RecordingIcon>⬛</RecordingIcon>
+            ) : (
+              <RecordingIcon>🎙️</RecordingIcon>
             )}
-    
-            {transcript && (
-              <TranscriptBox>
-                <TranscriptLabel>Transcription:</TranscriptLabel>
-                <TranscriptText>{transcript}</TranscriptText>
-              </TranscriptBox>
-            )}
-    
-            {audioBlob && (
-              <ActionButton 
-                onClick={handleSubmitTranscript} 
-                disabled={isProcessing}
-              >
-                {isProcessing ? "Analyzing..." : "Analyze My Voice"}
-              </ActionButton>
-            )}
-          </RecordingCard>
-          {/* </RecordingPageContainer> */}
-    
+          </MicrophoneButton>
+
+          <RecordingInstructions>
+            {isRecording ? "Tap to stop recording" : "Tap microphone to begin"}
+          </RecordingInstructions>
+        </RecordingSection>
+
+        {audioBlob && (
+          <AudioPreview>
+            <PreviewLabel>Review your recording:</PreviewLabel>
+            <AudioPlayer controls>
+              <source src={audioURL} type="audio/wav" />
+              Your browser does not support the audio element.
+            </AudioPlayer>
+          </AudioPreview>
+        )}
+
+        {transcript && (
+          <TranscriptBox>
+            <TranscriptLabel>Transcription:</TranscriptLabel>
+            <TranscriptText>{transcript}</TranscriptText>
+          </TranscriptBox>
+        )}
+
+        {audioBlob && (
+          <ActionButton
+            onClick={handleSubmitTranscript}
+            disabled={isProcessing}
+          >
+            {isProcessing ? "Analyzing..." : "Analyze My Voice"}
+          </ActionButton>
+        )}
+      </RecordingCard>
+      {/* </RecordingPageContainer> */}
 
       {/* // {isProcessing && <ProcessingSpinner />} */}
 
       {prediction !== "" && (
         <PredictionFrame>
-          <Heading size="md" mb={4} color="rgb(164, 111, 61)">
-            Your Voice Analysis Results
+          <Heading size="md" mb={4} color="rgb(87, 168, 255)">
+            Your Audio Analysis Results
           </Heading>
 
           {prediction === 1 ? (
             <PredictionText>
-              I've detected signs of stress in your voice. No worries, we're here 
-              to help you relax and feel better! Check out these videos to calm your mind.
+              I've detected signs of stress in your voice. No worries, we're
+              here to help you relax and feel better! Check out these videos to
+              calm your mind.
             </PredictionText>
           ) : (
             <PredictionText>
-              You're doing great! Your voice patterns suggest you're in a positive state.
-              Remember to maintain this balance and practice self-care regularly.
+              You're doing great! Your voice patterns suggest you're in a
+              positive state. Remember to maintain this balance and practice
+              self-care regularly.
             </PredictionText>
           )}
         </PredictionFrame>
@@ -431,14 +454,22 @@ const AudioPage = () => {
           <GamesMusicContainer>
             <GridItem>
               <NavButton onClick={navigateToGames}>
-                <Heading size="lg" color="black">Games</Heading>
-                <Text mt={2} color="black">Play stress-relief games</Text>
+                <Heading size="lg" color="black">
+                  Games
+                </Heading>
+                <Text mt={2} color="black">
+                  Play stress-relief games
+                </Text>
               </NavButton>
             </GridItem>
             <GridItem>
               <NavButton onClick={navigateToMusic}>
-                <Heading size="lg" color="black">Music</Heading>
-                <Text mt={2} color="black">Listen to calming music</Text>
+                <Heading size="lg" color="black">
+                  Music
+                </Heading>
+                <Text mt={2} color="black">
+                  Listen to calming music
+                </Text>
               </NavButton>
             </GridItem>
           </GamesMusicContainer>
@@ -494,7 +525,7 @@ const ContentContainer = styled.div`
   overflow: hidden;
   max-width: 1000px;
   width: 100%;
-  
+
   @media (min-width: 768px) {
     flex-direction: row;
   }
@@ -504,7 +535,7 @@ const TextSection = styled.div`
   flex: 1;
   padding: 40px;
   order: 2;
-  
+
   @media (min-width: 768px) {
     order: 1;
   }
@@ -518,7 +549,7 @@ const IllustrationSection = styled.div`
   // background-color: #f7fafc;
   padding: 20px;
   order: 1;
-  
+
   @media (min-width: 768px) {
     order: 2;
   }
@@ -526,7 +557,7 @@ const IllustrationSection = styled.div`
 
 const Title = styled.h1`
   font-size: 28px;
-  color: rgb(139, 193, 252);
+  color: #6c5ce7;
   // margin-bottom: 5px;
   // font-weigth: 10px;
 
@@ -536,7 +567,7 @@ const Title = styled.h1`
 `;
 
 const TitleNext = styled.h1`
-font-size: 28px;
+  font-size: 28px;
   color: rgb(36, 36, 36);
   margin-bottom: 35px;
   font-weigth: 10px;
@@ -551,7 +582,7 @@ const Description = styled.p`
   color: #555;
   margin-bottom: 30px;
   line-height: 1.6;
-  
+
   @media (min-width: 768px) {
     font-size: 18px;
   }
@@ -562,7 +593,7 @@ const ButtonContainer = styled.div`
   flex-direction: column;
   gap: 15px;
   width: 100%;
-  
+
   @media (min-width: 768px) {
     flex-direction: row;
     gap: 20px;
@@ -571,7 +602,7 @@ const ButtonContainer = styled.div`
 
 const PrimaryButton = styled.button`
   padding: 12px 24px;
-  background-color:rgb(192, 219, 248) ;
+  background-color: rgb(192, 219, 248);
   color: rgb(143, 143, 143);
   border: none;
   border-radius: 8px;
@@ -579,9 +610,9 @@ const PrimaryButton = styled.button`
   cursor: pointer;
   transition: all 0.3s ease;
   width: 100%;
-  
+
   &:hover {
-    background-color:#e6f2ff;
+    background-color: #e6f2ff;
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   }
@@ -590,16 +621,16 @@ const PrimaryButton = styled.button`
 const SecondaryButton = styled.button`
   padding: 12px 24px;
   background-color: #e6f2ff;
-  color:rgb(143, 143, 143);
+  color: rgb(143, 143, 143);
   border: none;
   border-radius: 8px;
   font-size: 16px;
   cursor: pointer;
   transition: all 0.3s ease;
   width: 100%;
-  
+
   &:hover {
-    background-color:rgb(190, 218, 248);
+    background-color: rgb(190, 218, 248);
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   }
@@ -616,9 +647,9 @@ const RecordingPageContainer = styled.div`
   flex-direction: column;
   align-items: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+  background: linear-gradient(135deg, #e6f2ff 0%, #ffffff 100%);
   padding: 40px 20px;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   position: relative;
 `;
 
@@ -688,7 +719,7 @@ const RecordingSection = styled.div`
 const RecordingStatus = styled.div`
   font-size: 18px;
   font-weight: 600;
-  color: ${props => props.isRecording ? '#e53e3e' : '#4a5568'};
+  color: ${(props) => (props.isRecording ? "#e53e3e" : "#4a5568")};
   margin-bottom: 20px;
 `;
 
@@ -697,7 +728,7 @@ const MicrophoneButton = styled.button`
   height: 120px;
   border-radius: 50%;
   border: none;
-  background-color: ${props => props.isRecording ? '#fed7d7' : '#e6fffa'};
+  background-color: ${(props) => (props.isRecording ? "#fed7d7" : "#e6fffa")};
   display: flex;
   justify-content: center;
   align-items: center;
@@ -705,7 +736,7 @@ const MicrophoneButton = styled.button`
   cursor: pointer;
   transition: all 0.3s ease;
   margin-bottom: 16px;
-  
+
   ${(props) =>
     props.isRecording &&
     `
@@ -806,7 +837,6 @@ const ActionButton = styled.button`
   }
 `;
 
-
 const PredictionFrame = styled.div`
   margin: 20px 0;
   width: 100%;
@@ -819,8 +849,8 @@ const PredictionFrame = styled.div`
   padding: 25px;
   background-color: #f8f9fa;
   border-radius: 12px;
-  border-left: 6px solid rgb(190, 152, 117);
-  border-right: 6px solid rgb(190, 152, 117);
+  border-left: 6px solid rgb(183, 217, 253);
+  border-right: 6px solid rgb(183, 217, 253);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 `;
 
@@ -839,7 +869,7 @@ const VideoSection = styled.div`
 
 const VideoSectionTitle = styled.h3`
   font-size: 24px;
-  color: rgb(164, 111, 61);
+  color: rgb(87, 168, 255);
   margin-bottom: 20px;
   text-align: center;
 `;
@@ -868,7 +898,7 @@ const VideoCard = styled.div`
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  
+
   &:hover {
     transform: translateY(-5px);
     box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
@@ -953,14 +983,14 @@ const VideoLink = styled.button`
   color: rgb(0, 0, 0);
   font-weight: bold;
   padding: 8px 20px;
-  border: 1.5px solid rgb(190, 152, 117);
+  border: 1.5px solid rgb(183, 217, 253);
   border-radius: 20px;
   transition: all 0.3s ease;
   background: none;
   cursor: pointer;
 
   &:hover {
-    background-color: rgb(190, 152, 117);
+    background-color: rgb(183, 217, 253);
     color: white;
   }
 `;
@@ -983,7 +1013,7 @@ const VideoLink = styled.button`
 const Button = styled.button`
   padding: 12px 20px;
   font-size: 16px;
-  background-color: rgb(190, 152, 117);
+  background-color: rgb(183, 217, 253);
   color: white;
   border: none;
   border-radius: 8px;
@@ -992,7 +1022,7 @@ const Button = styled.button`
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   width: 100%;
   &:hover {
-    background-color: rgb(190, 152, 117);
+    background-color: rgb(183, 217, 253);
   }
   @media (min-width: 768px) {
     width: auto;
